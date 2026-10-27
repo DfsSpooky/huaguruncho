@@ -1,0 +1,47 @@
+<div id="scenes-list-container">
+  {% for sc in scenes %}
+  <div class="scene-card {% if sc.uuid == active_scene.uuid or forloop.first and not active_scene %}active{% endif %}"
+       id="scene-card-{{ sc.uuid }}"
+       data-uuid="{{ sc.uuid }}"
+       data-seq="{{ sc.sequence }}"
+       onclick="handleSceneCardClick(this)"
+       hx-get="{% url 'admin:tourism_route_scene_inspector' route.id sc.uuid %}"
+       hx-target="#scene-inspector-panel"
+       hx-swap="innerHTML">
+    <img class="scene-thumb" src="{% if sc.panorama_image %}{{ sc.panorama_image.url }}{% else %}https://placehold.co/100x100?text=360{% endif %}" alt="{{ sc.title }}"/>
+    <div class="scene-info">
+      <div class="scene-title">{{ sc.sequence }}. {{ sc.title }}</div>
+      <div class="scene-meta">
+        {% if sc.altitude_masl %}{{ sc.altitude_masl }} m s.n.m.{% else %}Sin altitud{% endif %}
+        • {{ sc.hotspots.count }} Hotspots
+      </div>
+    </div>
+    <button type="button"
+            class="btn-delete-scene"
+            title="Eliminar escena"
+            hx-delete="{% url 'admin:tourism_route_delete_scene' route.id sc.uuid %}"
+            hx-target="#scene-card-{{ sc.uuid }}"
+            hx-swap="outerHTML swap:300ms"
+            hx-confirm="¿Estás seguro de eliminar esta escena 360°?"
+            onclick="event.stopPropagation();">
+      🗑️
+    </button>
+  </div>
+  {% empty %}
+  <div style="padding: 24px 16px; text-align: center; color: #718096; font-size: 12.5px;">
+    <div style="font-size: 28px; margin-bottom: 8px;">🏔️</div>
+    <b>No hay escenas creadas aún.</b><br>
+    <span style="font-size: 11px; color: #a0aec0;">Haz clic en el sendero del mapa para crear puntos, o pulsa el botón para auto-crear la ruta completa.</span>
+    <br><br>
+    <button type="button"
+            class="btn-studio btn-auto-nodes"
+            style="width: 100%; justify-content: center; font-size: 11.5px;"
+            hx-post="{% url 'admin:tourism_route_generate_trail_nodes' route.id %}"
+            hx-target="#scenes-list"
+            hx-swap="innerHTML"
+            hx-confirm="¿Deseas auto-generar los nodos 360° a lo largo del sendero GPX y enlazarlos en cadena Street View?">
+      ⚡ Auto-Generar Nodos GPX
+    </button>
+  </div>
+  {% endfor %}
+</div>

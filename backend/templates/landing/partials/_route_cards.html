@@ -1,0 +1,110 @@
+{% if routes %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for route in routes %}
+            <div class="apple-glass-card rounded-[28px] p-7 flex flex-col justify-between relative overflow-hidden group">
+                <!-- Sutil reflejo superior de titanio -->
+                <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                
+                <div>
+                    <!-- Header: Badge de Nivel & Distancia -->
+                    <div class="flex items-center justify-between gap-3 mb-5">
+                        {% if route.difficulty == 'facil' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Fácil • Aclimatación
+                            </span>
+                        {% elif route.difficulty == 'moderada' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Moderada • Glaciar
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Alta Cumbre (Difícil)
+                            </span>
+                        {% endif %}
+
+                        <span class="font-mono text-xs text-slate-300 bg-white/[0.06] px-2.5 py-1 rounded-full border border-white/[0.08]">
+                            {{ route.distance_km|default:"14.5" }} km
+                        </span>
+                    </div>
+
+                    <!-- Título -->
+                    <h3 class="text-xl font-bold text-white group-hover:text-apple-blue transition-colors mb-2 leading-snug">
+                        {{ route.name }}
+                    </h3>
+
+                    <!-- Descripción -->
+                    <p class="text-apple-gray text-xs sm:text-sm leading-relaxed mb-6 line-clamp-3">
+                        {{ route.description }}
+                    </p>
+
+                    <!-- Telemetría estilo Apple Workout -->
+                    <div class="grid grid-cols-3 gap-2.5 p-3.5 rounded-2xl bg-black/40 border border-white/[0.06] font-mono text-xs mb-6">
+                        <div>
+                            <span class="text-apple-gray text-[10px] block font-sans">Duración</span>
+                            <span class="font-bold text-white">~6h 00m</span>
+                        </div>
+                        <div class="border-x border-white/[0.08] px-2">
+                            <span class="text-apple-gray text-[10px] block font-sans">Desnivel +</span>
+                            <span class="font-bold text-apple-blue">+{{ route.elevation_gain_m|default:"1,280" }}m</span>
+                        </div>
+                        <div>
+                            <span class="text-apple-gray text-[10px] block font-sans">Cota Máx</span>
+                            <span class="font-bold text-apple-gold">{{ route.max_altitude_m|default:"4,680" }}m</span>
+                        </div>
+                    </div>
+
+                    <!-- Puntos de Interés / Hitos -->
+                    {% if route.points_of_interest.all %}
+                        <div class="mb-5">
+                            <span class="text-[10px] uppercase tracking-widest text-apple-gray font-semibold block mb-2 font-mono">Hitos Satelitales:</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                {% for poi in route.points_of_interest.all|slice:":3" %}
+                                    <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-white/[0.04] text-slate-300 border border-white/[0.06]">
+                                        <i data-lucide="map-pin" class="w-3 h-3 text-apple-blue"></i> {{ poi.name }}
+                                    </span>
+                                {% endfor %}
+                                {% if route.points_of_interest.count > 3 %}
+                                    <span class="text-[11px] px-2 py-1 rounded-lg bg-white/[0.03] text-apple-gray">
+                                        +{{ route.points_of_interest.count|add:"-3" }} más
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Footer con Botón Apple -->
+                <div class="pt-5 border-t border-white/[0.08] flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                        <span>Offline Ready</span>
+                    </div>
+                    
+                    <button 
+                        @click="$dispatch('open-route-modal', { name: '{{ route.name|escapejs }}', desc: '{{ route.description|escapejs }}', dist: '{{ route.distance_km }}', altMax: '{{ route.max_altitude_m }}', gain: '{{ route.elevation_gain_m }}', safety: '{{ route.safety_recommendations|escapejs }}' })"
+                        class="px-4 py-2 rounded-full bg-white text-black hover:bg-neutral-200 text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 shadow-sm">
+                        <span>Ver Ficha Pro</span>
+                        <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="apple-glass-card rounded-[32px] p-12 text-center">
+        <div class="w-14 h-14 rounded-full bg-white/[0.06] flex items-center justify-center mx-auto mb-4 border border-white/10">
+            <i data-lucide="compass" class="w-7 h-7 text-apple-blue"></i>
+        </div>
+        <h4 class="text-lg font-bold text-white mb-2">No hay rutas para este criterio</h4>
+        <p class="text-xs sm:text-sm text-apple-gray max-w-sm mx-auto mb-6">
+            Selecciona otra dificultad o explora el catálogo completo de travesías.
+        </p>
+        <button 
+            hx-get="{% url 'landing:htmx-routes' %}?difficulty=all" 
+            hx-target="#routes-container" 
+            hx-swap="innerHTML"
+            class="px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs transition-all">
+            Ver Todas las Rutas
+        </button>
+    </div>
+{% endif %}

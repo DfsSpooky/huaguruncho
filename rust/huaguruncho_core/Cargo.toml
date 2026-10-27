@@ -1,0 +1,24 @@
+[package]
+name = "huaguruncho_core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Motor nativo en Rust para Huaguruncho 360: Geoespacial GPX, Paquetes Offline, EXIF y Auditoría Criptográfica Huella Cero"
+
+[lib]
+name = "huaguruncho_core"
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+blake3 = "1.5"
+hmac = "0.12"
+hex = "0.4"
+quick-xml = "0.36"
+zip = { version = "2.2", default-features = false, features = ["deflate"] }
+rayon = "1.10"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+kamadak-exif = "0.5"

@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = [
+    "huaguruncho_core",
+    "huaguruncho_server",
+]
+
+[workspace.package]
+version = "2.0.0"
+edition = "2021"
+authors = ["Proyecto Huaguruncho 360 - Huachón, Pasco, Perú"]
+license = "MIT"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = false

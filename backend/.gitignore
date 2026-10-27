@@ -1,0 +1,34 @@
+# Python / Django Backend .gitignore
+__pycache__/
+*.py[cod]
+*$py.class
+*.so.bak
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Sensitive Environment Variables
+.env
+.env.*
+!.env.example
+
+# Local SQLite Database
+*.sqlite3
+*.sqlite3-journal
+
+# Django Collected Static & Generated Media Packages
+staticfiles/
+media/offline_packages/
+media/reports/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+playwright-report/
+test-results/

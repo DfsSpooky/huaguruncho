@@ -1,0 +1,168 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0b1d2e;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+#viewer-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  touch-action: none;
+  cursor: grab;
+}
+
+#viewer-container:active {
+  cursor: grabbing;
+}
+
+#panorama-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#hotspots-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hotspot {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease-out;
+  z-index: 10;
+}
+
+.hotspot:active {
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+.hotspot-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.hotspot-pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: pulse-animation 2s infinite ease-out;
+  pointer-events: none;
+}
+
+.hotspot-label {
+  margin-top: 6px;
+  background-color: rgba(18, 59, 93, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #FFFFFF;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  max-width: 160px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Hotspot type variants */
+.hotspot-navigation .hotspot-icon-wrapper {
+  background-color: #2D6A4F;
+  border: 2px solid #A3E635;
+}
+.hotspot-navigation .hotspot-pulse {
+  border: 2px solid #A3E635;
+}
+
+.hotspot-information .hotspot-icon-wrapper {
+  background-color: #123B5D;
+  border: 2px solid #4A90B5;
+}
+.hotspot-information .hotspot-pulse {
+  border: 2px solid #4A90B5;
+}
+
+.hotspot-warning .hotspot-icon-wrapper {
+  background-color: #C2410C;
+  border: 2px solid #FDBA74;
+}
+.hotspot-warning .hotspot-pulse {
+  border: 2px solid #FDBA74;
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+#loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(11, 29, 46, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #4A90B5;
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #E9E2D0;
+}

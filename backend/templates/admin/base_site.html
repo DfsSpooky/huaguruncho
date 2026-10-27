@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:'HUAGURUNCHO 360 Admin' }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/huaguruncho_admin.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // If in Tour 360 Studio view, activate full-bleed mode
+  if (window.location.pathname.includes('/studio/')) {
+    document.body.classList.add('in-tour-studio');
+    const navSidebar = document.getElementById('nav-sidebar');
+    if (navSidebar) navSidebar.style.display = 'none';
+    const toggleNav = document.getElementById('toggle-nav-sidebar');
+    if (toggleNav) toggleNav.style.display = 'none';
+  }
+});
+</script>
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+  <a href="{% url 'admin:index' %}" style="display: inline-flex; align-items: center; gap: 10px;">
+    <span style="font-size: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🏔️</span>
+    <div>
+      <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 0.5px; color: #FFFFFF; line-height: 1.1;">
+        HUAGURUNCHO <span style="color: #4DD0E1;">360</span>
+      </div>
+      <div style="font-size: 11px; font-weight: 500; color: #B2DFDB; letter-spacing: 0.2px;">
+        Gestión Glaciar, Rutas & Conservación
+      </div>
+    </div>
+  </a>
+</div>
+{% endblock %}
+
+{% block userlinks %}
+  <a href="/" target="_blank" rel="noopener" style="background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px;">
+    🌐 Ver Portal
+  </a>
+  <a href="/api/docs/" target="_blank" rel="noopener" style="background: rgba(0, 131, 143, 0.35); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; color: #80DEEA !important;">
+    📄 Swagger API
+  </a>
+  {{ block.super }}
+{% endblock %}

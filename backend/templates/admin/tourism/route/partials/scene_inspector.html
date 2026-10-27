@@ -1,0 +1,100 @@
+{% if scene %}
+<div class="inspector-inner-content">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+    <div>
+      <h4 style="margin: 0; font-size: 14.5px; font-weight: 700; color: var(--google-text);">
+        {{ scene.sequence }}. {{ scene.title }}
+      </h4>
+      <div style="font-size: 11px; color: var(--google-text-secondary); margin-top: 3px;">
+        UUID: <code style="font-size: 10.5px; background: #f1f3f4; padding: 2px 4px; border-radius: 4px;">{{ scene.uuid|slice:":8" }}...</code>
+      </div>
+    </div>
+    <span class="google-chip google-chip-green" style="font-size: 11px; padding: 3px 10px;">
+      {% if scene.altitude_masl %}{{ scene.altitude_masl }}m{% else %}Sin cota{% endif %}
+    </span>
+  </div>
+
+  <!-- Formulario de Edición Rápida con HTMX -->
+  <form hx-post="{% url 'admin:tourism_route_update_scene' route.id scene.uuid %}"
+        hx-target="#scene-inspector-panel"
+        hx-swap="innerHTML">
+    {% csrf_token %}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div class="google-input-group">
+        <label>Latitud GPS</label>
+        <input type="text" name="latitude" value="{{ scene.latitude|default:'' }}" />
+      </div>
+      <div class="google-input-group">
+        <label>Longitud GPS</label>
+        <input type="text" name="longitude" value="{{ scene.longitude|default:'' }}" />
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div class="google-input-group">
+        <label>Altitud (m)</label>
+        <input type="number" name="altitude_masl" value="{{ scene.altitude_masl|default:'' }}" />
+      </div>
+      <div class="google-input-group">
+        <label>Rumbo Norte (°)</label>
+        <input type="number" step="0.1" name="heading" value="{{ scene.heading|default:0.0 }}" />
+      </div>
+    </div>
+
+    <div class="google-input-group">
+      <label>Descripción del Punto</label>
+      <textarea name="description" rows="2">{{ scene.description }}</textarea>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+      <span style="font-size: 11.5px; color: #1e8e3e; font-weight: 600;" id="save-indicator">
+        {% if updated %}✔ Guardado{% endif %}
+      </span>
+      <button type="submit" class="btn-google btn-google-primary" style="padding: 7px 16px;">
+        💾 Guardar Cambios
+      </button>
+    </div>
+  </form>
+
+  <!-- Lista de Hotspots de la Escena -->
+  <div style="margin-top: 20px; border-top: 1px solid var(--google-border); padding-top: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span style="font-size: 12.5px; font-weight: 700; color: var(--google-text);">
+        🎯 Hotspots en esta escena ({{ scene.hotspots.count }})
+      </span>
+    </div>
+
+    <div id="hotspots-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+      {% for h in scene.hotspots.all %}
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8f9fa; border: 1px solid var(--google-border); border-radius: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+          <span style="font-size: 15px;">{% if h.type == 'navigation' %}🔗{% elif h.type == 'photo_poi' %}📷{% elif h.type == 'audio_guide' %}🎧{% elif h.type == 'warning' %}⚠️{% else %}ℹ️{% endif %}</span>
+          <div style="overflow: hidden;">
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--google-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ h.title }}</div>
+            <div style="font-size: 11px; color: var(--google-text-secondary);">
+              {% if h.target_scene %}Hacia: {{ h.target_scene.title|slice:":18" }}... • {% endif %}(Yaw: {{ h.yaw|floatformat:0 }}°, Pitch: {{ h.pitch|floatformat:0 }}°)
+            </div>
+          </div>
+        </div>
+        <button type="button"
+                style="background: transparent; border: none; color: #d93025; font-size: 14px; cursor: pointer; padding: 4px; border-radius: 4px;"
+                hx-delete="{% url 'admin:tourism_route_delete_hotspot' route.id h.id %}"
+                hx-target="closest div"
+                hx-swap="outerHTML swap:200ms"
+                title="Eliminar hotspot">
+          ✕
+        </button>
+      </div>
+      {% empty %}
+      <div style="font-size: 12px; color: var(--google-text-secondary); text-align: center; padding: 12px;">
+        No hay hotspots aún. Usa el botón "🎯 Añadir Hotspot / POI".
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% else %}
+<div style="padding: 30px 20px; text-align: center; color: var(--google-text-secondary); font-size: 13px;">
+  Selecciona una escena para ver y editar sus propiedades.
+</div>
+{% endif %}

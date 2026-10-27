@@ -1,0 +1,5 @@
+-r base.txt
+gunicorn>=23.0.0
+psycopg[binary]>=3.2.1
+django-storages[s3]>=1.14.4
+whitenoise>=6.7.0

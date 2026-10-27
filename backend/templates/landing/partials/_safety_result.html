@@ -1,0 +1,111 @@
+<div class="apple-glass-card rounded-[32px] p-7 space-y-6 animate-fade-in relative overflow-hidden">
+    <!-- Reflejo superior -->
+    <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
+    <!-- Header: Diagnóstico y Nivel de Riesgo -->
+    <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/[0.08]">
+        <div>
+            <span class="text-[10px] uppercase tracking-widest text-apple-gray font-semibold font-mono block mb-1">
+                Telemetría de Oxigenación & Soroche
+            </span>
+            <div class="text-3xl font-extrabold text-white flex items-baseline gap-2">
+                <span class="font-mono text-apple-blue">{{ target_altitude }}</span>
+                <span class="text-xs font-medium text-apple-gray">m s.n.m.</span>
+            </div>
+        </div>
+
+        <!-- Badge de Riesgo Apple Watch Ultra -->
+        <div>
+            {% if risk_color == 'teal' %}
+                <div class="px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Riesgo {{ risk_level }}
+                </div>
+            {% elif risk_color == 'gold' %}
+                <div class="px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    Riesgo {{ risk_level }}
+                </div>
+            {% elif risk_color == 'orange' %}
+                <div class="px-4 py-1.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs font-semibold flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
+                    Riesgo {{ risk_level }}
+                </div>
+            {% else %}
+                <div class="px-4 py-1.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+                    Riesgo {{ risk_level }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Indicadores Biométricos estilo Apple Health -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Oxígeno Efectivo -->
+        <div class="p-5 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs text-apple-gray mb-3">
+                <span class="font-medium">O₂ Efectivo</span>
+                <i data-lucide="activity" class="w-4 h-4 text-apple-blue"></i>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-white mb-2">
+                {{ o2_effective_pct }}<span class="text-base text-apple-blue font-normal">%</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-1.5 rounded-full overflow-hidden mb-2">
+                <div class="h-full bg-gradient-to-r from-apple-blue-dark to-apple-blue rounded-full" :style="'width: ' + '{{ o2_effective_pct }}' + '%'"></div>
+            </div>
+            <span class="text-[10px] text-apple-gray font-mono">Vs. 100% a nivel del mar</span>
+        </div>
+
+        <!-- Hidratación Requerida -->
+        <div class="p-5 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs text-apple-gray mb-3">
+                <span class="font-medium">Hidratación</span>
+                <i data-lucide="droplet" class="w-4 h-4 text-cyan-400"></i>
+            </div>
+            <div class="text-3xl font-extrabold font-mono text-cyan-300 mb-2">
+                {{ recommended_water }}<span class="text-base text-apple-gray font-normal"> L/día</span>
+            </div>
+            <span class="text-[10px] text-apple-gray leading-tight">
+                Agua + electrolitos o infusión de muña andina.
+            </span>
+        </div>
+
+        <!-- Pauta de Marcha -->
+        <div class="p-5 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs text-apple-gray mb-3">
+                <span class="font-medium">Pausa de Marcha</span>
+                <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
+            </div>
+            <div class="text-sm font-bold text-white mb-1 leading-snug">
+                {{ rest_interval }}
+            </div>
+            <span class="text-[10px] text-apple-gray">
+                Cadencia: 1 paso = 1 respiración rítmica.
+            </span>
+        </div>
+    </div>
+
+    <!-- Dictamen Médico de Montaña -->
+    <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] text-xs leading-relaxed flex items-start gap-3">
+        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
+        <div>
+            <strong class="text-white block mb-0.5">Protocolo de Seguridad Oficial:</strong>
+            <p class="text-slate-300">{{ risk_advice }}</p>
+        </div>
+    </div>
+
+    <!-- Botón SOS Apple Style -->
+    <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+        <div class="flex items-center gap-2 text-xs text-apple-gray font-mono">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+            <span>Central 105 & Centro de Salud Huachón 24h</span>
+        </div>
+        <button 
+            @click="$dispatch('open-sos-modal')"
+            class="px-4 py-2 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-semibold transition-all flex items-center gap-1.5">
+            <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+            <span>Directorio de Rescate SOS</span>
+        </button>
+    </div>
+</div>

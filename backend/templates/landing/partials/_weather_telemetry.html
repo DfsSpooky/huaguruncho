@@ -1,0 +1,95 @@
+<div class="apple-glass-card rounded-[32px] p-7 relative overflow-hidden transition-all duration-300">
+    <!-- Header de la Estación -->
+    <div class="flex items-center justify-between pb-5 border-b border-white/[0.08] mb-6">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-apple-blue/10 border border-apple-blue/20 flex items-center justify-center text-apple-blue shadow-sm">
+                <i data-lucide="satellite" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-white text-base leading-tight">
+                    {{ weather_station.name|default:"Estación Huascacocha Basecamp" }}
+                </h4>
+                <p class="text-xs text-apple-gray font-mono">
+                    {{ weather_station.altitude_masl|default:"4,250" }} msnm • Telemetría Satelital Activa
+                </p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> En Vivo
+            </span>
+            <button 
+                hx-get="{% url 'landing:htmx-weather-telemetry' %}" 
+                hx-target="#weather-telemetry-container" 
+                hx-swap="innerHTML"
+                hx-indicator="#weather-loader"
+                class="p-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 hover:text-white transition-all text-xs border border-white/[0.08]"
+                title="Actualizar telemetría">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Alertas Activas (si existen) -->
+    {% if weather_alerts %}
+        <div class="mb-6 space-y-2">
+            {% for alert in weather_alerts %}
+                <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                        <span><strong>{{ alert.title }}:</strong> {{ alert.description|truncatewords:14 }}</span>
+                    </div>
+                    <span class="font-mono text-[10px] bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/20 whitespace-nowrap">
+                        Nivel {{ alert.get_severity_display|default:"Moderado" }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Rejilla de Sensores estilo Apple Weather -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 font-mono">
+        <!-- Temperatura -->
+        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-col justify-between">
+            <span class="text-[10px] text-apple-gray uppercase tracking-widest font-sans block mb-1">Temperatura</span>
+            <div class="text-3xl font-extrabold text-white flex items-baseline gap-1 my-1">
+                {{ weather_station.temp_day_celsius|default:"4.2" }}<span class="text-sm text-apple-blue font-normal">°C</span>
+            </div>
+            <span class="text-[10px] text-apple-gray font-sans block">Sensación: {{ weather_station.wind_chill_celsius|default:"-1.0" }}°C</span>
+        </div>
+
+        <!-- Viento -->
+        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-col justify-between">
+            <span class="text-[10px] text-apple-gray uppercase tracking-widest font-sans block mb-1">Viento</span>
+            <div class="text-3xl font-extrabold text-cyan-300 flex items-baseline gap-1 my-1">
+                {{ weather_station.wind_kmh|default:"18" }}<span class="text-sm text-apple-gray font-normal">km/h</span>
+            </div>
+            <span class="text-[10px] text-apple-gray font-sans block">Ráfagas: {{ weather_station.wind_gusts_kmh|default:"25" }} km/h</span>
+        </div>
+
+        <!-- Barómetro -->
+        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-col justify-between">
+            <span class="text-[10px] text-apple-gray uppercase tracking-widest font-sans block mb-1">Barómetro</span>
+            <div class="text-3xl font-extrabold text-apple-gold flex items-baseline gap-1 my-1">
+                {{ weather_station.pressure_hpa|default:"612" }}<span class="text-sm text-apple-gray font-normal">hPa</span>
+            </div>
+            <span class="text-[10px] text-apple-gray font-sans block">Humedad: {{ weather_station.humidity_percentage|default:"65" }}%</span>
+        </div>
+
+        <!-- Índice UV -->
+        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.06] flex flex-col justify-between">
+            <span class="text-[10px] text-apple-gray uppercase tracking-widest font-sans block mb-1">Índice UV</span>
+            <div class="text-3xl font-extrabold text-rose-400 flex items-baseline gap-1 my-1">
+                {{ weather_station.uv_index|default:"9.4" }}<span class="text-xs text-rose-400 font-sans font-semibold ml-1">{{ weather_station.uv_level|default:"Muy Alto" }}</span>
+            </div>
+            <span class="text-[10px] text-rose-300/80 font-sans block">FPS 50+ Obligatorio</span>
+        </div>
+    </div>
+
+    <!-- Indicador de carga HTMX -->
+    <div id="weather-loader" class="htmx-indicator absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center gap-2.5 text-xs text-apple-blue font-mono">
+        <i data-lucide="loader" class="w-4 h-4 animate-spin"></i>
+        <span>Sincronizando telemetría satelital...</span>
+    </div>
+</div>

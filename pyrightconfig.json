@@ -1,0 +1,36 @@
+{
+  "venvPath": "/Users/miguel/Documents/Proyectos/Aqui en Huaguruncho/backend",
+  "venv": ".venv",
+  "extraPaths": [
+    "/Users/miguel/Documents/Proyectos/Aqui en Huaguruncho/backend",
+    "/Users/miguel/Documents/Proyectos/Aqui en Huaguruncho/backend/apps",
+    "/Users/miguel/Documents/Proyectos/Aqui en Huaguruncho/backend/.venv/lib/python3.12/site-packages"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "extraPaths": [
+        "/Users/miguel/Documents/Proyectos/Aqui en Huaguruncho/backend",
+        "/Users/miguel/Documents/Proyectos/Aqui en Huaguruncho/backend/apps",
+        "/Users/miguel/Documents/Proyectos/Aqui en Huaguruncho/backend/.venv/lib/python3.12/site-packages"
+      ]
+    }
+  ],
+  "reportMissingTypeStubs": false,
+  "reportIncompatibleVariableOverride": false,
+  "reportIncompatibleMethodOverride": false,
+  "reportAttributeAccessIssue": false,
+  "reportGeneralTypeIssues": false,
+  "reportOptionalMemberAccess": false,
+  "reportAssignmentType": false,
+  "reportIndexIssue": false,
+  "reportArgumentType": false,
+  "reportCallIssue": false,
+  "include": [
+    "backend"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__"
+  ]
+}

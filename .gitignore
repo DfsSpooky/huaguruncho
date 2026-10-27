@@ -1,0 +1,114 @@
+# ==============================================================================
+# Huaguruncho 360 - Global .gitignore
+# ==============================================================================
+
+# --- Operating System & Editor Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+*.bak
+
+# --- IDEs & Code Editors ---
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# --- Environment Variables & Sensitive Secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+
+# --- Python / Django Backend ---
+.venv/
+venv/
+env/
+ENV/
+backend/.venv/
+backend/venv/
+backend/env/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so.bak
+
+# Django runtime, database & storage
+backend/db.sqlite3
+backend/db.sqlite3-journal
+*.sqlite3
+backend/staticfiles/
+backend/media/offline_packages/
+backend/media/reports/
+
+# Python test & lint caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+playwright-report/
+test-results/
+
+# --- Rust Engine & Server ---
+target/
+rust/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# --- Flutter / Dart Mobile ---
+.dart_tool/
+mobile/.dart_tool/
+.flutter-plugins
+mobile/.flutter-plugins
+.flutter-plugins-dependencies
+mobile/.flutter-plugins-dependencies
+.pub-cache/
+mobile/.pub-cache/
+.pub/
+mobile/.pub/
+build/
+mobile/build/
+coverage/
+mobile/coverage/
+.widget_preview/
+mobile/.widget_preview/
+app.*.symbols
+app.*.map.json
+
+# --- Android Mobile ---
+.gradle/
+**/android/.gradle/
+local.properties
+**/android/local.properties
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+**/*.keystore
+**/*.jks
+key.properties
+**/android/captures/
+**/android/.cxx/
+GeneratedPluginRegistrant.java
+**/GeneratedPluginRegistrant.java
+
+# --- iOS & macOS Mobile ---
+**/ios/Flutter/.last_build_id
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec

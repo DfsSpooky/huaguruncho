@@ -1,0 +1,38 @@
+<div class="apple-glass-card rounded-[32px] p-8 border border-emerald-500/30 text-center space-y-5 animate-fade-in shadow-2xl">
+    <!-- Icono Apple Check -->
+    <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
+        <i data-lucide="check" class="w-6 h-6"></i>
+    </div>
+
+    <div>
+        <h4 class="text-xl font-bold text-white mb-1">Acceso Anticipado Activado</h4>
+        <p class="text-xs text-apple-gray max-w-sm mx-auto">
+            Hemos registrado <strong class="text-white font-mono">{{ contact }}</strong> para la descarga directa.
+        </p>
+    </div>
+
+    <!-- QR & Download Box -->
+    <div class="p-5 rounded-2xl bg-black/60 border border-white/[0.08] flex flex-col sm:flex-row items-center justify-center gap-5">
+        <div class="p-2.5 bg-white rounded-2xl shadow-xl shrink-0">
+            <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://huaguruncho.pe/app/download" 
+                alt="QR Descarga App Huaguruncho 360" 
+                class="w-20 h-20">
+        </div>
+        <div class="text-left text-xs space-y-1.5">
+            <span class="font-bold text-white block">Escanea desde tu cámara:</span>
+            <div class="flex items-center gap-2 text-slate-300">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>Build Oficial v1.0.4 Firmada</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300">
+                <i data-lucide="smartphone" class="w-3.5 h-3.5 text-apple-blue"></i>
+                <span>Android 8.0+ / iOS 15+ TestFlight</span>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-[11px] text-apple-gray">
+        🏔️ Bienvenido al programa de <strong>Guardianes de la Cordillera</strong>.
+    </p>
+</div>

@@ -1,0 +1,15 @@
+[package]
+name = "huaguruncho_server"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Microservicio de alto rendimiento en Rust (Axum) para telemetría GPS, análisis GPX y auditoría criptográfica Huella Cero"
+
+[dependencies]
+huaguruncho_core = { path = "../huaguruncho_core" }
+axum = "0.7"
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "net", "signal"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tower-http = { version = "0.6", features = ["cors"] }

@@ -1,0 +1,1947 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static l10n %}
+
+{% block title %}Tour 360 Studio • {{ route.name }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+<!-- Pannellum CSS & JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<!-- HTMX Core -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.12/htmx.min.js"></script>
+
+<!-- Google Font: Roboto & Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --google-blue: #1a73e8;
+    --google-blue-hover: #1557b0;
+    --google-blue-surface: #e8f0fe;
+    --google-green: #1e8e3e;
+    --google-green-surface: #e6f4ea;
+    --google-yellow: #f9ab00;
+    --google-red: #d93025;
+    --google-red-surface: #fce8e6;
+    --google-text: #202124;
+    --google-text-secondary: #5f6368;
+    --google-border: #dadce0;
+    --google-bg: #f8f9fa;
+    --google-card-bg: #ffffff;
+    --google-shadow-sm: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    --google-shadow-md: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+    --google-shadow-lg: 0 2px 6px 2px rgba(60,64,67,0.15), 0 8px 24px 4px rgba(60,64,67,0.15);
+  }
+  
+  #content {
+    padding: 0 !important;
+  }
+  
+  .studio-google-app {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+    min-height: 650px;
+    background: var(--google-bg);
+    margin: 0;
+    padding: 0;
+    font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--google-text);
+    overflow: hidden;
+  }
+  
+  /* Top App Bar (Google Style) */
+  .google-top-bar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--google-border);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.08);
+    z-index: 30;
+    flex-shrink: 0;
+  }
+  
+  .top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  
+  .btn-back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--google-text-secondary);
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  .btn-back-link:hover {
+    background: #f1f3f4;
+    color: var(--google-text);
+  }
+  
+  .route-main-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--google-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .google-chip {
+    background: #f1f3f4;
+    color: var(--google-text-secondary);
+    border: 1px solid var(--google-border);
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 11.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .google-chip-blue {
+    background: var(--google-blue-surface);
+    color: var(--google-blue);
+    border-color: #d2e3fc;
+  }
+  
+  .google-chip-green {
+    background: var(--google-green-surface);
+    color: var(--google-green);
+    border-color: #ceead6;
+  }
+  
+  .top-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Google Action Buttons */
+  .btn-google {
+    background: #ffffff;
+    color: var(--google-text);
+    border: 1px solid var(--google-border);
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.05);
+  }
+  
+  .btn-google:hover {
+    background: #f8f9fa;
+    border-color: #c6c9cc;
+    color: var(--google-blue);
+    box-shadow: 0 1px 3px rgba(60,64,67,0.15);
+  }
+  
+  .btn-google-primary {
+    background: var(--google-blue);
+    color: #ffffff;
+    border-color: var(--google-blue);
+  }
+  .btn-google-primary:hover {
+    background: var(--google-blue-hover);
+    border-color: var(--google-blue-hover);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(26,115,232,0.3);
+  }
+  
+  .btn-google-tonal {
+    background: var(--google-blue-surface);
+    color: var(--google-blue);
+    border-color: #d2e3fc;
+  }
+  .btn-google-tonal:hover {
+    background: #d2e3fc;
+    color: var(--google-blue-hover);
+  }
+  
+  /* View Mode Segmented Control (Google Style) */
+  .segmented-control {
+    background: #f1f3f4;
+    border: 1px solid var(--google-border);
+    border-radius: 8px;
+    padding: 2px;
+    display: flex;
+    gap: 2px;
+  }
+  
+  .segmented-btn {
+    background: transparent;
+    color: var(--google-text-secondary);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+  
+  .segmented-btn:hover {
+    color: var(--google-text);
+  }
+  
+  .segmented-btn.active {
+    background: #ffffff;
+    color: var(--google-blue);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(60,64,67,0.15);
+  }
+  
+  /* Main Workspace Layout */
+  .studio-workspace-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+  }
+  
+  /* Left Scenes Sidebar */
+  .sidebar-scenes-panel {
+    width: 290px;
+    background: #ffffff;
+    border-right: 1px solid var(--google-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 15;
+  }
+  
+  .sidebar-scenes-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--google-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+  }
+  
+  .sidebar-scenes-header h3 {
+    margin: 0;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--google-text-secondary);
+    font-weight: 700;
+  }
+  
+  .scenes-list-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+  }
+  
+  /* Scene Card (Google Card Style) */
+  .scene-card {
+    background: #ffffff;
+    border: 1px solid var(--google-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.04);
+  }
+  
+  .scene-card:hover {
+    border-color: #bdc1c6;
+    box-shadow: 0 2px 6px rgba(60,64,67,0.1);
+    transform: translateY(-1px);
+  }
+  
+  .scene-card.active {
+    background: var(--google-blue-surface);
+    border: 1.5px solid var(--google-blue);
+    box-shadow: 0 2px 8px rgba(26,115,232,0.18);
+  }
+  
+  .scene-thumb, .scene-thumb-img {
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #e8eaed;
+    border: 1px solid rgba(0,0,0,0.06);
+    flex-shrink: 0;
+  }
+  
+  .scene-info, .scene-card-details {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .scene-title, .scene-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--google-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .scene-card.active .scene-title, .scene-card.active .scene-card-title {
+    color: var(--google-blue);
+  }
+  
+  .scene-meta, .scene-card-subtitle {
+    font-size: 11.5px;
+    color: var(--google-text-secondary);
+    margin-top: 2px;
+  }
+  
+  .btn-delete-scene, .btn-card-delete {
+    background: transparent;
+    border: none;
+    color: #9aa0a6;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-delete-scene:hover, .btn-card-delete:hover {
+    background: var(--google-red-surface);
+    color: var(--google-red);
+  }
+  
+  /* Inspector Form & Hotspots Styles */
+  .inspector-card {
+    padding: 16px;
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--google-text-secondary);
+    margin-bottom: 4px;
+  }
+  
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid var(--google-border);
+    border-radius: 8px;
+    color: var(--google-text);
+    padding: 8px 12px;
+    font-size: 12.5px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+  }
+  
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--google-blue);
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+  }
+  
+  .btn-studio {
+    background: #ffffff;
+    color: var(--google-text);
+    border: 1px solid var(--google-border);
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+  
+  .btn-primary-studio {
+    background: var(--google-blue);
+    color: #ffffff;
+    border-color: var(--google-blue);
+  }
+  .btn-primary-studio:hover {
+    background: var(--google-blue-hover);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(26,115,232,0.3);
+  }
+  
+  .hotspot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid var(--google-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    transition: all 0.15s ease;
+  }
+  .hotspot-item:hover {
+    background: #f1f3f4;
+  }
+  
+  .btn-delete-hotspot {
+    background: transparent;
+    border: none;
+    color: #9aa0a6;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    font-size: 13px;
+  }
+  .btn-delete-hotspot:hover {
+    background: var(--google-red-surface);
+    color: var(--google-red);
+  }
+  
+  /* Center Viewport Stage */
+  .studio-center-viewports {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    position: relative;
+  }
+  
+  .split-panels-wrapper {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+  }
+  
+  .stage-panel {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    transition: flex 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  #map-view {
+    width: 100%;
+    height: 100%;
+    min-height: 350px;
+    background: #e5e3df;
+  }
+  
+  #panorama-viewer {
+    width: 100%;
+    height: 100%;
+    min-height: 350px;
+    background: #111111;
+  }
+  
+  /* Google Maps Layer Switcher Floating Dock */
+  .google-map-layer-dock {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 1000;
+    background: #ffffff;
+    border: 1px solid var(--google-border);
+    border-radius: 24px;
+    padding: 3px;
+    display: flex;
+    gap: 3px;
+    box-shadow: var(--google-shadow-md);
+  }
+  
+  .map-layer-pill {
+    background: transparent;
+    color: var(--google-text-secondary);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .map-layer-pill:hover {
+    background: #f1f3f4;
+    color: var(--google-text);
+  }
+  
+  .map-layer-pill.active {
+    background: var(--google-blue-surface);
+    color: var(--google-blue);
+    font-weight: 600;
+  }
+  
+  /* Map GPS Floating Info Badge */
+  .google-gps-hud {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 1000;
+    background: #ffffff;
+    border: 1px solid var(--google-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--google-text-secondary);
+    box-shadow: var(--google-shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .google-gps-hud strong {
+    color: var(--google-blue);
+  }
+  
+  /* 360 Floating Header & Tool Controls */
+  .pano-header-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--google-border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--google-text);
+    box-shadow: var(--google-shadow-sm);
+  }
+  
+  .pano-bottom-tools {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+  }
+  
+  /* Bottom Altimetry Section */
+  .altimetry-dock {
+    height: 115px;
+    background: #ffffff;
+    border-top: 1px solid var(--google-border);
+    padding: 8px 20px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  
+  .altimetry-dock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--google-text-secondary);
+    margin-bottom: 2px;
+  }
+  
+  .altimetry-canvas-box {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+  }
+  
+  /* Right Inspector Panel */
+  .sidebar-inspector-panel {
+    width: 320px;
+    background: #ffffff;
+    border-left: 1px solid var(--google-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 15;
+    overflow-y: auto;
+  }
+  
+  .inspector-inner-content {
+    padding: 16px;
+  }
+  
+  /* Form Inputs (Google Material 3 Light) */
+  .google-input-group {
+    margin-bottom: 15px;
+  }
+  
+  .google-input-group label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--google-text);
+    margin-bottom: 6px;
+    letter-spacing: 0.15px;
+  }
+  
+  .google-input-group input[type="text"],
+  .google-input-group input[type="number"],
+  .google-input-group input[type="url"],
+  .google-input-group input[type="file"],
+  .google-input-group select,
+  .google-input-group textarea {
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid var(--google-border);
+    border-radius: 8px;
+    color: var(--google-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .google-input-group input[type="text"],
+  .google-input-group input[type="number"],
+  .google-input-group input[type="url"] {
+    height: 42px;
+    min-height: 42px;
+    padding: 9px 14px;
+  }
+
+  .google-input-group select {
+    height: 44px;
+    min-height: 44px;
+    padding: 9px 38px 9px 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    cursor: pointer;
+  }
+
+  .google-input-group select option {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    color: var(--google-text);
+    background: #ffffff;
+  }
+
+  .google-input-group textarea {
+    min-height: 80px;
+    padding: 10px 14px;
+    resize: vertical;
+  }
+
+  .google-input-group input[type="file"] {
+    padding: 8px 12px;
+    height: auto;
+    min-height: 42px;
+    background: #f8f9fa;
+    cursor: pointer;
+  }
+  
+  .google-input-group input:focus,
+  .google-input-group textarea:focus,
+  .google-input-group select:focus {
+    outline: none;
+    border-color: var(--google-blue);
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.18);
+  }
+  
+  /* Toast Notification */
+  #studio-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #202124;
+    color: #ffffff;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--google-shadow-lg);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Google Modal Styles */
+  .google-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(32, 33, 36, 0.55);
+    backdrop-filter: blur(5px);
+    z-index: 9990;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .google-modal-dialog {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22), 0 0 1px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  
+  .google-modal-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--google-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+  }
+  
+  .google-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--google-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .google-modal-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--google-text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+
+  .google-modal-close-btn:hover {
+    background: #f1f3f4;
+    color: var(--google-text);
+  }
+  
+  .google-modal-body {
+    padding: 24px;
+    max-height: 72vh;
+    overflow-y: auto;
+  }
+  
+  .google-modal-footer {
+    padding: 16px 24px;
+    background: #f8f9fa;
+    border-top: 1px solid var(--google-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="studio-google-app">
+  
+  <!-- 1. Top Google Command Bar -->
+  <div class="google-top-bar">
+    <div class="top-bar-left">
+      <a href="{% url 'admin:tourism_route_changelist' %}" class="btn-back-link" title="Volver a lista de rutas">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div>
+        <h1 class="route-main-title">
+          <span>🏔️ {{ route.name }}</span>
+        </h1>
+      </div>
+      <span class="google-chip google-chip-blue">
+        📍 {{ route.distance_km|default:'22.0' }} km • +{{ route.elevation_gain_m|default:'639' }}m D+
+      </span>
+      <span class="google-chip google-chip-green">
+        {{ route.get_difficulty_display }}
+      </span>
+    </div>
+    
+    <div class="top-bar-actions">
+      <!-- Segmented View Mode -->
+      <div class="segmented-control">
+        <button id="mode-split-btn" class="segmented-btn active" onclick="setViewMode('split')">🌓 Dividido</button>
+        <button id="mode-map-btn" class="segmented-btn" onclick="setViewMode('map')">🛰️ Mapa</button>
+        <button id="mode-pano-btn" class="segmented-btn" onclick="setViewMode('pano')">🌐 360°</button>
+      </div>
+
+      <!-- Auto-Generar Nodos GPX -->
+      <button 
+        class="btn-google btn-google-tonal"
+        hx-post="{% url 'admin:tourism_route_generate_trail_nodes' route.id %}"
+        hx-target="#scenes-list-container"
+        hx-swap="innerHTML"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        onclick="showToast('⚡ Generando y enlazando nodos 360° a lo largo del sendero GPX...')">
+        ⚡ Auto-Generar Nodos
+      </button>
+
+      <!-- Auto-Enlazar Hotspots Street View -->
+      <button 
+        class="btn-google"
+        hx-post="{% url 'admin:tourism_route_auto_link' route.id %}"
+        hx-target="#scenes-list-container"
+        hx-swap="innerHTML"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        onclick="showToast('🔗 Conectando nodos en cadena Street View...')">
+        🔗 Enlazar Nodos
+      </button>
+
+      <!-- Simulador de Recorrido Virtual -->
+      <button class="btn-google btn-google-primary" onclick="startVirtualTourSimulator()">
+        🚶 Simular Recorrido
+      </button>
+
+      <!-- Subir Nuevo GPX -->
+      <button class="btn-google" onclick="openGpxModal()">
+        📂 Reemplazar GPX
+      </button>
+
+      <!-- Exportar PDF -->
+      <a href="{% url 'admin:tourism_route_export_pdf' route.id %}" target="_blank" class="btn-google" title="Descargar Ficha Técnica">
+        📄 Ficha Técnica
+      </a>
+    </div>
+  </div>
+
+  <!-- 2. Workspace Body -->
+  <div class="studio-workspace-body">
+    
+    <!-- Left Scenes List Sidebar -->
+    <div class="sidebar-scenes-panel">
+      <div class="sidebar-scenes-header">
+        <h3>Hitos 360° (<span id="scenes-count-badge">{{ scenes.count }}</span>)</h3>
+        <button class="btn-google" style="padding: 4px 10px; font-size: 11.5px;" onclick="openNewSceneModal()">
+          + Añadir
+        </button>
+      </div>
+      <div id="scenes-list-container" class="scenes-list-scroll">
+        {% include "admin/tourism/route/partials/scenes_list.html" %}
+      </div>
+    </div>
+
+    <!-- Center Stage: Google Satellite Map & 360 Viewport -->
+    <div class="studio-center-viewports">
+      
+      <div class="split-panels-wrapper">
+        
+        <!-- Left Stage: Google Satellite Map -->
+        <div id="map-panel" class="stage-panel">
+          
+          <!-- Floating Map Layer Switcher Dock -->
+          <div class="google-map-layer-dock">
+            <button id="layer-hybrid-btn" class="map-layer-pill active" onclick="switchMapLayer('google-hybrid')">
+              🛰️ Google Híbrido
+            </button>
+            <button id="layer-terrain-btn" class="map-layer-pill" onclick="switchMapLayer('google-terrain')">
+              🏔️ Google Relieve
+            </button>
+            <button id="layer-osm-btn" class="map-layer-pill" onclick="switchMapLayer('osm')">
+              🗺️ OpenStreetMap
+            </button>
+            <button id="layer-topo-btn" class="map-layer-pill" onclick="switchMapLayer('opentopo')">
+              📐 Topográfico
+            </button>
+          </div>
+
+          <!-- Leaflet Interactive Container -->
+          <div id="map-view"></div>
+
+          <!-- Live GPS Coordinate HUD -->
+          <div id="map-coords-hud" class="google-gps-hud">
+            <span>📍 Coordenadas: <strong id="hud-lat">-10.5489</strong>, <strong id="hud-lng">-75.9541</strong></span>
+          </div>
+        </div>
+
+        <!-- Right Stage: Pannellum 360 Panorama -->
+        <div id="pano-panel" class="stage-panel">
+          <div id="active-scene-badge" class="pano-header-badge">
+            1. Plaza Mayor de Huachón (Punto de Partida)
+          </div>
+
+          <div class="pano-bottom-tools">
+            <button class="btn-google" style="background: #ffffff;" onclick="setCurrentViewAsInitialHeading()" title="Fijar ángulo de vista inicial al entrar a esta foto">
+              🎯 Fijar como Inicio
+            </button>
+            <button id="add-hotspot-mode-btn" class="btn-google btn-google-primary" onclick="toggleAddHotspotMode()">
+              🎯 Añadir Hotspot / POI
+            </button>
+          </div>
+
+          <!-- Pannellum Container -->
+          <div id="panorama-viewer"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Altimetry Section -->
+      <div class="altimetry-dock">
+        <div class="altimetry-dock-header">
+          <span>PERFIL DE ALTIMETRÍA Y DESNIVEL (GPX)</span>
+          <span style="color: var(--google-blue); font-weight: 700;">
+            Cota Mín: {{ route.min_altitude_m|default:'3371' }}m • Cota Máx: {{ route.max_altitude_m|default:'4796' }}m
+          </span>
+        </div>
+        <div class="altimetry-canvas-box">
+          <canvas id="elevation-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Inspector Panel -->
+    <div id="scene-inspector-panel" class="sidebar-inspector-panel">
+      {% if scenes.first %}
+        {% with scene=scenes.first %}
+          {% include "admin/tourism/route/partials/scene_inspector.html" %}
+        {% endwith %}
+      {% else %}
+        <div style="padding: 40px 20px; text-align: center; color: var(--google-text-secondary);">
+          <div style="font-size: 36px; margin-bottom: 12px;">📍</div>
+          <p style="font-size: 13.5px; font-weight: 600; margin: 0;">Selecciona un hito en el mapa para editar sus propiedades</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Subir GPX -->
+<div id="gpx-modal" class="google-modal-overlay">
+  <div class="google-modal-dialog">
+    <div class="google-modal-header">
+      <h3>📂 Cargar Trazo GPX de Wikiloc / Garmin</h3>
+      <button type="button" class="google-modal-close-btn" onclick="closeModal('gpx-modal')">&times;</button>
+    </div>
+    <form 
+      hx-post="{% url 'admin:tourism_route_upload_gpx_htmx' route.id %}" 
+      hx-target="#scenes-list-container" 
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      onsubmit="closeModal('gpx-modal'); showToast('Procesando archivo GPX...')">
+      <div class="google-modal-body">
+        <div class="google-input-group">
+          <label>Archivo GPX (.gpx):</label>
+          <input type="file" name="gpx_file" accept=".gpx" required />
+        </div>
+        <p style="font-size: 12.5px; color: var(--google-text-secondary); line-height: 1.5; margin: 8px 0 0 0;">
+          El sistema calculará automáticamente la distancia exacta en km, los metros de desnivel positivo (+D), las cotas mínima/máxima y generará los nodos iniciales a lo largo del sendero.
+        </p>
+      </div>
+      <div class="google-modal-footer">
+        <button type="button" class="btn-google" onclick="closeModal('gpx-modal')">Cancelar</button>
+        <button type="submit" class="btn-google btn-google-primary">Subir y Procesar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Crear Nuevo Nodo 360 -->
+<div id="scene-modal" class="google-modal-overlay">
+  <div class="google-modal-dialog">
+    <div class="google-modal-header">
+      <h3>➕ Crear Nuevo Hito Panorámico 360°</h3>
+      <button type="button" class="google-modal-close-btn" onclick="closeModal('scene-modal')">&times;</button>
+    </div>
+    <form 
+      hx-post="{% url 'admin:tourism_route_create_scene' route.id %}" 
+      hx-target="#scenes-list-container" 
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      onsubmit="closeModal('scene-modal'); showToast('Creando hito 360...')">
+      <div class="google-modal-body">
+        <div class="google-input-group">
+          <label>Título del Hito:</label>
+          <input type="text" name="title" placeholder="Ej. Laguna Huascacocha" required />
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="google-input-group">
+            <label>Latitud GPS:</label>
+            <input type="text" id="scene-lat" name="latitude" placeholder="-10.5489" />
+          </div>
+          <div class="google-input-group">
+            <label>Longitud GPS:</label>
+            <input type="text" id="scene-lng" name="longitude" placeholder="-75.9541" />
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="google-input-group">
+            <label>Altitud (m s.n.m.):</label>
+            <input type="number" id="scene-alt" name="altitude_masl" placeholder="3850" />
+          </div>
+          <div class="google-input-group">
+            <label>Secuencia en Sendero:</label>
+            <input type="number" id="scene-seq-input" name="sequence" value="1" />
+          </div>
+        </div>
+        <div class="google-input-group">
+          <label>Foto Panorámica Esférica 360° (Equirectangular):</label>
+          <input type="file" name="panorama_image" accept="image/*" />
+        </div>
+      </div>
+      <div class="google-modal-footer">
+        <button type="button" class="btn-google" onclick="closeModal('scene-modal')">Cancelar</button>
+        <button type="submit" class="btn-google btn-google-primary">Guardar Hito</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Añadir Hotspot / Punto de Interés 360 -->
+<div id="hotspot-modal" class="google-modal-overlay">
+  <div class="google-modal-dialog">
+    <div class="google-modal-header">
+      <h3>🎯 Crear Hotspot / Punto de Interés</h3>
+      <button type="button" class="google-modal-close-btn" onclick="closeModal('hotspot-modal')">&times;</button>
+    </div>
+    <form 
+      hx-post="{% url 'admin:tourism_route_create_hotspot' route.id %}" 
+      hx-target="#scene-inspector-panel" 
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      onsubmit="closeModal('hotspot-modal'); showToast('Hotspot guardado'); setTimeout(fetchStudioJson, 500);">
+      <input type="hidden" id="hotspot-source-uuid" name="source_scene_uuid" />
+      <input type="hidden" id="hotspot-pitch" name="pitch" />
+      <input type="hidden" id="hotspot-yaw" name="yaw" />
+
+      <div class="google-modal-body">
+        <div class="google-input-group">
+          <label>Tipo de Hotspot / POI:</label>
+          <select name="type" id="hotspot-type-select" onchange="handleHotspotTypeChange(this.value)">
+            <option value="navigation">🔗 Navegación Street View (Avanzar a otra foto)</option>
+            <option value="photo_poi">📷 Fotografía / Mirador / Detalle en Alta Resolución</option>
+            <option value="audio_guide">🎧 Audioguía / Relato Cultural</option>
+            <option value="information">ℹ️ Información Turística / Flora & Fauna</option>
+            <option value="warning">⚠️ Advertencia de Seguridad / Peligro Glaciar</option>
+          </select>
+        </div>
+
+        <div class="google-input-group">
+          <label>Título del Punto:</label>
+          <input type="text" name="title" placeholder="Ej. Mirador de la Laguna o Avanzar al Hito 2" required />
+        </div>
+
+        <!-- Grupo Navegación: Hito Destino y Ángulo de Entrada -->
+        <div id="target-scene-group" class="google-input-group">
+          <label>Hito Destino al pulsar:</label>
+          <select name="target_scene_uuid">
+            {% for s in scenes %}
+              <option value="{{ s.uuid }}">{{ s.sequence }}. {{ s.title }}</option>
+            {% endfor %}
+          </select>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            <div class="google-input-group" style="margin-bottom: 0;">
+              <label>Ángulo de Llegada (Yaw °):</label>
+              <input type="number" step="0.1" name="target_yaw" id="target-yaw-input" value="0.0" />
+            </div>
+            <div class="google-input-group" style="margin-bottom: 0;">
+              <label>Inclinación (Pitch °):</label>
+              <input type="number" step="0.1" name="target_pitch" id="target-pitch-input" value="0.0" />
+            </div>
+          </div>
+          <span style="font-size: 11.5px; color: var(--google-text-secondary); margin-top: 4px; display: block;">
+            💡 Define hacia dónde apuntará la cámara cuando el turista pulse la flecha para entrar a esta foto.
+          </span>
+        </div>
+
+        <!-- Grupo Fotografía Detallada -->
+        <div id="media-image-group" class="google-input-group" style="display: none;">
+          <label>Fotografía de Detalle / Alta Resolución:</label>
+          <input type="file" name="media_image" accept="image/*" />
+          <span style="font-size: 11.5px; color: var(--google-text-secondary); margin-top: 4px; display: block;">
+            Foto que se abrirá en un modal interactivo cuando el usuario toque el icono de cámara en el 360.
+          </span>
+        </div>
+
+        <!-- Grupo Audioguía -->
+        <div id="audio-url-group" class="google-input-group" style="display: none;">
+          <label>URL de Audio Guía (MP3 / Streaming):</label>
+          <input type="url" name="audio_url" placeholder="https://ejemplo.com/audio-huaguruncho.mp3" />
+        </div>
+
+        <div class="google-input-group" style="margin-bottom: 0;">
+          <label>Descripción / Mensaje Explicativo:</label>
+          <textarea name="content" rows="3" placeholder="Detalles de la flora, fauna o historia del lugar..."></textarea>
+        </div>
+      </div>
+      <div class="google-modal-footer">
+        <button type="button" class="btn-google" onclick="closeModal('hotspot-modal')">Cancelar</button>
+        <button type="submit" class="btn-google btn-google-primary">Guardar Hotspot</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Vista Previa de POI / Fotografía 360 -->
+<div id="poi-preview-modal" class="google-modal-overlay">
+  <div class="google-modal-dialog" style="max-width: 600px;">
+    <div class="google-modal-header">
+      <h3 id="poi-preview-title">Punto de Interés</h3>
+      <button type="button" class="google-modal-close-btn" onclick="closeModal('poi-preview-modal')">&times;</button>
+    </div>
+    <div class="google-modal-body" style="text-align: center;">
+      <img id="poi-preview-img" src="" style="max-width: 100%; max-height: 320px; border-radius: 12px; object-fit: cover; display: none; margin-bottom: 12px; box-shadow: var(--google-shadow-sm);" />
+      <p id="poi-preview-desc" style="font-size: 13.5px; color: var(--google-text); text-align: left; line-height: 1.6; margin: 0;"></p>
+      <div id="poi-preview-audio-box" style="margin-top: 14px; display: none;">
+        <audio id="poi-preview-audio" controls style="width: 100%;"></audio>
+      </div>
+    </div>
+    <div class="google-modal-footer">
+      <button type="button" class="btn-google btn-google-primary" onclick="closeModal('poi-preview-modal')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Simulador de Recorrido Virtual Street View -->
+<div id="simulator-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background: #000000;">
+  <div style="position: absolute; top: 18px; left: 24px; z-index: 1000; display: flex; align-items: center; gap: 14px;">
+    <div style="background: #ffffff; border: 1px solid var(--google-border); padding: 8px 18px; border-radius: 24px; color: var(--google-text); font-weight: 700; font-size: 13.5px; box-shadow: var(--google-shadow-md);">
+      🚶 Recorrido Virtual: <span id="sim-scene-title" style="color: var(--google-blue);">Plaza Huachón</span>
+    </div>
+  </div>
+
+  <div style="position: absolute; top: 18px; right: 24px; z-index: 1000;">
+    <button class="btn-google btn-google-primary" style="background: var(--google-red); border-color: var(--google-red); color: white;" onclick="stopVirtualTourSimulator()">
+      &times; Cerrar Simulador
+    </button>
+  </div>
+
+  <div id="simulator-viewer" style="width: 100%; height: 100%;"></div>
+
+  <!-- Controles de Paseo Inferiores -->
+  <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #ffffff; border: 1px solid var(--google-border); border-radius: 30px; padding: 6px 16px; display: flex; gap: 10px; align-items: center; box-shadow: var(--google-shadow-lg);">
+    <button class="btn-google" onclick="simNavigatePrev()">
+      &larr; Anterior
+    </button>
+    <button id="sim-autoplay-btn" class="btn-google btn-google-primary" onclick="toggleSimAutoPlay()">
+      ▶️ Auto-Tour
+    </button>
+    <button class="btn-google" onclick="simNavigateNext()">
+      Siguiente &rarr;
+    </button>
+  </div>
+</div>
+
+<!-- Toast Flotante -->
+<div id="studio-toast"></div>
+
+<!-- Variables Serializadas de Django (Seguras para analizadores de JS) -->
+<div id="studio-config"
+  data-route-pk="{{ route.id }}"
+  data-route-uuid="{{ route.uuid }}"
+  data-csrf-token="{{ csrf_token }}"
+  data-min-altitude="{{ route.min_altitude_m|unlocalize|default:'3371' }}"
+  data-max-altitude="{{ route.max_altitude_m|unlocalize|default:'4796' }}"
+  data-distance-km="{{ route.distance_km|unlocalize|default:'22.0' }}">
+</div>
+
+<script id="geojson-track-json" type="application/json">{{ geojson_track_json|safe }}</script>
+<script id="scenes-data-json" type="application/json">{{ scenes_json|safe }}</script>
+<script id="pois-data-json" type="application/json">{{ pois_json|safe }}</script>
+<script id="elevation-profile-json" type="application/json">{{ elevation_profile_json|safe }}</script>
+
+<!-- Lógica JavaScript del Studio -->
+<script>
+(function() {
+  var configEl = document.getElementById('studio-config');
+  var routePk = parseInt(configEl ? configEl.getAttribute('data-route-pk') || '0' : '0', 10);
+  var routeUuid = configEl ? configEl.getAttribute('data-route-uuid') || '' : '';
+  var csrfToken = configEl ? configEl.getAttribute('data-csrf-token') || '' : '';
+  var minAltDefault = parseFloat(configEl ? configEl.getAttribute('data-min-altitude') || '3371' : '3371');
+  var maxAltDefault = parseFloat(configEl ? configEl.getAttribute('data-max-altitude') || '4796' : '4796');
+  var distanceKmDefault = parseFloat(configEl ? configEl.getAttribute('data-distance-km') || '22.0' : '22.0');
+
+  var geojsonTrackEl = document.getElementById('geojson-track-json');
+  var scenesDataEl = document.getElementById('scenes-data-json');
+  var poisDataEl = document.getElementById('pois-data-json');
+  var elevationProfileEl = document.getElementById('elevation-profile-json');
+
+  var geojsonTrack = geojsonTrackEl ? JSON.parse(geojsonTrackEl.textContent || 'null') : null;
+  var scenesData = scenesDataEl ? JSON.parse(scenesDataEl.textContent || '[]') : [];
+  var poisData = poisDataEl ? JSON.parse(poisDataEl.textContent || '[]') : [];
+  var elevationProfile = elevationProfileEl ? JSON.parse(elevationProfileEl.textContent || '[]') : [];
+
+  var leafletMap = null;
+  var trackLayer = null;
+  var markersLayer = null;
+  var poisLayer = null;
+  var elevationTrackerMarker = null;
+
+  var mapTileLayers = {};
+  var currentTileLayer = null;
+
+  var panoViewer = null;
+  var elevationChart = null;
+  var activeSceneUuid = scenesData.length > 0 ? scenesData[0].uuid : null;
+  var isAddHotspotMode = false;
+
+  var simViewer = null;
+  var activeSimIndex = 0;
+  var simAutoPlayInterval = null;
+
+  function startStudio() {
+    initMap();
+    initElevationChart();
+    if (scenesData.length > 0) {
+      selectScene(scenesData[0].uuid, scenesData[0].sequence);
+    } else {
+      loadPlaceholderPanorama();
+    }
+  }
+
+  // 1. Inicialización del Mapa Multicapa Híbrido
+  function initMap() {
+    if (typeof L === 'undefined') {
+      setTimeout(initMap, 150);
+      return;
+    }
+
+    var mapContainer = document.getElementById('map-view');
+    if (!mapContainer) return;
+
+    if (leafletMap) {
+      try { leafletMap.remove(); } catch (_) {}
+    }
+
+    mapTileLayers = {
+      'google-hybrid': L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        attribution: '© Google Maps • Satelital & Etiquetas Híbridas'
+      }),
+      'google-terrain': L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        attribution: '© Google Maps • Relieve Topográfico'
+      }),
+      'osm': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }),
+      'opentopo': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: '© OpenTopoMap'
+      })
+    };
+
+    currentTileLayer = mapTileLayers['google-hybrid'];
+
+    var initLat = -10.5512;
+    var initLng = -75.9814;
+    if (geojsonTrack && geojsonTrack.geometry && geojsonTrack.geometry.coordinates && geojsonTrack.geometry.coordinates.length > 0) {
+      initLat = geojsonTrack.geometry.coordinates[0][1];
+      initLng = geojsonTrack.geometry.coordinates[0][0];
+    }
+
+    leafletMap = L.map('map-view', {
+      center: [initLat, initLng],
+      zoom: 13,
+      layers: [currentTileLayer],
+      zoomControl: false
+    });
+
+    L.control.zoom({ position: 'bottomright' }).addTo(leafletMap);
+    markersLayer = L.layerGroup().addTo(leafletMap);
+    poisLayer = L.layerGroup().addTo(leafletMap);
+
+    if (geojsonTrack && geojsonTrack.geometry && geojsonTrack.geometry.coordinates.length > 0) {
+      drawGpxTrack(geojsonTrack);
+    }
+
+    renderSceneMarkers();
+    renderPoisOnMap();
+
+    leafletMap.on('mousemove', function(e) {
+      var hudLat = document.getElementById('hud-lat');
+      var hudLng = document.getElementById('hud-lng');
+      if (hudLat) hudLat.innerText = e.latlng.lat.toFixed(5);
+      if (hudLng) hudLng.innerText = e.latlng.lng.toFixed(5);
+    });
+
+    leafletMap.on('click', function(e) {
+      openNewSceneModal(e.latlng.lat, e.latlng.lng);
+    });
+
+    setTimeout(function() { if (leafletMap) leafletMap.invalidateSize(); }, 250);
+  }
+
+  // Cambio de Capa de Mapa
+  window.switchMapLayer = function(layerKey) {
+    if (!leafletMap || !mapTileLayers[layerKey]) return;
+
+    if (currentTileLayer) {
+      leafletMap.removeLayer(currentTileLayer);
+    }
+    currentTileLayer = mapTileLayers[layerKey];
+    leafletMap.addLayer(currentTileLayer);
+
+    document.querySelectorAll('.map-layer-pill').forEach(function(btn) { btn.classList.remove('active'); });
+    if (layerKey === 'google-hybrid') document.getElementById('layer-hybrid-btn').classList.add('active');
+    if (layerKey === 'google-terrain') document.getElementById('layer-terrain-btn').classList.add('active');
+    if (layerKey === 'osm') document.getElementById('layer-osm-btn').classList.add('active');
+    if (layerKey === 'opentopo') document.getElementById('layer-topo-btn').classList.add('active');
+  };
+
+  // Cambio de Modo de Visualización
+  window.setViewMode = function(mode) {
+    var mapPanel = document.getElementById('map-panel');
+    var panoPanel = document.getElementById('pano-panel');
+    document.querySelectorAll('.segmented-btn').forEach(function(btn) { btn.classList.remove('active'); });
+
+    if (mode === 'split') {
+      mapPanel.style.display = 'block';
+      panoPanel.style.display = 'block';
+      mapPanel.style.flex = '1';
+      panoPanel.style.flex = '1';
+      document.getElementById('mode-split-btn').classList.add('active');
+    } else if (mode === 'map') {
+      mapPanel.style.display = 'block';
+      panoPanel.style.display = 'none';
+      mapPanel.style.flex = '1';
+      document.getElementById('mode-map-btn').classList.add('active');
+    } else if (mode === 'pano') {
+      mapPanel.style.display = 'none';
+      panoPanel.style.display = 'block';
+      panoPanel.style.flex = '1';
+      document.getElementById('mode-pano-btn').classList.add('active');
+    }
+
+    setTimeout(function() {
+      if (leafletMap) leafletMap.invalidateSize();
+      if (panoViewer) {
+        try { panoViewer.resize(); } catch (_) {}
+      }
+    }, 200);
+  };
+
+  function drawGpxTrack(geojson) {
+    if (!leafletMap) return;
+    if (trackLayer) leafletMap.removeLayer(trackLayer);
+
+    trackLayer = L.geoJSON(geojson, {
+      style: {
+        color: '#1a73e8',
+        weight: 5,
+        opacity: 0.95
+      }
+    }).addTo(leafletMap);
+
+    var coords = geojson.geometry.coordinates;
+    if (coords && coords.length > 0) {
+      var startPt = coords[0];
+      var endPt = coords[coords.length - 1];
+
+      var startIcon = L.divIcon({
+        className: 'start-marker',
+        html: '<div style="background:#1e8e3e; color:white; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; border:2.5px solid white; box-shadow:0 2px 8px rgba(0,0,0,0.35);">🟢</div>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+      });
+      L.marker([startPt[1], startPt[0]], { icon: startIcon })
+        .bindPopup('<b>🟢 Punto de Inicio (Huachón)</b>')
+        .addTo(markersLayer);
+
+      var endIcon = L.divIcon({
+        className: 'end-marker',
+        html: '<div style="background:#d93025; color:white; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; border:2.5px solid white; box-shadow:0 2px 8px rgba(0,0,0,0.35);">🏁</div>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+      });
+      L.marker([endPt[1], endPt[0]], { icon: endIcon })
+        .bindPopup('<b>🏁 Cumbre / Punto Final de Ruta</b>')
+        .addTo(markersLayer);
+    }
+
+    try {
+      leafletMap.fitBounds(trackLayer.getBounds(), { padding: [40, 40] });
+    } catch (_) {}
+  }
+
+  function renderSceneMarkers() {
+    if (!markersLayer || !leafletMap) return;
+    markersLayer.clearLayers();
+
+    scenesData.forEach(function(sc) {
+      if (sc.latitude && sc.longitude) {
+        var isSelected = sc.uuid === activeSceneUuid;
+        var markerIcon = L.divIcon({
+          className: 'custom-360-marker',
+          html: '<div style="background:' + (isSelected ? '#1a73e8' : '#3c4043') + '; color:#FFFFFF; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; border:2.5px solid white; box-shadow:0 2px 8px rgba(0,0,0,0.35); cursor:grab;">' + sc.sequence + '</div>',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+
+        var marker = L.marker([sc.latitude, sc.longitude], { 
+          icon: markerIcon,
+          draggable: true 
+        }).addTo(markersLayer);
+
+        marker.bindPopup('<b>' + sc.sequence + '. ' + sc.title + '</b><br>' + (sc.altitude_masl ? sc.altitude_masl + ' m s.n.m.' : '') + '<br><span style="font-size:10.5px; color:#5f6368;">Arrastra para reubicar coordenadas</span>');
+
+        marker.on('click', function() {
+          selectScene(sc.uuid, sc.sequence);
+          htmx.ajax('GET', '/admin/tourism/route/' + routePk + '/studio/scene-inspector/' + sc.uuid + '/', {
+            target: '#scene-inspector-panel',
+            swap: 'innerHTML'
+          });
+        });
+
+        marker.on('dragend', function(e) {
+          var newPos = e.target.getLatLng();
+          sc.latitude = newPos.lat;
+          sc.longitude = newPos.lng;
+          
+          var formData = new FormData();
+          formData.append('latitude', newPos.lat.toFixed(6));
+          formData.append('longitude', newPos.lng.toFixed(6));
+          formData.append('title', sc.title);
+          
+          fetch('/admin/tourism/route/' + routePk + '/studio/update-scene/' + sc.uuid + '/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: formData
+          }).then(function() {
+            showToast('📍 Hito ' + sc.sequence + ' reubicado a: [' + newPos.lat.toFixed(5) + ', ' + newPos.lng.toFixed(5) + ']');
+          });
+        });
+      }
+    });
+  }
+
+  // Renderizar Puntos de Interés (POIs) en el mapa satelital
+  function renderPoisOnMap() {
+    if (!poisLayer || !poisData) return;
+    poisLayer.clearLayers();
+
+    poisData.forEach(function(poi) {
+      if (poi.latitude && poi.longitude) {
+        var iconEmoji = '📍';
+        if (poi.category === 'laguna') iconEmoji = '🌊';
+        else if (poi.category === 'mirador') iconEmoji = '📷';
+        else if (poi.category === 'campamento') iconEmoji = '🏕️';
+        else if (poi.category === 'flora_rodal') iconEmoji = '🌸';
+        else if (poi.category === 'sitio_sagrado') iconEmoji = '🪨';
+
+        var poiIcon = L.divIcon({
+          className: 'poi-custom-pin',
+          html: '<div style="background:#ffffff; border:1.5px solid #1a73e8; border-radius:16px; padding:3px 8px; font-size:11.5px; font-weight:600; color:#202124; box-shadow:0 2px 6px rgba(60,64,67,0.25); display:inline-flex; align-items:center; gap:4px; cursor:pointer;">' + iconEmoji + ' ' + poi.name + '</div>',
+          iconSize: [110, 26],
+          iconAnchor: [55, 13]
+        });
+
+        var marker = L.marker([poi.latitude, poi.longitude], { icon: poiIcon }).addTo(poisLayer);
+        marker.bindPopup('<b>' + iconEmoji + ' ' + poi.name + '</b> (' + (poi.category_display || poi.category) + ')<br>' + (poi.altitude_masl ? poi.altitude_masl + ' m s.n.m.<br>' : '') + (poi.description || ''));
+      }
+    });
+  }
+
+  // 2. Gráfico de Altimetría Interactivo
+  function initElevationChart() {
+    if (typeof Chart === 'undefined') {
+      setTimeout(initElevationChart, 150);
+      return;
+    }
+
+    var ctx = document.getElementById('elevation-chart');
+    if (!ctx) return;
+
+    var labels = [];
+    var dataPoints = [];
+
+    if (elevationProfile && elevationProfile.length > 0) {
+      labels = elevationProfile.map(function(p) { return (p.distance_km || 0) + ' km'; });
+      dataPoints = elevationProfile.map(function(p) { return p.altitude_m || 0; });
+    } else {
+      var minA = minAltDefault;
+      var maxA = maxAltDefault;
+      var dist = distanceKmDefault;
+      labels = ['0 km', (dist*0.25).toFixed(1) + ' km', (dist*0.5).toFixed(1) + ' km', (dist*0.75).toFixed(1) + ' km', dist.toFixed(1) + ' km'];
+      dataPoints = [minA, Math.round(minA + (maxA-minA)*0.3), Math.round(minA + (maxA-minA)*0.6), Math.round(minA + (maxA-minA)*0.85), maxA];
+    }
+
+    if (elevationChart) {
+      try { elevationChart.destroy(); } catch (_) {}
+    }
+
+    var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 85);
+    gradient.addColorStop(0, 'rgba(26, 115, 232, 0.35)');
+    gradient.addColorStop(1, 'rgba(26, 115, 232, 0.02)');
+
+    elevationChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Altitud (m s.n.m.)',
+          data: dataPoints,
+          borderColor: '#1a73e8',
+          borderWidth: 2.5,
+          backgroundColor: gradient,
+          fill: true,
+          tension: 0.35,
+          pointRadius: 2,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: '#1a73e8',
+          pointHoverBorderColor: '#ffffff',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function(items) { return 'Punto ' + (items[0].dataIndex + 1) + ' del Sendero'; },
+              label: function(item) { return item.parsed.y + ' m s.n.m. • Distancia: ' + labels[item.dataIndex]; }
+            }
+          }
+        },
+        scales: {
+          x: { display: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#5f6368', font: { size: 10.5 } } },
+          y: {
+            display: true,
+            suggestedMin: 3200,
+            grid: { color: 'rgba(0,0,0,0.04)' },
+            ticks: { color: '#5f6368', font: { size: 10.5 }, callback: function(val) { return val + 'm'; } }
+          }
+        },
+        onHover: function(evt, elements) {
+          if (elements.length > 0 && geojsonTrack && geojsonTrack.geometry && geojsonTrack.geometry.coordinates) {
+            var idx = elements[0].index;
+            var coords = geojsonTrack.geometry.coordinates;
+            var ptIdx = Math.floor((idx / dataPoints.length) * (coords.length - 1));
+            var pt = coords[ptIdx];
+            if (pt && leafletMap) {
+              updateElevationTrackerMarker(pt[1], pt[0]);
+            }
+          }
+        },
+        onClick: function(evt, elements) {
+          if (elements.length > 0) {
+            var idx = elements[0].index;
+            if (scenesData.length > 0) {
+              var scene = scenesData[Math.min(idx, scenesData.length - 1)];
+              if (scene) selectScene(scene.uuid, scene.sequence);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function updateElevationTrackerMarker(lat, lng) {
+    if (!leafletMap) return;
+    if (elevationTrackerMarker) {
+      elevationTrackerMarker.setLatLng([lat, lng]);
+    } else {
+      var trackerIcon = L.divIcon({
+        className: 'elevation-tracker-dot',
+        html: '<div style="background:#1a73e8; width:14px; height:14px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(26,115,232,0.8);"></div>',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      });
+      elevationTrackerMarker = L.marker([lat, lng], { icon: trackerIcon }).addTo(leafletMap);
+    }
+  }
+
+  // 3. Visor 360 con Pannellum & Hotspots Ricos
+  function loadPlaceholderPanorama() {
+    if (typeof pannellum === 'undefined') {
+      setTimeout(loadPlaceholderPanorama, 150);
+      return;
+    }
+    var placeholderImg = 'https://pannellum.org/images/cerro-toco-0.jpg';
+    var badge = document.getElementById('active-scene-badge');
+    if (badge) badge.innerText = '1. Vista Panorámica Inicial (Demo)';
+
+    if (panoViewer) {
+      try { panoViewer.destroy(); } catch (_) {}
+    }
+    try {
+      panoViewer = pannellum.viewer('panorama-viewer', {
+        type: 'equirectangular',
+        panorama: placeholderImg,
+        autoLoad: true,
+        showControls: true,
+        compass: true
+      });
+    } catch (err) {
+      console.warn('Pannellum notice:', err);
+    }
+  }
+
+  function loadPanorama(scene, targetYaw, targetPitch) {
+    if (typeof pannellum === 'undefined') {
+      setTimeout(function() { loadPanorama(scene, targetYaw, targetPitch); }, 150);
+      return;
+    }
+
+    var imgUrl = scene.panorama_image_url || 'https://pannellum.org/images/cerro-toco-0.jpg';
+    var badge = document.getElementById('active-scene-badge');
+    if (badge) badge.innerText = scene.sequence + '. ' + scene.title;
+
+    var startYaw = targetYaw !== undefined ? targetYaw : (scene.initial_yaw || 0.0);
+    var startPitch = targetPitch !== undefined ? targetPitch : (scene.initial_pitch || 0.0);
+
+    var hotspotsConfig = (scene.hotspots || []).map(function(h) {
+      var isNav = h.type === 'navigation';
+      return {
+        pitch: h.pitch,
+        yaw: h.yaw,
+        type: isNav ? "scene" : "info",
+        text: h.title,
+        clickHandlerFunc: function() {
+          if (isNav && h.target_scene_uuid) {
+            var target = scenesData.find(function(s) { return s.uuid === h.target_scene_uuid; });
+            if (target) {
+              selectScene(target.uuid, target.sequence, h.target_yaw, h.target_pitch);
+              htmx.ajax('GET', '/admin/tourism/route/' + routePk + '/studio/scene-inspector/' + target.uuid + '/', {
+                target: '#scene-inspector-panel',
+                swap: 'innerHTML'
+              });
+            }
+          } else {
+            openPoiPreviewModal(h.title, h.content, h.media_image_url, h.audio_url);
+          }
+        }
+      };
+    });
+
+    if (panoViewer) {
+      try { panoViewer.destroy(); } catch (_) {}
+    }
+
+    try {
+      panoViewer = pannellum.viewer('panorama-viewer', {
+        type: 'equirectangular',
+        panorama: imgUrl,
+        autoLoad: true,
+        showControls: true,
+        compass: true,
+        yaw: startYaw,
+        pitch: startPitch,
+        northOffset: scene.heading || 0,
+        hotSpots: hotspotsConfig
+      });
+
+      panoViewer.on('mousedown', function(event) {
+        if (isAddHotspotMode) {
+          var coords = panoViewer.mouseEventToCoords(event);
+          var pitch = coords[0];
+          var yaw = coords[1];
+          openHotspotModal(pitch, yaw);
+          toggleAddHotspotMode(false);
+        }
+      });
+    } catch (err) {
+      console.warn('Pannellum error:', err);
+    }
+  }
+
+  function selectScene(uuid, seq, targetYaw, targetPitch) {
+    activeSceneUuid = uuid;
+    var scene = scenesData.find(function(s) { return s.uuid === uuid; });
+    if (!scene) return;
+
+    document.querySelectorAll('.scene-card').forEach(function(el) { el.classList.remove('active'); });
+    var card = document.getElementById('scene-card-' + uuid);
+    if (card) card.classList.add('active');
+
+    loadPanorama(scene, targetYaw, targetPitch);
+
+    if (scene.latitude && scene.longitude && leafletMap) {
+      leafletMap.flyTo([scene.latitude, scene.longitude], 15, { duration: 1.2 });
+    }
+
+    renderSceneMarkers();
+  }
+
+  window.selectScene = selectScene;
+
+  window.handleSceneCardClick = function(el) {
+    var uuid = el.getAttribute('data-uuid');
+    var seq = parseInt(el.getAttribute('data-seq') || '1', 10);
+    selectScene(uuid, seq);
+  };
+
+  // Fijar la orientación/ángulo actual del visor como el inicio oficial de esta foto
+  window.setCurrentViewAsInitialHeading = function() {
+    if (!panoViewer || !activeSceneUuid) return;
+    var yaw = panoViewer.getYaw();
+    var pitch = panoViewer.getPitch();
+
+    var formData = new FormData();
+    formData.append('initial_yaw', yaw.toFixed(2));
+    formData.append('initial_pitch', pitch.toFixed(2));
+
+    var scene = scenesData.find(function(s) { return s.uuid === activeSceneUuid; });
+    if (scene) {
+      formData.append('title', scene.title);
+      if (scene.latitude) formData.append('latitude', scene.latitude);
+      if (scene.longitude) formData.append('longitude', scene.longitude);
+      if (scene.altitude_masl) formData.append('altitude_masl', scene.altitude_masl);
+    }
+
+    fetch('/admin/tourism/route/' + routePk + '/studio/update-scene/' + activeSceneUuid + '/', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrfToken },
+      body: formData
+    }).then(function() {
+      showToast('🎯 Vista inicial fijada: Yaw ' + yaw.toFixed(1) + '°, Pitch ' + pitch.toFixed(1) + '°');
+      if (scene) {
+        scene.initial_yaw = parseFloat(yaw.toFixed(2));
+        scene.initial_pitch = parseFloat(pitch.toFixed(2));
+      }
+    });
+  };
+
+  // Modal de Vista Previa de POI / Fotografía
+  function openPoiPreviewModal(title, desc, imgUrl, audioUrl) {
+    document.getElementById('poi-preview-title').innerText = title || 'Punto de Interés';
+    document.getElementById('poi-preview-desc').innerText = desc || '';
+    
+    var imgEl = document.getElementById('poi-preview-img');
+    if (imgUrl) {
+      imgEl.src = imgUrl;
+      imgEl.style.display = 'inline-block';
+    } else {
+      imgEl.style.display = 'none';
+    }
+
+    var audioBox = document.getElementById('poi-preview-audio-box');
+    var audioEl = document.getElementById('poi-preview-audio');
+    if (audioUrl) {
+      audioEl.src = audioUrl;
+      audioBox.style.display = 'block';
+    } else {
+      audioBox.style.display = 'none';
+      if (audioEl) audioEl.pause();
+    }
+
+    document.getElementById('poi-preview-modal').style.display = 'flex';
+  }
+
+  function fetchStudioJson() {
+    fetch('/api/v1/routes/' + routeUuid + '/studio-data/')
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        scenesData = data.scenes;
+        if (data.route.geojson_track) {
+          geojsonTrack = data.route.geojson_track;
+          drawGpxTrack(geojsonTrack);
+        }
+        renderSceneMarkers();
+
+        var countBadge = document.getElementById('scenes-count-badge');
+        if (countBadge) countBadge.innerText = scenesData.length;
+
+        if (scenesData.length > 0 && !activeSceneUuid) {
+          selectScene(scenesData[0].uuid, scenesData[0].sequence);
+        }
+      })
+      .catch(function() {});
+  }
+
+  // 4. Simulador de Recorrido Virtual Street View
+  window.startVirtualTourSimulator = function() {
+    if (scenesData.length === 0) {
+      alert('Debes tener al menos 1 escena 360 para simular el paseo. Pulsa "⚡ Auto-Generar Nodos" para crear las escenas instantáneamente.');
+      return;
+    }
+    document.getElementById('simulator-overlay').style.display = 'block';
+    activeSimIndex = 0;
+    loadSimulatorScene(scenesData[activeSimIndex]);
+  };
+
+  window.stopVirtualTourSimulator = function() {
+    document.getElementById('simulator-overlay').style.display = 'none';
+    if (simAutoPlayInterval) {
+      clearInterval(simAutoPlayInterval);
+      simAutoPlayInterval = null;
+    }
+    if (simViewer) {
+      try { simViewer.destroy(); } catch (_) {}
+    }
+  };
+
+  function loadSimulatorScene(scene) {
+    document.getElementById('sim-scene-title').innerText = scene.sequence + '. ' + scene.title + ' (' + (scene.altitude_masl || 0) + ' m s.n.m.)';
+    var imgUrl = scene.panorama_image_url || 'https://pannellum.org/images/cerro-toco-0.jpg';
+
+    if (simViewer) {
+      try { simViewer.destroy(); } catch (_) {}
+    }
+    try {
+      simViewer = pannellum.viewer('simulator-viewer', {
+        type: 'equirectangular',
+        panorama: imgUrl,
+        autoLoad: true,
+        showControls: true,
+        compass: true,
+        yaw: scene.initial_yaw || 0.0,
+        pitch: scene.initial_pitch || 0.0,
+        northOffset: scene.heading || 0
+      });
+    } catch (err) {
+      console.warn('Sim viewer notice:', err);
+    }
+  }
+
+  window.simNavigateNext = function() {
+    if (activeSimIndex < scenesData.length - 1) {
+      activeSimIndex++;
+      loadSimulatorScene(scenesData[activeSimIndex]);
+    } else {
+      showToast('🏁 Has llegado al final del sendero.');
+      if (simAutoPlayInterval) clearInterval(simAutoPlayInterval);
+    }
+  };
+
+  window.simNavigatePrev = function() {
+    if (activeSimIndex > 0) {
+      activeSimIndex--;
+      loadSimulatorScene(scenesData[activeSimIndex]);
+    } else {
+      showToast('🟢 Estás en el punto de partida.');
+    }
+  };
+
+  window.toggleSimAutoPlay = function() {
+    var btn = document.getElementById('sim-autoplay-btn');
+    if (simAutoPlayInterval) {
+      clearInterval(simAutoPlayInterval);
+      simAutoPlayInterval = null;
+      btn.innerText = '▶️ Auto-Tour';
+      showToast('Auto-Tour pausado');
+    } else {
+      btn.innerText = '⏸️ Pausar';
+      showToast('Auto-Tour activo (Avanzando cada 5s)');
+      simAutoPlayInterval = setInterval(function() {
+        simNavigateNext();
+      }, 5000);
+    }
+  };
+
+  // Modales
+  window.openNewSceneModal = function(lat, lng) {
+    document.getElementById('scene-lat').value = lat ? lat.toFixed(6) : '';
+    document.getElementById('scene-lng').value = lng ? lng.toFixed(6) : '';
+    document.getElementById('scene-seq-input').value = scenesData.length + 1;
+    document.getElementById('scene-modal').style.display = 'flex';
+  };
+
+  window.openGpxModal = function() { document.getElementById('gpx-modal').style.display = 'flex'; };
+
+  window.openHotspotModal = function(pitch, yaw) {
+    document.getElementById('hotspot-source-uuid').value = activeSceneUuid;
+    document.getElementById('hotspot-pitch').value = pitch.toFixed(2);
+    document.getElementById('hotspot-yaw').value = yaw.toFixed(2);
+    document.getElementById('hotspot-modal').style.display = 'flex';
+  };
+
+  window.closeModal = function(id) { 
+    document.getElementById(id).style.display = 'none';
+    if (id === 'poi-preview-modal') {
+      var audioEl = document.getElementById('poi-preview-audio');
+      if (audioEl) audioEl.pause();
+    }
+  };
+
+  window.toggleAddHotspotMode = function(force) {
+    isAddHotspotMode = force !== undefined ? force : !isAddHotspotMode;
+    var btn = document.getElementById('add-hotspot-mode-btn');
+    if (btn) {
+      if (isAddHotspotMode) {
+        btn.style.background = '#d93025';
+        btn.innerText = '🎯 Clic en el 360 para fijar';
+      } else {
+        btn.style.background = 'var(--google-blue)';
+        btn.innerText = '🎯 Añadir Hotspot / POI';
+      }
+    }
+  };
+
+  window.handleHotspotTypeChange = function(type) {
+    var targetGroup = document.getElementById('target-scene-group');
+    var mediaGroup = document.getElementById('media-image-group');
+    var audioGroup = document.getElementById('audio-url-group');
+
+    if (targetGroup) targetGroup.style.display = type === 'navigation' ? 'block' : 'none';
+    if (mediaGroup) mediaGroup.style.display = type === 'photo_poi' ? 'block' : 'none';
+    if (audioGroup) audioGroup.style.display = type === 'audio_guide' ? 'block' : 'none';
+  };
+
+  function showToast(message) {
+    var toast = document.getElementById('studio-toast');
+    if (toast) {
+      toast.innerText = message;
+      toast.style.display = 'flex';
+      setTimeout(function() { toast.style.display = 'none'; }, 3500);
+    }
+  }
+
+  window.showToast = showToast;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startStudio);
+  } else {
+    startStudio();
+  }
+})();
+</script>
+{% endblock %}

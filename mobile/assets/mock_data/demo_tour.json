@@ -1,0 +1,134 @@
+{
+  "route": {
+    "uuid": "demo-route-huachon-huaguruncho",
+    "name": "Ruta piloto Huachón – Mirador Huaguruncho",
+    "description": "Explora el circuito tradicional desde el pueblo de Huachón hasta las faldas glaciares del Nevado Huaguruncho (5,742 msnm).",
+    "difficulty": "moderada",
+    "difficulty_display": "Moderada",
+    "distance_km": 14.5,
+    "estimated_duration_minutes": 360,
+    "safety_recommendations": "Clima de alta montaña. Llevar ropa por capas, calzado impermeable y protector solar.",
+    "cover_image_url": "assets/images/huaguruncho_cover.jpg",
+    "is_downloaded": true
+  },
+  "scenes": [
+    {
+      "uuid": "demo-scene-01-plaza",
+      "title": "Plaza Principal de Huachón",
+      "description": "Altitud 3,400 m s.n.m. Punto de partida para coordinar con guías de montaña.",
+      "panorama_asset": "assets/panoramas/scene_huachon_plaza.jpg",
+      "latitude": -10.605120,
+      "longitude": -75.952130,
+      "sequence": 1,
+      "hotspots": [
+        {
+          "uuid": "demo-hotspot-01",
+          "title": "Hacia Laguna Huaguruncho",
+          "type": "navigation",
+          "target_scene_uuid": "demo-scene-02-laguna",
+          "yaw": 35.0,
+          "pitch": -2.0,
+          "content": "Avanzar por el sendero comunal hacia el campamento base.",
+          "icon": "arrow_forward"
+        },
+        {
+          "uuid": "demo-hotspot-02",
+          "title": "Historia de Huachón",
+          "type": "information",
+          "yaw": -60.0,
+          "pitch": 5.0,
+          "content": "Pueblo ganadero y guardián ancestral del nevado sagrado.",
+          "icon": "info"
+        }
+      ]
+    },
+    {
+      "uuid": "demo-scene-02-laguna",
+      "title": "Laguna Huaguruncho",
+      "description": "Altitud 4,200 m s.n.m. Espejo de agua glaciar con vista directa al nevado.",
+      "panorama_asset": "assets/panoramas/scene_laguna_huaguruncho.jpg",
+      "latitude": -10.551240,
+      "longitude": -75.981450,
+      "sequence": 2,
+      "hotspots": [
+        {
+          "uuid": "demo-hotspot-03",
+          "title": "Subir al Mirador Glaciar",
+          "type": "navigation",
+          "target_scene_uuid": "demo-scene-03-mirador",
+          "yaw": 15.0,
+          "pitch": 8.0,
+          "content": "Ascenso por la morrena lateral.",
+          "icon": "arrow_forward"
+        },
+        {
+          "uuid": "demo-hotspot-04",
+          "title": "Regresar a la Plaza",
+          "type": "navigation",
+          "target_scene_uuid": "demo-scene-01-plaza",
+          "yaw": 195.0,
+          "pitch": -5.0,
+          "content": "Retornar al pueblo de Huachón.",
+          "icon": "arrow_back"
+        },
+        {
+          "uuid": "demo-hotspot-05",
+          "title": "Alerta de Bajas Temperaturas",
+          "type": "warning",
+          "yaw": -45.0,
+          "pitch": -10.0,
+          "content": "A partir de las 16:00 la temperatura desciende bajo 0°C.",
+          "icon": "warning"
+        },
+        {
+          "uuid": "demo-hotspot-06",
+          "title": "Cuidado del Agua",
+          "type": "information",
+          "yaw": 90.0,
+          "pitch": 0.0,
+          "content": "No lavar recipientes ni arrojar residuos al agua de la laguna.",
+          "icon": "eco"
+        }
+      ]
+    },
+    {
+      "uuid": "demo-scene-03-mirador",
+      "title": "Mirador del Glaciar Nevado Huaguruncho",
+      "description": "Altitud 4,650 m s.n.m. Frente a las imponentes paredes de hielo del coloso.",
+      "panorama_asset": "assets/panoramas/scene_mirador_glaciar.jpg",
+      "latitude": -10.528930,
+      "longitude": -75.992810,
+      "sequence": 3,
+      "hotspots": [
+        {
+          "uuid": "demo-hotspot-07",
+          "title": "Descender a la Laguna",
+          "type": "navigation",
+          "target_scene_uuid": "demo-scene-02-laguna",
+          "yaw": 180.0,
+          "pitch": -15.0,
+          "content": "Camino de retorno al campamento base.",
+          "icon": "arrow_back"
+        },
+        {
+          "uuid": "demo-hotspot-08",
+          "title": "Cumbre Huaguruncho (5,742 msnm)",
+          "type": "information",
+          "yaw": 0.0,
+          "pitch": 20.0,
+          "content": "Pico piramidal reverenciado como Apu protector de la región Pasco.",
+          "icon": "terrain"
+        },
+        {
+          "uuid": "demo-hotspot-09",
+          "title": "Peligro de Grietas",
+          "type": "warning",
+          "yaw": 25.0,
+          "pitch": 10.0,
+          "content": "Zona de alta montaña técnica. Solo transitar con equipo de rescate y crampones.",
+          "icon": "warning"
+        }
+      ]
+    }
+  ]
+}

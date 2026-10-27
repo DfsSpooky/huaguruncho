@@ -1,0 +1,6803 @@
+openapi: 3.0.3
+info:
+  title: HUAGURUNCHO 360 API
+  version: 1.0.0
+  description: API REST para turismo sostenible, tour virtual 360 y eco-reportes ambientales
+    en el Nevado Huaguruncho (Huachón, Pasco, Perú).
+paths:
+  /api/v1/admin/environmental-reports/:
+    get:
+      operationId: admin_environmental_reports_list
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría del Incidente
+          enum:
+          - accidente
+          - basura
+          - flora_fauna_afectada
+          - incendio
+          - otro
+          - senalizacion_danada
+        description: |-
+          * `basura` - Acumulación de Basura / Residuos
+          * `incendio` - Foco de Incendio / Quema
+          * `accidente` - Accidente o Persona en Riesgo
+          * `senalizacion_danada` - Señalización Turística Dañada
+          * `flora_fauna_afectada` - Flora o Fauna Afectada
+          * `otro` - Otro Incidente Ambiental
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: route__uuid
+        schema:
+          type: string
+          format: uuid
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Estado del Reporte
+          enum:
+          - atendido
+          - cerrado
+          - en_revision
+          - pendiente
+          - recibido
+        description: |-
+          * `pendiente` - Pendiente de Revisión
+          * `recibido` - Recibido por Central
+          * `en_revision` - En Inspección / Verificación
+          * `atendido` - Atendido / Solucionado
+          * `cerrado` - Cerrado
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnvironmentalReportList'
+          description: ''
+  /api/v1/admin/environmental-reports/{uuid}/:
+    get:
+      operationId: admin_environmental_reports_retrieve
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalReport'
+          description: ''
+    patch:
+      operationId: admin_environmental_reports_partial_update
+      summary: Actualizar estado de reporte (Administración)
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminReportStatusRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminReportStatusRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminReportStatusRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalReport'
+          description: ''
+  /api/v1/analytics/overview/:
+    get:
+      operationId: analytics_overview_retrieve
+      summary: Obtener métricas globales de turismo, conservación y comunidad
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverview'
+          description: ''
+  /api/v1/audio-guides/:
+    get:
+      operationId: audio_guides_list
+      summary: Listar audioguías y relatos culturales bilingües
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría Temática
+          enum:
+          - flora_fauna
+          - hidrologia
+          - historia
+          - mitologia
+        description: |-
+          * `mitologia` - Mitología Andina y Cosmovisión
+          * `hidrologia` - Hidrología Sagrada y Lagunas
+          * `flora_fauna` - Flora y Fauna Milenaria
+          * `historia` - Historia Comunal y Tradiciones
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - audio-guides
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AudioGuide'
+          description: ''
+  /api/v1/audio-guides/{uuid}/:
+    get:
+      operationId: audio_guides_retrieve
+      summary: Obtener detalle de audioguía con transcripciones en Español y Quechua
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - audio-guides
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioGuide'
+          description: ''
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: Autentica al usuario con correo y contraseña, retornando tokens
+        JWT.
+      summary: Inicio de sesión
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: ''
+  /api/v1/auth/profile/:
+    get:
+      operationId: auth_profile_retrieve
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: auth_profile_update
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: auth_profile_partial_update
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: auth_register_create
+      description: Crea una nueva cuenta de usuario turista y retorna tokens JWT.
+      summary: Registro de nuevo turista
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: ''
+  /api/v1/badges/:
+    get:
+      operationId: badges_list
+      summary: Listar medallas y logros ecológicos de Guardián Glacial
+      parameters:
+      - in: query
+        name: tier
+        schema:
+          type: string
+          title: Nivel
+          enum:
+          - bronce
+          - diamante
+          - oro
+          - plata
+        description: |-
+          * `bronce` - Bronce
+          * `plata` - Plata
+          * `oro` - Oro
+          * `diamante` - Diamante Glacial
+      tags:
+      - badges
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GuardianBadge'
+          description: ''
+  /api/v1/badges/{slug}/:
+    get:
+      operationId: badges_retrieve
+      summary: Obtener detalle de medalla
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - badges
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardianBadge'
+          description: ''
+  /api/v1/biodiversity/:
+    get:
+      operationId: biodiversity_list
+      summary: Listar catálogo de biodiversidad altoandina
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría
+          enum:
+          - aves
+          - endemicas
+          - fauna
+          - flora
+        description: |-
+          * `flora` - Flora Nativa
+          * `fauna` - Fauna Silvestre
+          * `aves` - Aves de Altura
+          * `endemicas` - Especies Endémicas
+      - in: query
+        name: conservation_status
+        schema:
+          type: string
+          title: Estado de Conservación (UICN / SERFOR)
+          enum:
+          - CR
+          - EN
+          - LC
+          - NT
+          - VU
+        description: |-
+          * `CR` - En Peligro Crítico (CR)
+          * `EN` - En Peligro (EN)
+          * `VU` - Vulnerable (VU)
+          * `NT` - Casi Amenazado (NT)
+          * `LC` - Preocupación Menor (LC)
+      - in: query
+        name: is_endemic
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - biodiversity
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BiodiversitySpecies'
+          description: ''
+  /api/v1/biodiversity/{uuid}/:
+    get:
+      operationId: biodiversity_retrieve
+      summary: Obtener detalle de una especie de flora o fauna
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - biodiversity
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiodiversitySpecies'
+          description: ''
+  /api/v1/checkpoint-entries/:
+    get:
+      operationId: checkpoint_entries_list
+      description: |-
+        Control de acceso y retorno obligatorio de residuos sólidos en el Nevado Huaguruncho.
+        Restringido exclusivamente a Guardaparques, Personal Municipal y Administradores.
+      summary: Listar registros del puesto de control (Guardaparques)
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Estado de la Visita
+          enum:
+          - alerta_retraso
+          - completado
+          - en_montana
+        description: |-
+          * `en_montana` - En Montaña / Ascendiendo
+          * `completado` - Descenso Completado / Verificado
+          * `alerta_retraso` - Alerta de Retraso
+      - in: query
+        name: waste_compliance_status
+        schema:
+          type: string
+          title: Cumplimiento de Residuos (Huella Cero)
+          enum:
+          - compliant
+          - extra_collected
+          - infraction_missing
+          - pending_checkout
+        description: |-
+          * `pending_checkout` - En Montaña (Pendiente de Retorno)
+          * `compliant` - Conforme (Retornó 100% de Residuos)
+          * `extra_collected` - Meritorio (Recogió Residuos Extras en Sendero)
+          * `infraction_missing` - Infracción (Faltan Residuos / Abandono)
+      tags:
+      - checkpoint-entries
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCheckpointVisitorLogList'
+          description: ''
+    post:
+      operationId: checkpoint_entries_create
+      description: |-
+        Control de acceso y retorno obligatorio de residuos sólidos en el Nevado Huaguruncho.
+        Restringido exclusivamente a Guardaparques, Personal Municipal y Administradores.
+      summary: Registrar entrada de visitante y declaración de residuos
+      tags:
+      - checkpoint-entries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointVisitorLog'
+          description: ''
+  /api/v1/checkpoint-entries/{uuid}/:
+    get:
+      operationId: checkpoint_entries_retrieve
+      description: |-
+        Control de acceso y retorno obligatorio de residuos sólidos en el Nevado Huaguruncho.
+        Restringido exclusivamente a Guardaparques, Personal Municipal y Administradores.
+      summary: Detalle de registro de puesto de control
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - checkpoint-entries
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointVisitorLog'
+          description: ''
+    put:
+      operationId: checkpoint_entries_update
+      description: |-
+        Control de acceso y retorno obligatorio de residuos sólidos en el Nevado Huaguruncho.
+        Restringido exclusivamente a Guardaparques, Personal Municipal y Administradores.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - checkpoint-entries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointVisitorLog'
+          description: ''
+    patch:
+      operationId: checkpoint_entries_partial_update
+      description: |-
+        Control de acceso y retorno obligatorio de residuos sólidos en el Nevado Huaguruncho.
+        Restringido exclusivamente a Guardaparques, Personal Municipal y Administradores.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - checkpoint-entries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCheckpointVisitorLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCheckpointVisitorLogRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCheckpointVisitorLogRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointVisitorLog'
+          description: ''
+    delete:
+      operationId: checkpoint_entries_destroy
+      description: |-
+        Control de acceso y retorno obligatorio de residuos sólidos en el Nevado Huaguruncho.
+        Restringido exclusivamente a Guardaparques, Personal Municipal y Administradores.
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - checkpoint-entries
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/checkpoint-entries/{uuid}/check-out/:
+    post:
+      operationId: checkpoint_entries_check_out_create
+      description: Verifica los residuos devueltos por el visitante y actualiza el
+        estado de cumplimiento.
+      summary: Registrar salida de visitante e inspección de residuos (Check-out)
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - checkpoint-entries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckpointVisitorLogRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointVisitorLog'
+          description: ''
+  /api/v1/checkpoint-entries/sync-batch/:
+    post:
+      operationId: checkpoint_entries_sync_batch_create
+      description: |-
+        Endpoint de sincronización en lote offline para la garita de guardaparques.
+        Idempotente respecto a local_uuid.
+      summary: Sincronización en lote offline de registros de guardabosques
+      tags:
+      - checkpoint-entries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckpointSyncBatchRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckpointSyncBatchRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckpointSyncBatchRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointSyncBatchResponse'
+          description: ''
+  /api/v1/community-posts/:
+    get:
+      operationId: community_posts_list
+      summary: Listar publicaciones aprobadas del muro comunitario
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría
+          enum:
+          - accion_ecologica
+          - avistamientos
+          - consejos
+          - fotografia
+        description: |-
+          * `fotografia` - Fotografía de Alta Montaña
+          * `avistamientos` - Avistamientos de Flora y Fauna
+          * `consejos` - Consejos de Ruta y Seguridad
+          * `accion_ecologica` - Acción Ecológica y Limpieza
+      - in: query
+        name: lnt_verified
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - community-posts
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommunityPostList'
+          description: ''
+    post:
+      operationId: community_posts_create
+      summary: Crear nueva publicación en el muro comunitario (pasa a moderación)
+      tags:
+      - community-posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPost'
+          description: ''
+  /api/v1/community-posts/{uuid}/:
+    get:
+      operationId: community_posts_retrieve
+      summary: Obtener detalle de publicación comunitaria
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - community-posts
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPost'
+          description: ''
+    put:
+      operationId: community_posts_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - community-posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPost'
+          description: ''
+    patch:
+      operationId: community_posts_partial_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - community-posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityPostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityPostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityPostRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPost'
+          description: ''
+    delete:
+      operationId: community_posts_destroy
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - community-posts
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/community-services/:
+    get:
+      operationId: community_services_list
+      summary: Listar servicios y emprendimientos comunitarios de Huachón
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría de Servicio
+          enum:
+          - arriero
+          - artesania
+          - campamento
+          - gastronomia
+          - guia
+          - hospedaje
+        description: |-
+          * `guia` - Guía Oficial de Alta Montaña
+          * `arriero` - Transporte y Carga (Red de Arrieros)
+          * `hospedaje` - Hospedaje / Albergue Comunitario
+          * `campamento` - Zona de Campamento Eco-Lodge
+          * `gastronomia` - Gastronomía Típica Andina
+          * `artesania` - Artesanía y Textiles Locales
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - community-services
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommunityService'
+          description: ''
+  /api/v1/community-services/{uuid}/:
+    get:
+      operationId: community_services_retrieve
+      summary: Obtener detalle de servicio comunitario
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - community-services
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityService'
+          description: ''
+  /api/v1/emergency-contacts/:
+    get:
+      operationId: emergency_contacts_list
+      summary: Listar contactos de emergencia SOS y brigadas de rescate
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - emergency-contacts
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmergencyContact'
+          description: ''
+  /api/v1/emergency-contacts/{uuid}/:
+    get:
+      operationId: emergency_contacts_retrieve
+      summary: Obtener detalle de contacto de emergencia
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - emergency-contacts
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyContact'
+          description: ''
+  /api/v1/environmental-reports/:
+    get:
+      operationId: environmental_reports_list
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría del Incidente
+          enum:
+          - accidente
+          - basura
+          - flora_fauna_afectada
+          - incendio
+          - otro
+          - senalizacion_danada
+        description: |-
+          * `basura` - Acumulación de Basura / Residuos
+          * `incendio` - Foco de Incendio / Quema
+          * `accidente` - Accidente o Persona en Riesgo
+          * `senalizacion_danada` - Señalización Turística Dañada
+          * `flora_fauna_afectada` - Flora o Fauna Afectada
+          * `otro` - Otro Incidente Ambiental
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: route__uuid
+        schema:
+          type: string
+          format: uuid
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Estado del Reporte
+          enum:
+          - atendido
+          - cerrado
+          - en_revision
+          - pendiente
+          - recibido
+        description: |-
+          * `pendiente` - Pendiente de Revisión
+          * `recibido` - Recibido por Central
+          * `en_revision` - En Inspección / Verificación
+          * `atendido` - Atendido / Solucionado
+          * `cerrado` - Cerrado
+      tags:
+      - environmental-reports
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnvironmentalReportList'
+          description: ''
+    post:
+      operationId: environmental_reports_create
+      description: Registra un reporte de incidente ambiental. Si se envía local_uuid
+        existente, retorna el registro sin duplicar.
+      summary: Crear un nuevo reporte ambiental
+      tags:
+      - environmental-reports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentalReportCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnvironmentalReportCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnvironmentalReportCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalReportCreate'
+          description: ''
+  /api/v1/environmental-reports/{uuid}/:
+    get:
+      operationId: environmental_reports_retrieve
+      summary: Obtener detalle de un reporte ambiental
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - environmental-reports
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalReport'
+          description: ''
+    put:
+      operationId: environmental_reports_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - environmental-reports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentalReportRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnvironmentalReportRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnvironmentalReportRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalReport'
+          description: ''
+    patch:
+      operationId: environmental_reports_partial_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - environmental-reports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvironmentalReportRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvironmentalReportRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvironmentalReportRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalReport'
+          description: ''
+    delete:
+      operationId: environmental_reports_destroy
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - environmental-reports
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/environmental-reports/{uuid}/evidences/:
+    post:
+      operationId: environmental_reports_evidences_create
+      description: Sube una fotografía de evidencia para un reporte ambiental existente.
+      summary: Adjuntar evidencia fotográfica a un reporte
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - environmental-reports
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReportEvidenceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReportEvidenceRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportEvidence'
+          description: ''
+  /api/v1/environmental-reports/me/:
+    get:
+      operationId: environmental_reports_me_list
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría del Incidente
+          enum:
+          - accidente
+          - basura
+          - flora_fauna_afectada
+          - incendio
+          - otro
+          - senalizacion_danada
+        description: |-
+          * `basura` - Acumulación de Basura / Residuos
+          * `incendio` - Foco de Incendio / Quema
+          * `accidente` - Accidente o Persona en Riesgo
+          * `senalizacion_danada` - Señalización Turística Dañada
+          * `flora_fauna_afectada` - Flora o Fauna Afectada
+          * `otro` - Otro Incidente Ambiental
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Estado del Reporte
+          enum:
+          - atendido
+          - cerrado
+          - en_revision
+          - pendiente
+          - recibido
+        description: |-
+          * `pendiente` - Pendiente de Revisión
+          * `recibido` - Recibido por Central
+          * `en_revision` - En Inspección / Verificación
+          * `atendido` - Atendido / Solucionado
+          * `cerrado` - Cerrado
+      tags:
+      - environmental-reports
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnvironmentalReportList'
+          description: ''
+  /api/v1/environmental-reports/sync-batch/:
+    post:
+      operationId: environmental_reports_sync_batch_create
+      description: Recibe una lista de reportes capturados offline. Es idempotente
+        respecto a local_uuid.
+      summary: Sincronización en lote de eco-reportes offline
+      tags:
+      - environmental-reports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncBatchRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SyncBatchRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SyncBatchRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncBatchResponse'
+          description: ''
+  /api/v1/expeditions/:
+    get:
+      operationId: expeditions_list
+      summary: Listar expediciones registradas
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: route
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Estado de la Expedición
+          enum:
+          - alerta_sos
+          - en_curso
+          - planificada
+          - retornada
+          - retrasada
+        description: |-
+          * `planificada` - Planificada
+          * `en_curso` - En Curso / En la Montaña
+          * `retornada` - Retornada con Éxito (Check-out)
+          * `retrasada` - Retrasada / Posible Emergencia
+          * `alerta_sos` - Alerta SOS Activada
+      tags:
+      - expeditions
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTrekkingExpeditionList'
+          description: ''
+    post:
+      operationId: expeditions_create
+      summary: Registrar salida de expedición de alta montaña
+      tags:
+      - expeditions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrekkingExpedition'
+          description: ''
+  /api/v1/expeditions/{uuid}/:
+    get:
+      operationId: expeditions_retrieve
+      summary: Detalle de una expedición
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - expeditions
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrekkingExpedition'
+          description: ''
+    put:
+      operationId: expeditions_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - expeditions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrekkingExpedition'
+          description: ''
+    patch:
+      operationId: expeditions_partial_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - expeditions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTrekkingExpeditionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTrekkingExpeditionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTrekkingExpeditionRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrekkingExpedition'
+          description: ''
+    delete:
+      operationId: expeditions_destroy
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - expeditions
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/expeditions/{uuid}/check-out/:
+    post:
+      operationId: expeditions_check_out_create
+      description: Registra el retorno seguro del grupo de montaña (Check-out).
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - expeditions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TrekkingExpeditionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrekkingExpedition'
+          description: ''
+  /api/v1/health/:
+    get:
+      operationId: health_retrieve
+      description: Retorna el estado de la API, conectividad de base de datos y motor
+        nativo.
+      summary: Verificación de estado de salud del sistema
+      tags:
+      - health
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+          description: ''
+  /api/v1/hotspots/:
+    get:
+      operationId: hotspots_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - hotspots
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHotspotList'
+          description: ''
+  /api/v1/hotspots/{uuid}/:
+    get:
+      operationId: hotspots_retrieve
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - hotspots
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hotspot'
+          description: ''
+  /api/v1/municipal-notices/:
+    get:
+      operationId: municipal_notices_list
+      summary: Listar avisos y comunicados oficiales de la Municipalidad de Huachón
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría
+          enum:
+          - clima
+          - comunal
+          - conservacion
+          - turismo
+          - vial
+        description: |-
+          * `vial` - Alerta Vial / Accesos
+          * `turismo` - Tours & Promoción Turística
+          * `conservacion` - Conservación y Medio Ambiente
+          * `clima` - Clima y Seguridad de Montaña
+          * `comunal` - Actividad Comunal
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: priority
+        schema:
+          type: string
+          title: Nivel de Prioridad
+          enum:
+          - alta
+          - comunitario
+          - informativo
+          - precaucion
+        description: |-
+          * `alta` - Prioridad Alta / Urgente
+          * `precaucion` - Precaución
+          * `informativo` - Informativo
+          * `comunitario` - Comunitario
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - municipal-notices
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMunicipalNoticeList'
+          description: ''
+    post:
+      operationId: municipal_notices_create
+      tags:
+      - municipal-notices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MunicipalNoticeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MunicipalNoticeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MunicipalNoticeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MunicipalNotice'
+          description: ''
+  /api/v1/municipal-notices/{uuid}/:
+    get:
+      operationId: municipal_notices_retrieve
+      summary: Detalle de un comunicado municipal
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - municipal-notices
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MunicipalNotice'
+          description: ''
+    put:
+      operationId: municipal_notices_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - municipal-notices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MunicipalNoticeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MunicipalNoticeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MunicipalNoticeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MunicipalNotice'
+          description: ''
+    patch:
+      operationId: municipal_notices_partial_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - municipal-notices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMunicipalNoticeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMunicipalNoticeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMunicipalNoticeRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MunicipalNotice'
+          description: ''
+    delete:
+      operationId: municipal_notices_destroy
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - municipal-notices
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/passport-stamps/:
+    get:
+      operationId: passport_stamps_list
+      summary: Listar sellos del Pasaporte de Montaña por ruta
+      parameters:
+      - in: query
+        name: route
+        schema:
+          type: integer
+      tags:
+      - passport-stamps
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrailPassportStamp'
+          description: ''
+  /api/v1/passport-stamps/{uuid}/:
+    get:
+      operationId: passport_stamps_retrieve
+      summary: Obtener detalle de sello de pasaporte
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - passport-stamps
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrailPassportStamp'
+          description: ''
+  /api/v1/points-of-interest/:
+    get:
+      operationId: points_of_interest_list
+      summary: Listar puntos de interés georreferenciados (POIs)
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría
+          enum:
+          - campamento
+          - flora_rodal
+          - laguna
+          - mirador
+          - quebrada
+          - sitio_sagrado
+        description: |-
+          * `laguna` - Laguna Glaciar
+          * `mirador` - Mirador Panorámico
+          * `campamento` - Zona de Campamento
+          * `quebrada` - Quebrada / Valle
+          * `sitio_sagrado` - Sitio Sagrado / Apacheta
+          * `flora_rodal` - Rodal de Puya Raimondi / Bosque
+      - in: query
+        name: route
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - points-of-interest
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PointOfInterest'
+          description: ''
+  /api/v1/points-of-interest/{uuid}/:
+    get:
+      operationId: points_of_interest_retrieve
+      summary: Obtener detalle de punto de interés
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - points-of-interest
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointOfInterest'
+          description: ''
+  /api/v1/routes/:
+    get:
+      operationId: routes_list
+      summary: Listar rutas turísticas activas
+      parameters:
+      - in: query
+        name: difficulty
+        schema:
+          type: string
+          title: Nivel de Dificultad
+          enum:
+          - dificil
+          - facil
+          - moderada
+        description: |-
+          * `facil` - Fácil
+          * `moderada` - Moderada
+          * `dificil` - Difícil
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - routes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRouteListList'
+          description: ''
+  /api/v1/routes/{uuid}/:
+    get:
+      operationId: routes_retrieve
+      summary: Obtener detalle de ruta con sus escenas 360 y puntos de interés
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - routes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteDetail'
+          description: ''
+  /api/v1/routes/{uuid}/auto-link-street-view/:
+    post:
+      operationId: routes_auto_link_street_view_create
+      summary: Generar automáticamente enlaces de navegación Street View (Avanzar
+        / Retroceder) entre escenas consecutivas
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - routes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteListRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RouteListRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RouteListRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteList'
+          description: ''
+  /api/v1/routes/{uuid}/offline-package/:
+    get:
+      operationId: routes_offline_package_retrieve
+      description: Retorna el contenido empaquetado (rutas, escenas, hotspots y URLs
+        de panoramas) para almacenamiento offline en la app.
+      summary: Obtener manifiesto del paquete offline para una ruta
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - routes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflinePackage'
+          description: ''
+  /api/v1/routes/{uuid}/offline-package/download/:
+    get:
+      operationId: routes_offline_package_download_retrieve
+      description: Transmite en streaming un archivo ZIP pre-almacenado con manifest.json,
+        geometrías GeoJSON, fotos 360 y checksum SHA-256.
+      summary: Descargar paquete ZIP offline completo
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - routes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/routes/{uuid}/points_of_interest/:
+    get:
+      operationId: routes_points_of_interest_list
+      summary: Listar puntos de interés (POIs) asociados a una ruta
+      parameters:
+      - in: query
+        name: difficulty
+        schema:
+          type: string
+          title: Nivel de Dificultad
+          enum:
+          - dificil
+          - facil
+          - moderada
+        description: |-
+          * `facil` - Fácil
+          * `moderada` - Moderada
+          * `dificil` - Difícil
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - routes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPointOfInterestList'
+          description: ''
+  /api/v1/routes/{uuid}/scenes/:
+    get:
+      operationId: routes_scenes_list
+      summary: Listar escenas 360 asociadas a una ruta
+      parameters:
+      - in: query
+        name: difficulty
+        schema:
+          type: string
+          title: Nivel de Dificultad
+          enum:
+          - dificil
+          - facil
+          - moderada
+        description: |-
+          * `facil` - Fácil
+          * `moderada` - Moderada
+          * `dificil` - Difícil
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - routes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTourSceneList'
+          description: ''
+  /api/v1/routes/{uuid}/studio-data/:
+    get:
+      operationId: routes_studio_data_retrieve
+      summary: Obtener datos completos para el Tour 360 Studio (Mapa OSM + Visor 360)
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - routes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteList'
+          description: ''
+  /api/v1/routes/{uuid}/upload-gpx/:
+    post:
+      operationId: routes_upload_gpx_create
+      summary: Subir y procesar archivo GPX de Wikiloc / Garmin
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - routes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteListRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RouteListRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RouteListRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteList'
+          description: ''
+  /api/v1/safety-recommendations/:
+    get:
+      operationId: safety_recommendations_list
+      description: Retorna la lista completa de recomendaciones para el turista altoandino.
+      summary: Listar recomendaciones de seguridad y sostenibilidad
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          title: Categoría
+          enum:
+          - ambiente
+          - bateria
+          - equipamiento
+          - hidratacion
+          - salud
+          - seguridad
+        description: |-
+          * `equipamiento` - Equipamiento y Ropa
+          * `salud` - Aclimatación y Salud
+          * `hidratacion` - Hidratación y Alimentación
+          * `seguridad` - Seguridad y Orientación
+          * `ambiente` - Cuidado y Protección Ambiental
+          * `bateria` - Batería y Conectividad
+      tags:
+      - safety-recommendations
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SafetyRecommendation'
+          description: ''
+  /api/v1/scenes/:
+    get:
+      operationId: scenes_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - scenes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTourSceneList'
+          description: ''
+  /api/v1/scenes/{uuid}/:
+    get:
+      operationId: scenes_retrieve
+      summary: Obtener detalle de escena 360 con sus hotspots
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - scenes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TourScene'
+          description: ''
+  /api/v1/scenes/{uuid}/hotspots/:
+    get:
+      operationId: scenes_hotspots_list
+      summary: Listar hotspots de una escena específica
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - scenes
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHotspotList'
+          description: ''
+  /api/v1/service-reviews/:
+    get:
+      operationId: service_reviews_list
+      summary: Listar reseñas de servicios comunitarios
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: rating
+        schema:
+          type: integer
+      - in: query
+        name: service
+        schema:
+          type: integer
+      tags:
+      - service-reviews
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommunityServiceReviewList'
+          description: ''
+    post:
+      operationId: service_reviews_create
+      summary: Publicar una reseña o calificación de un servicio
+      tags:
+      - service-reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityServiceReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityServiceReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityServiceReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityServiceReview'
+          description: ''
+  /api/v1/service-reviews/{uuid}/:
+    get:
+      operationId: service_reviews_retrieve
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - service-reviews
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityServiceReview'
+          description: ''
+    put:
+      operationId: service_reviews_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - service-reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityServiceReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityServiceReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityServiceReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityServiceReview'
+          description: ''
+    patch:
+      operationId: service_reviews_partial_update
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - service-reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityServiceReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityServiceReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityServiceReviewRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityServiceReview'
+          description: ''
+    delete:
+      operationId: service_reviews_destroy
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - service-reviews
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/weather-alerts/:
+    get:
+      operationId: weather_alerts_list
+      summary: Listar alertas meteorológicas activas de montaña
+      parameters:
+      - in: query
+        name: severity
+        schema:
+          type: string
+          title: Severidad
+          enum:
+          - info
+          - peligro
+          - precaucion
+        description: |-
+          * `info` - Informativo / Clima Favorable
+          * `precaucion` - Precaución / Vientos Fuertes
+          * `peligro` - Peligro / Tormenta Glaciar / Nieve
+      tags:
+      - weather-alerts
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherAlert'
+          description: ''
+  /api/v1/weather-alerts/{uuid}/:
+    get:
+      operationId: weather_alerts_retrieve
+      summary: Obtener detalle de una alerta meteorológica
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - weather-alerts
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherAlert'
+          description: ''
+  /api/v1/weather-stations/:
+    get:
+      operationId: weather_stations_list
+      summary: Listar estaciones meteorológicas por piso altitudinal
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - in: query
+        name: risk_level
+        schema:
+          type: string
+          title: Nivel de Riesgo
+          enum:
+          - bajo
+          - extremo
+          - heladas
+          - moderado
+          - ventisca
+        description: |-
+          * `bajo` - Bajo
+          * `moderado` - Moderado
+          * `heladas` - Heladas Nocturnas
+          * `extremo` - Alto Riesgo / Extremo Albedo
+          * `ventisca` - Ventisca y Congelamiento
+      tags:
+      - weather-stations
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MountainWeatherStation'
+          description: ''
+  /api/v1/weather-stations/{uuid}/:
+    get:
+      operationId: weather_stations_retrieve
+      summary: Obtener clima detallado de una estación/sector
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+          title: Identificador único público (UUID)
+        required: true
+      tags:
+      - weather-stations
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountainWeatherStation'
+          description: ''
+  /api/v1/weather-stations/refresh/:
+    get:
+      operationId: weather_stations_refresh_retrieve
+      description: Forzar actualización en tiempo real desde la API meteorológica
+      tags:
+      - weather-stations
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountainWeatherStation'
+          description: ''
+    post:
+      operationId: weather_stations_refresh_create
+      description: Forzar actualización en tiempo real desde la API meteorológica
+      tags:
+      - weather-stations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MountainWeatherStationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MountainWeatherStationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MountainWeatherStationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountainWeatherStation'
+          description: ''
+components:
+  schemas:
+    AnalyticsOverview:
+      type: object
+      properties:
+        engine:
+          $ref: '#/components/schemas/AnalyticsOverviewEngine'
+        tourism:
+          $ref: '#/components/schemas/AnalyticsOverviewTourism'
+        conservation:
+          $ref: '#/components/schemas/AnalyticsOverviewConservation'
+        gamification:
+          $ref: '#/components/schemas/AnalyticsOverviewGamification'
+      required:
+      - conservation
+      - engine
+      - gamification
+      - tourism
+    AnalyticsOverviewConservation:
+      type: object
+      properties:
+        total_species:
+          type: integer
+        total_reports:
+          type: integer
+        resolved_reports:
+          type: integer
+        pending_reports:
+          type: integer
+        resolution_rate_percent:
+          type: number
+          format: double
+      required:
+      - pending_reports
+      - resolution_rate_percent
+      - resolved_reports
+      - total_reports
+      - total_species
+    AnalyticsOverviewEngine:
+      type: object
+      properties:
+        rust_native_active:
+          type: boolean
+        rust_version:
+          type: string
+      required:
+      - rust_native_active
+      - rust_version
+    AnalyticsOverviewGamification:
+      type: object
+      properties:
+        total_badges:
+          type: integer
+        total_passport_stamps:
+          type: integer
+      required:
+      - total_badges
+      - total_passport_stamps
+    AnalyticsOverviewTourism:
+      type: object
+      properties:
+        total_routes:
+          type: integer
+        total_distance_km:
+          type: number
+          format: double
+        total_360_scenes:
+          type: integer
+        total_pois:
+          type: integer
+        total_weather_stations:
+          type: integer
+        total_community_services:
+          type: integer
+      required:
+      - total_360_scenes
+      - total_community_services
+      - total_distance_km
+      - total_pois
+      - total_routes
+      - total_weather_stations
+    AudioGuide:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        title_es:
+          type: string
+          title: Título en Español
+          maxLength: 200
+        title_qu:
+          type: string
+          title: Título en Quechua (Runa Simi)
+          maxLength: 200
+        category:
+          allOf:
+          - $ref: '#/components/schemas/AudioGuideCategoryEnum'
+          title: Categoría Temática
+        category_display:
+          type: string
+          readOnly: true
+        location_name:
+          type: string
+          title: Ubicación / Sector (ej. Laguna Huascacocha 4,250m)
+          maxLength: 150
+        duration_formatted:
+          type: string
+          title: Duración (ej. 3:45 min)
+          maxLength: 50
+        audio_file_url:
+          type: string
+          nullable: true
+          readOnly: true
+        audio_url:
+          title: URL Externa de Audio (Opcional)
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        transcript_es:
+          type: string
+          title: Transcripción en Español
+        transcript_qu:
+          type: string
+          title: Transcripción en Quechua
+        didactic_glossary:
+          type: string
+          title: Glosario Didáctico Andino
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden de Reproducción
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - audio_file_url
+      - category_display
+      - id
+      - location_name
+      - title_es
+      - transcript_es
+      - uuid
+    AudioGuideCategoryEnum:
+      enum:
+      - mitologia
+      - hidrologia
+      - flora_fauna
+      - historia
+      type: string
+      description: |-
+        * `mitologia` - Mitología Andina y Cosmovisión
+        * `hidrologia` - Hidrología Sagrada y Lagunas
+        * `flora_fauna` - Flora y Fauna Milenaria
+        * `historia` - Historia Comunal y Tradiciones
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        tokens:
+          type: object
+          additionalProperties: {}
+      required:
+      - tokens
+      - user
+    BiodiversityCategoryEnum:
+      enum:
+      - flora
+      - fauna
+      - aves
+      - endemicas
+      type: string
+      description: |-
+        * `flora` - Flora Nativa
+        * `fauna` - Fauna Silvestre
+        * `aves` - Aves de Altura
+        * `endemicas` - Especies Endémicas
+    BiodiversityConservationStatusEnum:
+      enum:
+      - CR
+      - EN
+      - VU
+      - NT
+      - LC
+      type: string
+      description: |-
+        * `CR` - En Peligro Crítico (CR)
+        * `EN` - En Peligro (EN)
+        * `VU` - Vulnerable (VU)
+        * `NT` - Casi Amenazado (NT)
+        * `LC` - Preocupación Menor (LC)
+    BiodiversitySpecies:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        name:
+          type: string
+          title: Nombre Común
+          maxLength: 150
+        quechua_name:
+          type: string
+          title: Nombre en Quechua / Originario
+          maxLength: 150
+        scientific_name:
+          type: string
+          title: Nombre Científico
+          maxLength: 150
+        category:
+          allOf:
+          - $ref: '#/components/schemas/BiodiversityCategoryEnum'
+          title: Categoría
+        category_display:
+          type: string
+          readOnly: true
+        altitude_range:
+          type: string
+          title: Rango Altitudinal
+          maxLength: 100
+        conservation_status:
+          allOf:
+          - $ref: '#/components/schemas/BiodiversityConservationStatusEnum'
+          title: Estado de Conservación (UICN / SERFOR)
+        conservation_status_display:
+          type: string
+          readOnly: true
+        is_endemic:
+          type: boolean
+          title: ¿Es Especie Endémica?
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        summary:
+          type: string
+          title: Descripción / Resumen de la Especie
+        ecological_role:
+          type: string
+          title: Rol Ecológico e Hídrico en la Puna
+        conservation_tip:
+          type: string
+          title: Pauta de Conservación (No Deje Rastro)
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden de Visualización
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - category_display
+      - conservation_status_display
+      - id
+      - image_url
+      - name
+      - scientific_name
+      - summary
+      - uuid
+    CheckpointSyncBatchItemRequest:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          minLength: 1
+          maxLength: 64
+        checkpoint_name:
+          type: string
+          minLength: 1
+          default: Garita de Control Huaguruncho - Abra Huachón
+        visitor_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        document_type:
+          type: string
+          minLength: 1
+          default: DNI
+        document_number:
+          type: string
+          minLength: 1
+          maxLength: 50
+        phone:
+          type: string
+          default: ''
+        group_size:
+          type: integer
+          default: 1
+        route_name:
+          type: string
+          minLength: 1
+          default: Nevado Huaguruncho - Ruta Glaciar
+        guide_name:
+          type: string
+          default: ''
+        entry_datetime:
+          type: string
+          format: date-time
+        entry_ranger_name:
+          type: string
+          default: ''
+        plastic_bottles_in:
+          type: integer
+          default: 0
+        cans_in:
+          type: integer
+          default: 0
+        plastic_wrappers_in:
+          type: integer
+          default: 0
+        plastic_bags_in:
+          type: integer
+          default: 0
+        batteries_in:
+          type: integer
+          default: 0
+        gas_canisters_in:
+          type: integer
+          default: 0
+        other_waste_details_in:
+          type: string
+          default: ''
+        total_items_in:
+          type: integer
+          default: 0
+        exit_datetime:
+          type: string
+          format: date-time
+          nullable: true
+        exit_ranger_name:
+          type: string
+          default: ''
+        plastic_bottles_out:
+          type: integer
+          default: 0
+        cans_out:
+          type: integer
+          default: 0
+        plastic_wrappers_out:
+          type: integer
+          default: 0
+        plastic_bags_out:
+          type: integer
+          default: 0
+        batteries_out:
+          type: integer
+          default: 0
+        gas_canisters_out:
+          type: integer
+          default: 0
+        total_items_out:
+          type: integer
+          default: 0
+        waste_compliance_status:
+          type: string
+          minLength: 1
+          default: pending_checkout
+        status:
+          type: string
+          minLength: 1
+          default: en_montana
+        notes:
+          type: string
+          default: ''
+      required:
+      - document_number
+      - entry_datetime
+      - local_uuid
+      - visitor_name
+    CheckpointSyncBatchRequestRequest:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckpointSyncBatchItemRequest'
+      required:
+      - entries
+    CheckpointSyncBatchResponse:
+      type: object
+      properties:
+        processed:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckpointSyncBatchResult'
+      required:
+      - processed
+      - results
+    CheckpointSyncBatchResult:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+        server_uuid:
+          type: string
+        status:
+          type: string
+        action:
+          type: string
+      required:
+      - action
+      - local_uuid
+      - server_uuid
+      - status
+    CheckpointVisitorLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        local_uuid:
+          type: string
+          title: UUID Local (Drift SQLite)
+          maxLength: 64
+        checkpoint_name:
+          type: string
+          title: Puesto de Control
+          maxLength: 150
+        visitor_name:
+          type: string
+          title: Nombre del Visitante / Líder de Grupo
+          maxLength: 150
+        document_type:
+          type: string
+          title: Tipo de Documento
+          maxLength: 30
+        document_number:
+          type: string
+          title: N° Documento
+          maxLength: 50
+        phone:
+          type: string
+          title: Teléfono / WhatsApp
+          maxLength: 50
+        group_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Número de Personas
+        route_name:
+          type: string
+          title: Ruta o Destino
+          maxLength: 200
+        guide_name:
+          type: string
+          title: Guía o Arriero Acompañante
+          maxLength: 150
+        entry_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Entrada
+        entry_ranger_name:
+          type: string
+          title: Guardabosques de Entrada
+          maxLength: 150
+        plastic_bottles_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Botellas Plásticas (Subida)
+        cans_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Latas / Conservas (Subida)
+        plastic_wrappers_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envoltorios Snacks (Subida)
+        plastic_bags_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Bolsas Plásticas (Subida)
+        batteries_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pilas / Baterías (Subida)
+        gas_canisters_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envases de Gas / Camping (Subida)
+        other_waste_details_in:
+          type: string
+          title: Otros Residuos Declarados
+        total_items_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Total Residuos que Suben
+        exit_datetime:
+          type: string
+          format: date-time
+          nullable: true
+          title: Fecha y Hora de Salida
+        exit_ranger_name:
+          type: string
+          title: Guardabosques de Salida
+          maxLength: 150
+        plastic_bottles_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Botellas Plásticas Retornadas
+        cans_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Latas / Conservas Retornadas
+        plastic_wrappers_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envoltorios Snacks Retornados
+        plastic_bags_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Bolsas Plásticas Retornadas
+        batteries_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pilas / Baterías Retornadas
+        gas_canisters_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envases Gas Retornados
+        total_items_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Total Residuos Retornados
+        waste_compliance_status:
+          allOf:
+          - $ref: '#/components/schemas/CheckpointVisitorLogWasteStatusEnum'
+          title: Cumplimiento de Residuos (Huella Cero)
+        waste_compliance_status_display:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CheckpointVisitorLogStatusEnum'
+          title: Estado de la Visita
+        status_display:
+          type: string
+          readOnly: true
+        notes:
+          type: string
+          title: Observaciones / Actas de Infracción
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Última actualización
+      required:
+      - created_at
+      - document_number
+      - id
+      - local_uuid
+      - status_display
+      - updated_at
+      - uuid
+      - visitor_name
+      - waste_compliance_status_display
+    CheckpointVisitorLogRequest:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          minLength: 1
+          title: UUID Local (Drift SQLite)
+          maxLength: 64
+        checkpoint_name:
+          type: string
+          minLength: 1
+          title: Puesto de Control
+          maxLength: 150
+        visitor_name:
+          type: string
+          minLength: 1
+          title: Nombre del Visitante / Líder de Grupo
+          maxLength: 150
+        document_type:
+          type: string
+          minLength: 1
+          title: Tipo de Documento
+          maxLength: 30
+        document_number:
+          type: string
+          minLength: 1
+          title: N° Documento
+          maxLength: 50
+        phone:
+          type: string
+          title: Teléfono / WhatsApp
+          maxLength: 50
+        group_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Número de Personas
+        route_name:
+          type: string
+          minLength: 1
+          title: Ruta o Destino
+          maxLength: 200
+        guide_name:
+          type: string
+          title: Guía o Arriero Acompañante
+          maxLength: 150
+        entry_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Entrada
+        entry_ranger_name:
+          type: string
+          title: Guardabosques de Entrada
+          maxLength: 150
+        plastic_bottles_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Botellas Plásticas (Subida)
+        cans_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Latas / Conservas (Subida)
+        plastic_wrappers_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envoltorios Snacks (Subida)
+        plastic_bags_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Bolsas Plásticas (Subida)
+        batteries_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pilas / Baterías (Subida)
+        gas_canisters_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envases de Gas / Camping (Subida)
+        other_waste_details_in:
+          type: string
+          title: Otros Residuos Declarados
+        total_items_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Total Residuos que Suben
+        exit_datetime:
+          type: string
+          format: date-time
+          nullable: true
+          title: Fecha y Hora de Salida
+        exit_ranger_name:
+          type: string
+          title: Guardabosques de Salida
+          maxLength: 150
+        plastic_bottles_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Botellas Plásticas Retornadas
+        cans_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Latas / Conservas Retornadas
+        plastic_wrappers_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envoltorios Snacks Retornados
+        plastic_bags_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Bolsas Plásticas Retornadas
+        batteries_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pilas / Baterías Retornadas
+        gas_canisters_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envases Gas Retornados
+        total_items_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Total Residuos Retornados
+        waste_compliance_status:
+          allOf:
+          - $ref: '#/components/schemas/CheckpointVisitorLogWasteStatusEnum'
+          title: Cumplimiento de Residuos (Huella Cero)
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CheckpointVisitorLogStatusEnum'
+          title: Estado de la Visita
+        notes:
+          type: string
+          title: Observaciones / Actas de Infracción
+      required:
+      - document_number
+      - local_uuid
+      - visitor_name
+    CheckpointVisitorLogStatusEnum:
+      enum:
+      - en_montana
+      - completado
+      - alerta_retraso
+      type: string
+      description: |-
+        * `en_montana` - En Montaña / Ascendiendo
+        * `completado` - Descenso Completado / Verificado
+        * `alerta_retraso` - Alerta de Retraso
+    CheckpointVisitorLogWasteStatusEnum:
+      enum:
+      - pending_checkout
+      - compliant
+      - extra_collected
+      - infraction_missing
+      type: string
+      description: |-
+        * `pending_checkout` - En Montaña (Pendiente de Retorno)
+        * `compliant` - Conforme (Retornó 100% de Residuos)
+        * `extra_collected` - Meritorio (Recogió Residuos Extras en Sendero)
+        * `infraction_missing` - Infracción (Faltan Residuos / Abandono)
+    CommunityPost:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        author_name:
+          type: string
+          title: Nombre del Autor
+          maxLength: 150
+        author_role:
+          type: string
+          title: Rol / Nivel de Centinela
+          maxLength: 100
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CommunityPostCategoryEnum'
+          title: Categoría
+        category_display:
+          type: string
+          readOnly: true
+        location_name:
+          type: string
+          title: Ubicación (ej. Laguna Huascacocha)
+          maxLength: 150
+        content:
+          type: string
+          title: Contenido / Relato
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        munay_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Aprecios / Munay
+        lnt_verified:
+          type: boolean
+          title: Verificado No Deje Rastro (LNT)
+        is_approved:
+          type: boolean
+          title: Publicación Aprobada por Moderación
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+      required:
+      - author_name
+      - category_display
+      - content
+      - created_at
+      - id
+      - image_url
+      - location_name
+      - uuid
+    CommunityPostCategoryEnum:
+      enum:
+      - fotografia
+      - avistamientos
+      - consejos
+      - accion_ecologica
+      type: string
+      description: |-
+        * `fotografia` - Fotografía de Alta Montaña
+        * `avistamientos` - Avistamientos de Flora y Fauna
+        * `consejos` - Consejos de Ruta y Seguridad
+        * `accion_ecologica` - Acción Ecológica y Limpieza
+    CommunityPostRequest:
+      type: object
+      properties:
+        author_name:
+          type: string
+          minLength: 1
+          title: Nombre del Autor
+          maxLength: 150
+        author_role:
+          type: string
+          minLength: 1
+          title: Rol / Nivel de Centinela
+          maxLength: 100
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CommunityPostCategoryEnum'
+          title: Categoría
+        location_name:
+          type: string
+          minLength: 1
+          title: Ubicación (ej. Laguna Huascacocha)
+          maxLength: 150
+        content:
+          type: string
+          minLength: 1
+          title: Contenido / Relato
+        munay_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Aprecios / Munay
+        lnt_verified:
+          type: boolean
+          title: Verificado No Deje Rastro (LNT)
+        is_approved:
+          type: boolean
+          title: Publicación Aprobada por Moderación
+      required:
+      - author_name
+      - content
+      - location_name
+    CommunityService:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        name:
+          type: string
+          title: Nombre del Emprendimiento / Prestador de Servicio
+          maxLength: 200
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CommunityServiceCategoryEnum'
+          title: Categoría de Servicio
+        category_display:
+          type: string
+          readOnly: true
+        contact_phone:
+          type: string
+          title: Teléfono de Llamadas
+          maxLength: 50
+        whatsapp_number:
+          type: string
+          title: Número de WhatsApp (+51...)
+          maxLength: 50
+        location_address:
+          type: string
+          title: Ubicación / Dirección en Huachón
+          maxLength: 250
+        price_range:
+          type: string
+          title: Tarifas / Precios Referenciales
+          maxLength: 100
+        badge_text:
+          type: string
+          title: Distintivo / Certificación (ej. DIRCETUR Acreditado)
+          maxLength: 100
+        experience_years:
+          type: string
+          title: Experiencia / Origen
+          maxLength: 100
+        services_description:
+          type: string
+          title: Descripción de Servicios Ofrecidos
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        average_rating:
+          type: number
+          format: double
+          readOnly: true
+        reviews_count:
+          type: integer
+          readOnly: true
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityServiceReview'
+          readOnly: true
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden de Visualización
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - average_rating
+      - category_display
+      - id
+      - image_url
+      - name
+      - reviews
+      - reviews_count
+      - services_description
+      - uuid
+    CommunityServiceCategoryEnum:
+      enum:
+      - guia
+      - arriero
+      - hospedaje
+      - campamento
+      - gastronomia
+      - artesania
+      type: string
+      description: |-
+        * `guia` - Guía Oficial de Alta Montaña
+        * `arriero` - Transporte y Carga (Red de Arrieros)
+        * `hospedaje` - Hospedaje / Albergue Comunitario
+        * `campamento` - Zona de Campamento Eco-Lodge
+        * `gastronomia` - Gastronomía Típica Andina
+        * `artesania` - Artesanía y Textiles Locales
+    CommunityServiceReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        service:
+          type: integer
+          title: Servicio / Prestador
+        user:
+          type: integer
+          nullable: true
+          title: Usuario
+        author_name:
+          type: string
+          title: Nombre del Reseñante
+          maxLength: 150
+        rating:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Puntuación (1 a 5 Estrellas)
+        comment:
+          type: string
+          title: Comentario / Testimonio
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+      required:
+      - author_name
+      - comment
+      - created_at
+      - id
+      - service
+      - uuid
+    CommunityServiceReviewRequest:
+      type: object
+      properties:
+        service:
+          type: integer
+          title: Servicio / Prestador
+        user:
+          type: integer
+          nullable: true
+          title: Usuario
+        author_name:
+          type: string
+          minLength: 1
+          title: Nombre del Reseñante
+          maxLength: 150
+        rating:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Puntuación (1 a 5 Estrellas)
+        comment:
+          type: string
+          minLength: 1
+          title: Comentario / Testimonio
+      required:
+      - author_name
+      - comment
+      - service
+    DifficultyEnum:
+      enum:
+      - facil
+      - moderada
+      - dificil
+      type: string
+      description: |-
+        * `facil` - Fácil
+        * `moderada` - Moderada
+        * `dificil` - Difícil
+    EmergencyContact:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        title:
+          type: string
+          title: Nombre de la Institución / Brigada
+          maxLength: 200
+        short_phone:
+          type: string
+          title: Número Corto / Central (ej. 105)
+          maxLength: 30
+        full_number:
+          type: string
+          title: Celular Directo / WhatsApp (+51...)
+          maxLength: 50
+        description:
+          type: string
+          title: Especialidad y Protocolo de Atención
+        icon:
+          type: string
+          title: Icono Material
+          maxLength: 50
+        priority_order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden de Prioridad
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - description
+      - id
+      - short_phone
+      - title
+      - uuid
+    EnvironmentalReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        local_uuid:
+          type: string
+          title: UUID Local Móvil (Idempotencia)
+          maxLength: 64
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        route:
+          type: integer
+          nullable: true
+          title: Ruta Cercana
+        route_name:
+          type: string
+          readOnly: true
+          nullable: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentalReportCategoryEnum'
+          title: Categoría del Incidente
+        category_display:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          title: Descripción del Incidente
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Latitud GPS
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Longitud GPS
+        accuracy_meters:
+          type: number
+          format: double
+          nullable: true
+          title: Precisión GPS (metros)
+        captured_at:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Captura Local
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentalReportStatusEnum'
+          readOnly: true
+          title: Estado del Reporte
+        status_display:
+          type: string
+          readOnly: true
+        admin_notes:
+          type: string
+          readOnly: true
+          title: Notas de Atención / Autoridad
+        synced_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de Sincronización con Servidor
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        evidences:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportEvidence'
+          readOnly: true
+      required:
+      - admin_notes
+      - category_display
+      - created_at
+      - description
+      - evidences
+      - id
+      - local_uuid
+      - route_name
+      - status
+      - status_display
+      - synced_at
+      - user
+      - uuid
+    EnvironmentalReportCategoryEnum:
+      enum:
+      - basura
+      - incendio
+      - accidente
+      - senalizacion_danada
+      - flora_fauna_afectada
+      - otro
+      type: string
+      description: |-
+        * `basura` - Acumulación de Basura / Residuos
+        * `incendio` - Foco de Incendio / Quema
+        * `accidente` - Accidente o Persona en Riesgo
+        * `senalizacion_danada` - Señalización Turística Dañada
+        * `flora_fauna_afectada` - Flora o Fauna Afectada
+        * `otro` - Otro Incidente Ambiental
+    EnvironmentalReportCreate:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          title: UUID Local Móvil (Idempotencia)
+          maxLength: 64
+        category:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentalReportCategoryEnum'
+          title: Categoría del Incidente
+        description:
+          type: string
+          title: Descripción del Incidente
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Latitud GPS
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Longitud GPS
+        accuracy_meters:
+          type: number
+          format: double
+          nullable: true
+          title: Precisión GPS (metros)
+        captured_at:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Captura Local
+      required:
+      - description
+      - local_uuid
+    EnvironmentalReportCreateRequest:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          minLength: 1
+          title: UUID Local Móvil (Idempotencia)
+          maxLength: 64
+        route_uuid:
+          type: string
+          format: uuid
+          writeOnly: true
+          nullable: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentalReportCategoryEnum'
+          title: Categoría del Incidente
+        description:
+          type: string
+          minLength: 1
+          title: Descripción del Incidente
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Latitud GPS
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Longitud GPS
+        accuracy_meters:
+          type: number
+          format: double
+          nullable: true
+          title: Precisión GPS (metros)
+        captured_at:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Captura Local
+      required:
+      - description
+      - local_uuid
+    EnvironmentalReportRequest:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          minLength: 1
+          title: UUID Local Móvil (Idempotencia)
+          maxLength: 64
+        route:
+          type: integer
+          nullable: true
+          title: Ruta Cercana
+        category:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentalReportCategoryEnum'
+          title: Categoría del Incidente
+        description:
+          type: string
+          minLength: 1
+          title: Descripción del Incidente
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Latitud GPS
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Longitud GPS
+        accuracy_meters:
+          type: number
+          format: double
+          nullable: true
+          title: Precisión GPS (metros)
+        captured_at:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Captura Local
+      required:
+      - description
+      - local_uuid
+    EnvironmentalReportStatusEnum:
+      enum:
+      - pendiente
+      - recibido
+      - en_revision
+      - atendido
+      - cerrado
+      type: string
+      description: |-
+        * `pendiente` - Pendiente de Revisión
+        * `recibido` - Recibido por Central
+        * `en_revision` - En Inspección / Verificación
+        * `atendido` - Atendido / Solucionado
+        * `cerrado` - Cerrado
+    GuardianBadge:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        slug:
+          type: string
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        title:
+          type: string
+          title: Título de la Medalla
+          maxLength: 150
+        quechua_title:
+          type: string
+          title: Título en Quechua
+          maxLength: 150
+        description:
+          type: string
+          title: Descripción / Criterio para obtenerla
+        tier:
+          allOf:
+          - $ref: '#/components/schemas/TierEnum'
+          title: Nivel
+        tier_display:
+          type: string
+          readOnly: true
+        icon:
+          type: string
+          title: Ícono / Emoji
+          maxLength: 50
+        xp_points:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Puntos de Guardián (XP)
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden en Repisa
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - description
+      - id
+      - slug
+      - tier_display
+      - title
+      - uuid
+    HealthCheckResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        database:
+          type: string
+        service:
+          type: string
+        version:
+          type: string
+        domain:
+          type: string
+        rust_engine:
+          type: object
+          additionalProperties: {}
+      required:
+      - database
+      - domain
+      - rust_engine
+      - service
+      - status
+      - timestamp
+      - version
+    Hotspot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        source_scene_uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        target_scene_uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Tipo de Hotspot
+        type_display:
+          type: string
+          readOnly: true
+        yaw:
+          type: number
+          format: double
+          title: Yaw / Giro Horizontal (-180° a +180°)
+        pitch:
+          type: number
+          format: double
+          title: Pitch / Inclinación Vertical (-90° a +90°)
+        target_yaw:
+          type: number
+          format: double
+          title: Ángulo de Llegada a la siguiente escena (-180° a +180°)
+        target_pitch:
+          type: number
+          format: double
+          title: Inclinación de Llegada (-90° a +90°)
+        title:
+          type: string
+          title: Título del Hotspot
+          maxLength: 150
+        content:
+          type: string
+          title: Contenido o Mensaje Explicativo
+        media_image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        audio_url:
+          nullable: true
+          title: Audioguía URL / Audio MP3
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        icon:
+          type: string
+          title: Icono Material
+          maxLength: 50
+      required:
+      - id
+      - media_image_url
+      - source_scene_uuid
+      - target_scene_uuid
+      - title
+      - type_display
+      - uuid
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    MountainWeatherStation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        name:
+          type: string
+          title: Nombre de la Estación / Sector
+          maxLength: 150
+        altitude_masl:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Altitud (m s.n.m.)
+        temp_day_celsius:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Temperatura Diurna (°C)
+        temp_night_celsius:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Temperatura Nocturna (°C)
+        condition:
+          type: string
+          title: Condición Climática
+          maxLength: 100
+        weather_icon:
+          type: string
+          title: Icono Material
+          maxLength: 50
+        wind_kmh:
+          type: number
+          format: double
+          maximum: 10000
+          minimum: -10000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Viento Promedio (km/h)
+        wind_gusts_kmh:
+          type: number
+          format: double
+          maximum: 10000
+          minimum: -10000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Ráfagas de Viento (km/h)
+        wind_chill_celsius:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Sensación Térmica (°C)
+        uv_index:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Índice UV
+        uv_level:
+          type: string
+          title: Nivel Radiación UV
+          maxLength: 50
+        humidity_percentage:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Humedad Relativa (%)
+        pressure_hpa:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Presión Atmosférica (hPa)
+        risk_level:
+          allOf:
+          - $ref: '#/components/schemas/RiskLevelEnum'
+          title: Nivel de Riesgo
+        risk_level_display:
+          type: string
+          readOnly: true
+        alert_advisory:
+          type: string
+          title: Aviso de Seguridad / Recomendación Activa
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden por Altitud
+        is_active:
+          type: boolean
+          title: Activo
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Última actualización
+      required:
+      - altitude_masl
+      - id
+      - name
+      - risk_level_display
+      - temp_day_celsius
+      - temp_night_celsius
+      - updated_at
+      - uuid
+    MountainWeatherStationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre de la Estación / Sector
+          maxLength: 150
+        altitude_masl:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Altitud (m s.n.m.)
+        temp_day_celsius:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Temperatura Diurna (°C)
+        temp_night_celsius:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Temperatura Nocturna (°C)
+        condition:
+          type: string
+          minLength: 1
+          title: Condición Climática
+          maxLength: 100
+        weather_icon:
+          type: string
+          minLength: 1
+          title: Icono Material
+          maxLength: 50
+        wind_kmh:
+          type: number
+          format: double
+          maximum: 10000
+          minimum: -10000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Viento Promedio (km/h)
+        wind_gusts_kmh:
+          type: number
+          format: double
+          maximum: 10000
+          minimum: -10000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Ráfagas de Viento (km/h)
+        wind_chill_celsius:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Sensación Térmica (°C)
+        uv_index:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Índice UV
+        uv_level:
+          type: string
+          minLength: 1
+          title: Nivel Radiación UV
+          maxLength: 50
+        humidity_percentage:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Humedad Relativa (%)
+        pressure_hpa:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Presión Atmosférica (hPa)
+        risk_level:
+          allOf:
+          - $ref: '#/components/schemas/RiskLevelEnum'
+          title: Nivel de Riesgo
+        alert_advisory:
+          type: string
+          title: Aviso de Seguridad / Recomendación Activa
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden por Altitud
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - altitude_masl
+      - name
+      - temp_day_celsius
+      - temp_night_celsius
+    MunicipalNotice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        title:
+          type: string
+          title: Título del Aviso
+          maxLength: 200
+        subtitle:
+          type: string
+          title: Subtítulo / Resumen Corto
+          maxLength: 250
+        category:
+          allOf:
+          - $ref: '#/components/schemas/MunicipalNoticeCategoryEnum'
+          title: Categoría
+        category_display:
+          type: string
+          readOnly: true
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          title: Nivel de Prioridad
+        priority_display:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          title: Área / Gerencia Emisora
+          maxLength: 200
+        icon:
+          type: string
+          title: Ícono Material
+          maxLength: 60
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        full_text:
+          type: string
+          title: Texto Completo del Comunicado
+        recommendations:
+          type: string
+          title: Recomendaciones Oficiales
+        published_at:
+          type: string
+          format: date-time
+          title: Fecha de Publicación
+        valid_until:
+          type: string
+          format: date-time
+          nullable: true
+          title: Válido Hasta
+        is_active:
+          type: boolean
+          title: Publicación Activa
+      required:
+      - category_display
+      - full_text
+      - id
+      - image_url
+      - priority_display
+      - subtitle
+      - title
+      - uuid
+    MunicipalNoticeCategoryEnum:
+      enum:
+      - vial
+      - turismo
+      - conservacion
+      - clima
+      - comunal
+      type: string
+      description: |-
+        * `vial` - Alerta Vial / Accesos
+        * `turismo` - Tours & Promoción Turística
+        * `conservacion` - Conservación y Medio Ambiente
+        * `clima` - Clima y Seguridad de Montaña
+        * `comunal` - Actividad Comunal
+    MunicipalNoticeRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          title: Título del Aviso
+          maxLength: 200
+        subtitle:
+          type: string
+          minLength: 1
+          title: Subtítulo / Resumen Corto
+          maxLength: 250
+        category:
+          allOf:
+          - $ref: '#/components/schemas/MunicipalNoticeCategoryEnum'
+          title: Categoría
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          title: Nivel de Prioridad
+        department:
+          type: string
+          minLength: 1
+          title: Área / Gerencia Emisora
+          maxLength: 200
+        icon:
+          type: string
+          minLength: 1
+          title: Ícono Material
+          maxLength: 60
+        full_text:
+          type: string
+          minLength: 1
+          title: Texto Completo del Comunicado
+        recommendations:
+          type: string
+          title: Recomendaciones Oficiales
+        published_at:
+          type: string
+          format: date-time
+          title: Fecha de Publicación
+        valid_until:
+          type: string
+          format: date-time
+          nullable: true
+          title: Válido Hasta
+        is_active:
+          type: boolean
+          title: Publicación Activa
+      required:
+      - full_text
+      - subtitle
+      - title
+    OfflinePackage:
+      type: object
+      properties:
+        package_uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        route_uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        version:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Versión del Paquete
+        size_bytes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          title: Tamaño Total Estimado (Bytes)
+        is_published:
+          type: boolean
+          title: Publicado / Disponible para Descarga
+        published_at:
+          type: string
+          format: date-time
+          title: Fecha de Publicación
+        manifest:
+          readOnly: true
+      required:
+      - manifest
+      - package_uuid
+      - route_uuid
+    POICategoryEnum:
+      enum:
+      - laguna
+      - mirador
+      - campamento
+      - quebrada
+      - sitio_sagrado
+      - flora_rodal
+      type: string
+      description: |-
+        * `laguna` - Laguna Glaciar
+        * `mirador` - Mirador Panorámico
+        * `campamento` - Zona de Campamento
+        * `quebrada` - Quebrada / Valle
+        * `sitio_sagrado` - Sitio Sagrado / Apacheta
+        * `flora_rodal` - Rodal de Puya Raimondi / Bosque
+    PaginatedCheckpointVisitorLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckpointVisitorLog'
+    PaginatedCommunityPostList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityPost'
+    PaginatedCommunityServiceReviewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityServiceReview'
+    PaginatedEnvironmentalReportList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvironmentalReport'
+    PaginatedHotspotList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hotspot'
+    PaginatedMunicipalNoticeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MunicipalNotice'
+    PaginatedPointOfInterestList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PointOfInterest'
+    PaginatedRouteListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteList'
+    PaginatedTourSceneList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TourScene'
+    PaginatedTrekkingExpeditionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrekkingExpedition'
+    PatchedAdminReportStatusRequest:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentalReportStatusEnum'
+          title: Estado del Reporte
+        admin_notes:
+          type: string
+          title: Notas de Atención / Autoridad
+    PatchedCheckpointVisitorLogRequest:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          minLength: 1
+          title: UUID Local (Drift SQLite)
+          maxLength: 64
+        checkpoint_name:
+          type: string
+          minLength: 1
+          title: Puesto de Control
+          maxLength: 150
+        visitor_name:
+          type: string
+          minLength: 1
+          title: Nombre del Visitante / Líder de Grupo
+          maxLength: 150
+        document_type:
+          type: string
+          minLength: 1
+          title: Tipo de Documento
+          maxLength: 30
+        document_number:
+          type: string
+          minLength: 1
+          title: N° Documento
+          maxLength: 50
+        phone:
+          type: string
+          title: Teléfono / WhatsApp
+          maxLength: 50
+        group_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Número de Personas
+        route_name:
+          type: string
+          minLength: 1
+          title: Ruta o Destino
+          maxLength: 200
+        guide_name:
+          type: string
+          title: Guía o Arriero Acompañante
+          maxLength: 150
+        entry_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Entrada
+        entry_ranger_name:
+          type: string
+          title: Guardabosques de Entrada
+          maxLength: 150
+        plastic_bottles_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Botellas Plásticas (Subida)
+        cans_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Latas / Conservas (Subida)
+        plastic_wrappers_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envoltorios Snacks (Subida)
+        plastic_bags_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Bolsas Plásticas (Subida)
+        batteries_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pilas / Baterías (Subida)
+        gas_canisters_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envases de Gas / Camping (Subida)
+        other_waste_details_in:
+          type: string
+          title: Otros Residuos Declarados
+        total_items_in:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Total Residuos que Suben
+        exit_datetime:
+          type: string
+          format: date-time
+          nullable: true
+          title: Fecha y Hora de Salida
+        exit_ranger_name:
+          type: string
+          title: Guardabosques de Salida
+          maxLength: 150
+        plastic_bottles_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Botellas Plásticas Retornadas
+        cans_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Latas / Conservas Retornadas
+        plastic_wrappers_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envoltorios Snacks Retornados
+        plastic_bags_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Bolsas Plásticas Retornadas
+        batteries_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pilas / Baterías Retornadas
+        gas_canisters_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Envases Gas Retornados
+        total_items_out:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Total Residuos Retornados
+        waste_compliance_status:
+          allOf:
+          - $ref: '#/components/schemas/CheckpointVisitorLogWasteStatusEnum'
+          title: Cumplimiento de Residuos (Huella Cero)
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CheckpointVisitorLogStatusEnum'
+          title: Estado de la Visita
+        notes:
+          type: string
+          title: Observaciones / Actas de Infracción
+    PatchedCommunityPostRequest:
+      type: object
+      properties:
+        author_name:
+          type: string
+          minLength: 1
+          title: Nombre del Autor
+          maxLength: 150
+        author_role:
+          type: string
+          minLength: 1
+          title: Rol / Nivel de Centinela
+          maxLength: 100
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CommunityPostCategoryEnum'
+          title: Categoría
+        location_name:
+          type: string
+          minLength: 1
+          title: Ubicación (ej. Laguna Huascacocha)
+          maxLength: 150
+        content:
+          type: string
+          minLength: 1
+          title: Contenido / Relato
+        munay_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Aprecios / Munay
+        lnt_verified:
+          type: boolean
+          title: Verificado No Deje Rastro (LNT)
+        is_approved:
+          type: boolean
+          title: Publicación Aprobada por Moderación
+    PatchedCommunityServiceReviewRequest:
+      type: object
+      properties:
+        service:
+          type: integer
+          title: Servicio / Prestador
+        user:
+          type: integer
+          nullable: true
+          title: Usuario
+        author_name:
+          type: string
+          minLength: 1
+          title: Nombre del Reseñante
+          maxLength: 150
+        rating:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Puntuación (1 a 5 Estrellas)
+        comment:
+          type: string
+          minLength: 1
+          title: Comentario / Testimonio
+    PatchedEnvironmentalReportRequest:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          minLength: 1
+          title: UUID Local Móvil (Idempotencia)
+          maxLength: 64
+        route:
+          type: integer
+          nullable: true
+          title: Ruta Cercana
+        category:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentalReportCategoryEnum'
+          title: Categoría del Incidente
+        description:
+          type: string
+          minLength: 1
+          title: Descripción del Incidente
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Latitud GPS
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Longitud GPS
+        accuracy_meters:
+          type: number
+          format: double
+          nullable: true
+          title: Precisión GPS (metros)
+        captured_at:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Captura Local
+    PatchedMunicipalNoticeRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          title: Título del Aviso
+          maxLength: 200
+        subtitle:
+          type: string
+          minLength: 1
+          title: Subtítulo / Resumen Corto
+          maxLength: 250
+        category:
+          allOf:
+          - $ref: '#/components/schemas/MunicipalNoticeCategoryEnum'
+          title: Categoría
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          title: Nivel de Prioridad
+        department:
+          type: string
+          minLength: 1
+          title: Área / Gerencia Emisora
+          maxLength: 200
+        icon:
+          type: string
+          minLength: 1
+          title: Ícono Material
+          maxLength: 60
+        full_text:
+          type: string
+          minLength: 1
+          title: Texto Completo del Comunicado
+        recommendations:
+          type: string
+          title: Recomendaciones Oficiales
+        published_at:
+          type: string
+          format: date-time
+          title: Fecha de Publicación
+        valid_until:
+          type: string
+          format: date-time
+          nullable: true
+          title: Válido Hasta
+        is_active:
+          type: boolean
+          title: Publicación Activa
+    PatchedTrekkingExpeditionRequest:
+      type: object
+      properties:
+        user:
+          type: integer
+          nullable: true
+          title: Usuario Registrado
+        tourist_name:
+          type: string
+          minLength: 1
+          title: Líder de Expedición
+          maxLength: 150
+        tourist_phone:
+          type: string
+          minLength: 1
+          title: Teléfono / WhatsApp
+          maxLength: 50
+        emergency_contact_name:
+          type: string
+          minLength: 1
+          title: Contacto de Emergencia Familiar
+          maxLength: 150
+        emergency_contact_phone:
+          type: string
+          minLength: 1
+          title: Teléfono de Emergencia Familiar
+          maxLength: 50
+        route:
+          type: integer
+          nullable: true
+          title: Ruta a Recorrer
+        group_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Número de Excursionistas
+        guide_name:
+          type: string
+          title: Guía o Arriero Acompañante
+          maxLength: 150
+        departure_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Salida
+        expected_return_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora Estimada de Retorno
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TrekkingExpeditionStatusEnum'
+          title: Estado de la Expedición
+        health_notes:
+          type: string
+          title: Declaración de Salud / Alergias / Medicamentos
+        gear_checklist_verified:
+          type: boolean
+          title: Checklist de Seguridad Verificado
+        admin_notes:
+          type: string
+          title: Notas de Guardaparques / COEL
+    PatchedUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo Electrónico
+          maxLength: 255
+        full_name:
+          type: string
+          minLength: 1
+          title: Nombre Completo
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Teléfono / WhatsApp
+          maxLength: 30
+    PointOfInterest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        route_uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        name:
+          type: string
+          title: Nombre del Punto de Interés
+          maxLength: 200
+        category:
+          allOf:
+          - $ref: '#/components/schemas/POICategoryEnum'
+          title: Categoría
+        category_display:
+          type: string
+          readOnly: true
+        altitude_masl:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Altitud (m s.n.m.)
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Latitud GPS
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Longitud GPS
+        description:
+          type: string
+          title: Descripción
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - altitude_masl
+      - category_display
+      - id
+      - image_url
+      - latitude
+      - longitude
+      - name
+      - route_uuid
+      - uuid
+    PriorityEnum:
+      enum:
+      - alta
+      - precaucion
+      - informativo
+      - comunitario
+      type: string
+      description: |-
+        * `alta` - Prioridad Alta / Urgente
+        * `precaucion` - Precaución
+        * `informativo` - Informativo
+        * `comunitario` - Comunitario
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo Electrónico
+          maxLength: 255
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        full_name:
+          type: string
+          minLength: 1
+          title: Nombre Completo
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Teléfono / WhatsApp
+          maxLength: 30
+      required:
+      - email
+      - full_name
+      - password
+    ReportEvidence:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          title: Fotografía de Evidencia
+        image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de Carga
+      required:
+      - created_at
+      - id
+      - image
+      - image_url
+    ReportEvidenceRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: binary
+          title: Fotografía de Evidencia
+      required:
+      - image
+    RiskLevelEnum:
+      enum:
+      - bajo
+      - moderado
+      - heladas
+      - extremo
+      - ventisca
+      type: string
+      description: |-
+        * `bajo` - Bajo
+        * `moderado` - Moderado
+        * `heladas` - Heladas Nocturnas
+        * `extremo` - Alto Riesgo / Extremo Albedo
+        * `ventisca` - Ventisca y Congelamiento
+    RoleEnum:
+      enum:
+      - turista
+      - guia
+      - administrador
+      - municipalidad
+      - guardaparque
+      type: string
+      description: |-
+        * `turista` - Turista
+        * `guia` - Guía Autorizado
+        * `administrador` - Administrador
+        * `municipalidad` - Personal Municipal / Guardaparque
+        * `guardaparque` - Guardaparque / Guardabosques
+    RouteDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        name:
+          type: string
+          title: Nombre de la Ruta
+          maxLength: 200
+        slug:
+          title: Slug URL
+          oneOf:
+          - type: string
+            maxLength: 220
+            pattern: ^[-a-zA-Z0-9_]+$
+          - type: string
+            maxLength: 0
+        description:
+          type: string
+          title: Descripción de la Ruta
+        difficulty:
+          allOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          title: Nivel de Dificultad
+        difficulty_display:
+          type: string
+          readOnly: true
+        distance_km:
+          type: number
+          format: double
+          maximum: 10000
+          minimum: -10000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Distancia (km)
+        estimated_duration_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Duración Estimada (minutos)
+        safety_recommendations:
+          type: string
+          title: Recomendaciones Específicas de la Ruta
+        cover_image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        gpx_file_url:
+          type: string
+          nullable: true
+          readOnly: true
+        elevation_gain_m:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Desnivel Positivo +D (m)
+        elevation_loss_m:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Desnivel Negativo -D (m)
+        max_altitude_m:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Cota Máxima (m s.n.m.)
+        min_altitude_m:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Cota Mínima (m s.n.m.)
+        is_active:
+          type: boolean
+          title: Ruta Activa
+        scenes_count:
+          type: integer
+          readOnly: true
+        scenes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TourScene'
+          readOnly: true
+        points_of_interest:
+          type: array
+          items:
+            $ref: '#/components/schemas/PointOfInterest'
+          readOnly: true
+        geojson_track:
+          nullable: true
+          title: Trazo GPS GeoJSON
+        elevation_profile:
+          nullable: true
+          title: Perfil de Elevación (Altimetría)
+      required:
+      - cover_image_url
+      - description
+      - difficulty_display
+      - gpx_file_url
+      - id
+      - name
+      - points_of_interest
+      - scenes
+      - scenes_count
+      - uuid
+    RouteList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        name:
+          type: string
+          title: Nombre de la Ruta
+          maxLength: 200
+        slug:
+          title: Slug URL
+          oneOf:
+          - type: string
+            maxLength: 220
+            pattern: ^[-a-zA-Z0-9_]+$
+          - type: string
+            maxLength: 0
+        description:
+          type: string
+          title: Descripción de la Ruta
+        difficulty:
+          allOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          title: Nivel de Dificultad
+        difficulty_display:
+          type: string
+          readOnly: true
+        distance_km:
+          type: number
+          format: double
+          maximum: 10000
+          minimum: -10000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Distancia (km)
+        estimated_duration_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Duración Estimada (minutos)
+        safety_recommendations:
+          type: string
+          title: Recomendaciones Específicas de la Ruta
+        cover_image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        gpx_file_url:
+          type: string
+          nullable: true
+          readOnly: true
+        elevation_gain_m:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Desnivel Positivo +D (m)
+        elevation_loss_m:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Desnivel Negativo -D (m)
+        max_altitude_m:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Cota Máxima (m s.n.m.)
+        min_altitude_m:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Cota Mínima (m s.n.m.)
+        is_active:
+          type: boolean
+          title: Ruta Activa
+        scenes_count:
+          type: integer
+          readOnly: true
+      required:
+      - cover_image_url
+      - description
+      - difficulty_display
+      - gpx_file_url
+      - id
+      - name
+      - scenes_count
+      - uuid
+    RouteListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre de la Ruta
+          maxLength: 200
+        slug:
+          title: Slug URL
+          oneOf:
+          - type: string
+            maxLength: 220
+            pattern: ^[-a-zA-Z0-9_]+$
+          - type: string
+            maxLength: 0
+        description:
+          type: string
+          minLength: 1
+          title: Descripción de la Ruta
+        difficulty:
+          allOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          title: Nivel de Dificultad
+        distance_km:
+          type: number
+          format: double
+          maximum: 10000
+          minimum: -10000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Distancia (km)
+        estimated_duration_minutes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Duración Estimada (minutos)
+        safety_recommendations:
+          type: string
+          title: Recomendaciones Específicas de la Ruta
+        elevation_gain_m:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Desnivel Positivo +D (m)
+        elevation_loss_m:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          title: Desnivel Negativo -D (m)
+        max_altitude_m:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Cota Máxima (m s.n.m.)
+        min_altitude_m:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Cota Mínima (m s.n.m.)
+        is_active:
+          type: boolean
+          title: Ruta Activa
+      required:
+      - description
+      - name
+    SafetyRecommendation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/SafetyRecommendationCategoryEnum'
+          title: Categoría
+        category_display:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          title: Título de la Recomendación
+          maxLength: 200
+        description:
+          type: string
+          title: Detalle de la Recomendación
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden de Visualización
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - category
+      - category_display
+      - description
+      - id
+      - title
+    SafetyRecommendationCategoryEnum:
+      enum:
+      - equipamiento
+      - salud
+      - hidratacion
+      - seguridad
+      - ambiente
+      - bateria
+      type: string
+      description: |-
+        * `equipamiento` - Equipamiento y Ropa
+        * `salud` - Aclimatación y Salud
+        * `hidratacion` - Hidratación y Alimentación
+        * `seguridad` - Seguridad y Orientación
+        * `ambiente` - Cuidado y Protección Ambiental
+        * `bateria` - Batería y Conectividad
+    SeverityEnum:
+      enum:
+      - info
+      - precaucion
+      - peligro
+      type: string
+      description: |-
+        * `info` - Informativo / Clima Favorable
+        * `precaucion` - Precaución / Vientos Fuertes
+        * `peligro` - Peligro / Tormenta Glaciar / Nieve
+    SyncBatchItemRequest:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+          minLength: 1
+          maxLength: 64
+        route_uuid:
+          type: string
+          format: uuid
+          nullable: true
+        category:
+          $ref: '#/components/schemas/EnvironmentalReportCategoryEnum'
+        description:
+          type: string
+          minLength: 1
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        accuracy_meters:
+          type: number
+          format: double
+          nullable: true
+        captured_at:
+          type: string
+          format: date-time
+      required:
+      - category
+      - description
+      - local_uuid
+    SyncBatchRequestRequest:
+      type: object
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncBatchItemRequest'
+      required:
+      - reports
+    SyncBatchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SyncBatchResult'
+      required:
+      - results
+    SyncBatchResult:
+      type: object
+      properties:
+        local_uuid:
+          type: string
+        success:
+          type: boolean
+        server_uuid:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+        message:
+          type: string
+      required:
+      - local_uuid
+      - message
+      - server_uuid
+      - status
+      - success
+    TierEnum:
+      enum:
+      - bronce
+      - plata
+      - oro
+      - diamante
+      type: string
+      description: |-
+        * `bronce` - Bronce
+        * `plata` - Plata
+        * `oro` - Oro
+        * `diamante` - Diamante Glacial
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    TourScene:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        route_uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+          title: Título del Punto / Escena
+          maxLength: 200
+        description:
+          type: string
+          title: Descripción del Punto
+        panorama_image_url:
+          type: string
+          nullable: true
+          readOnly: true
+        thumbnail_url:
+          type: string
+          nullable: true
+          readOnly: true
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Latitud GPS
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Longitud GPS
+        altitude_masl:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+          title: Altitud del Nodo (m s.n.m.)
+        heading:
+          type: number
+          format: double
+          title: Orientación / Rumbo Norte (0° - 360°)
+        initial_yaw:
+          type: number
+          format: double
+          title: Yaw Inicial / Ángulo de Inicio (-180° a +180°)
+        initial_pitch:
+          type: number
+          format: double
+          title: Pitch Inicial (-90° a +90°)
+        is_control_point:
+          type: boolean
+          title: Es Punto de Control / Waypoint
+        sequence:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden en la Ruta
+        is_active:
+          type: boolean
+          title: Activo
+        hotspots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hotspot'
+          readOnly: true
+      required:
+      - hotspots
+      - id
+      - panorama_image_url
+      - route_uuid
+      - thumbnail_url
+      - title
+      - uuid
+    TrailPassportStamp:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        route:
+          type: integer
+          title: Ruta Asociada
+        route_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Nombre del Sello
+          maxLength: 150
+        quechua_name:
+          type: string
+          title: Nombre en Quechua
+          maxLength: 150
+        altitude_masl:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Altitud del Hito (m s.n.m.)
+        latitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Latitud GPS del Hito
+        longitude:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+          title: Longitud GPS del Hito
+        landmark_icon:
+          type: string
+          title: Ícono del Hito
+          maxLength: 50
+        secret_code:
+          type: string
+          title: Código de Validación / QR
+          maxLength: 50
+        order:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Orden en Pasaporte
+        is_active:
+          type: boolean
+          title: Activo
+      required:
+      - altitude_masl
+      - id
+      - name
+      - route
+      - route_name
+      - uuid
+    TrekkingExpedition:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        user:
+          type: integer
+          nullable: true
+          title: Usuario Registrado
+        tourist_name:
+          type: string
+          title: Líder de Expedición
+          maxLength: 150
+        tourist_phone:
+          type: string
+          title: Teléfono / WhatsApp
+          maxLength: 50
+        emergency_contact_name:
+          type: string
+          title: Contacto de Emergencia Familiar
+          maxLength: 150
+        emergency_contact_phone:
+          type: string
+          title: Teléfono de Emergencia Familiar
+          maxLength: 50
+        route:
+          type: integer
+          nullable: true
+          title: Ruta a Recorrer
+        route_name:
+          type: string
+          readOnly: true
+        group_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Número de Excursionistas
+        guide_name:
+          type: string
+          title: Guía o Arriero Acompañante
+          maxLength: 150
+        departure_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Salida
+        expected_return_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora Estimada de Retorno
+        actual_return_datetime:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Fecha y Hora Real de Check-out
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TrekkingExpeditionStatusEnum'
+          title: Estado de la Expedición
+        status_display:
+          type: string
+          readOnly: true
+        health_notes:
+          type: string
+          title: Declaración de Salud / Alergias / Medicamentos
+        gear_checklist_verified:
+          type: boolean
+          title: Checklist de Seguridad Verificado
+        admin_notes:
+          type: string
+          title: Notas de Guardaparques / COEL
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+      required:
+      - actual_return_datetime
+      - created_at
+      - emergency_contact_name
+      - emergency_contact_phone
+      - expected_return_datetime
+      - id
+      - route_name
+      - status_display
+      - tourist_name
+      - tourist_phone
+      - uuid
+    TrekkingExpeditionRequest:
+      type: object
+      properties:
+        user:
+          type: integer
+          nullable: true
+          title: Usuario Registrado
+        tourist_name:
+          type: string
+          minLength: 1
+          title: Líder de Expedición
+          maxLength: 150
+        tourist_phone:
+          type: string
+          minLength: 1
+          title: Teléfono / WhatsApp
+          maxLength: 50
+        emergency_contact_name:
+          type: string
+          minLength: 1
+          title: Contacto de Emergencia Familiar
+          maxLength: 150
+        emergency_contact_phone:
+          type: string
+          minLength: 1
+          title: Teléfono de Emergencia Familiar
+          maxLength: 50
+        route:
+          type: integer
+          nullable: true
+          title: Ruta a Recorrer
+        group_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Número de Excursionistas
+        guide_name:
+          type: string
+          title: Guía o Arriero Acompañante
+          maxLength: 150
+        departure_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora de Salida
+        expected_return_datetime:
+          type: string
+          format: date-time
+          title: Fecha y Hora Estimada de Retorno
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TrekkingExpeditionStatusEnum'
+          title: Estado de la Expedición
+        health_notes:
+          type: string
+          title: Declaración de Salud / Alergias / Medicamentos
+        gear_checklist_verified:
+          type: boolean
+          title: Checklist de Seguridad Verificado
+        admin_notes:
+          type: string
+          title: Notas de Guardaparques / COEL
+      required:
+      - emergency_contact_name
+      - emergency_contact_phone
+      - expected_return_datetime
+      - tourist_name
+      - tourist_phone
+    TrekkingExpeditionStatusEnum:
+      enum:
+      - planificada
+      - en_curso
+      - retornada
+      - retrasada
+      - alerta_sos
+      type: string
+      description: |-
+        * `planificada` - Planificada
+        * `en_curso` - En Curso / En la Montaña
+        * `retornada` - Retornada con Éxito (Check-out)
+        * `retrasada` - Retrasada / Posible Emergencia
+        * `alerta_sos` - Alerta SOS Activada
+    TypeEnum:
+      enum:
+      - navigation
+      - information
+      - photo_poi
+      - audio_guide
+      - warning
+      type: string
+      description: |-
+        * `navigation` - Navegación (Paso Street View)
+        * `information` - Información Turística
+        * `photo_poi` - Fotografía / Hito de Interés
+        * `audio_guide` - Audioguía / Relato Cultural
+        * `warning` - Advertencia / Peligro de Alta Montaña
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Correo Electrónico
+          maxLength: 255
+        full_name:
+          type: string
+          title: Nombre Completo
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Teléfono / WhatsApp
+          maxLength: 30
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+          title: Rol del Usuario
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de Registro
+      required:
+      - date_joined
+      - email
+      - full_name
+      - id
+      - role
+    UserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo Electrónico
+          maxLength: 255
+        full_name:
+          type: string
+          minLength: 1
+          title: Nombre Completo
+          maxLength: 255
+        phone:
+          type: string
+          nullable: true
+          title: Teléfono / WhatsApp
+          maxLength: 30
+      required:
+      - email
+      - full_name
+    WeatherAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador único público (UUID)
+        title:
+          type: string
+          title: Título de la Alerta
+          maxLength: 200
+        severity:
+          allOf:
+          - $ref: '#/components/schemas/SeverityEnum'
+          title: Severidad
+        severity_display:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          title: Detalle de la Alerta Meteorológica
+        affected_sector:
+          type: string
+          title: Sector o Rango de Altitud Afectado
+          maxLength: 150
+        valid_from:
+          type: string
+          format: date-time
+          title: Válido Desde
+        valid_until:
+          type: string
+          format: date-time
+          title: Válido Hasta
+        is_active:
+          type: boolean
+          title: Alerta Activa
+      required:
+      - description
+      - id
+      - severity_display
+      - title
+      - uuid
+      - valid_from
+      - valid_until
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

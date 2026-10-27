@@ -1,0 +1,45 @@
+<div class="apple-glass-card rounded-[32px] p-7 text-center space-y-5 animate-fade-in shadow-2xl relative overflow-hidden">
+    <!-- Reflejo superior -->
+    <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-apple-gold/40 to-transparent"></div>
+    
+    <!-- Sello Estilo Apple Wallet Pass -->
+    <div class="inline-flex flex-col items-center justify-center p-5 rounded-2xl border border-apple-gold/40 bg-gradient-to-b from-amber-500/10 to-transparent max-w-xs mx-auto shadow-inner">
+        <div class="flex items-center gap-1.5 text-apple-gold font-mono text-[9px] uppercase tracking-widest font-semibold">
+            <span>★ PASAPORTE DE MONTAÑA ★</span>
+        </div>
+        <div class="my-3">
+            <i data-lucide="mountain-snow" class="w-10 h-10 text-apple-gold"></i>
+        </div>
+        <h4 class="font-bold text-white text-base leading-tight">
+            {{ stamp_name }}
+        </h4>
+        <span class="font-mono text-xs text-amber-200 mt-1 block">
+            {{ altitude }} • Huachón, Pasco
+        </span>
+        <div class="text-[9px] text-apple-gray font-mono mt-3 uppercase tracking-wider">
+            Sello Verificado con Geo-Lock
+        </div>
+    </div>
+
+    <!-- Puntos Acreditados -->
+    <div class="space-y-1">
+        <div class="text-sm font-bold text-emerald-400 flex items-center justify-center gap-1.5">
+            <i data-lucide="award" class="w-4 h-4"></i>
+            <span>+{{ points_earned }} Eco-Puntos Acreditados</span>
+        </div>
+        <div class="text-xs text-slate-300">
+            Rango: <strong class="text-white">{{ new_rank }}</strong> (Total: <span class="font-mono text-apple-gold">{{ total_points }} pts</span>)
+        </div>
+    </div>
+
+    <!-- Barra de Nivel Apple Style -->
+    <div class="max-w-xs mx-auto space-y-1.5">
+        <div class="flex justify-between text-[10px] text-apple-gray font-mono">
+            <span>Nivel 3</span>
+            <span>Próximo: Guardián Mayor (500 pts)</span>
+        </div>
+        <div class="w-full bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-apple-gold to-emerald-400 rounded-full" style="width: 68%;"></div>
+        </div>
+    </div>
+</div>

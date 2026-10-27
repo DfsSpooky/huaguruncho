@@ -1,0 +1,1514 @@
+{% extends "landing/base_landing.html" %}
+{% load static %}
+
+{% block content %}
+<div x-data="{ 
+    mobileMenuOpen: false,
+    activePhoneTab: 'tour',
+    routeModalOpen: false,
+    selectedRoute: {},
+    hotspotModalOpen: false,
+    selectedHotspot: {},
+    sosModalOpen: false,
+    downloadModalOpen: false,
+    audioPlaying: false,
+    audioElement: null,
+    audioContext: null,
+    oscillator: null,
+    gainNode: null,
+    activeFaq: 1,
+    hoveredWaypoint: { name: 'Laguna Huascacocha', alt: '4,250 m', desc: 'Campamento base y aguas turquesas' },
+
+    toggleAudio() {
+        if (this.audioPlaying) {
+            this.stopAudio();
+        } else {
+            this.startAudio();
+        }
+    },
+    startAudio() {
+        const audioSrc = '{% if cms_audio_guide and cms_audio_guide.audio_file %}{{ cms_audio_guide.audio_file.url }}{% endif %}';
+        if (audioSrc) {
+            if (!this.audioElement) {
+                this.audioElement = new Audio(audioSrc);
+                this.audioElement.onended = () => { this.audioPlaying = false; };
+            }
+            this.audioElement.play();
+            this.audioPlaying = true;
+            return;
+        }
+
+        // Ambient Sound Synth Fallback
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioCtx();
+            this.oscillator = this.audioContext.createOscillator();
+            this.gainNode = this.audioContext.createGain();
+            
+            this.oscillator.type = 'sine';
+            this.oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime);
+            this.oscillator.frequency.exponentialRampToValueAtTime(523.25, this.audioContext.currentTime + 1.5);
+            this.oscillator.frequency.exponentialRampToValueAtTime(659.25, this.audioContext.currentTime + 3.0);
+            
+            this.gainNode.gain.setValueAtTime(0.01, this.audioContext.currentTime);
+            this.gainNode.gain.linearRampToValueAtTime(0.12, this.audioContext.currentTime + 0.5);
+            
+            this.oscillator.connect(this.gainNode);
+            this.gainNode.connect(this.audioContext.destination);
+            
+            this.oscillator.start();
+            this.audioPlaying = true;
+        } catch(e) {
+            this.audioPlaying = true;
+        }
+    },
+    stopAudio() {
+        if (this.audioElement) {
+            this.audioElement.pause();
+            this.audioPlaying = false;
+            return;
+        }
+        if (this.gainNode && this.audioContext) {
+            this.gainNode.gain.linearRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+            setTimeout(() => {
+                if (this.oscillator) this.oscillator.stop();
+                this.audioPlaying = false;
+            }, 300);
+        } else {
+            this.audioPlaying = false;
+        }
+    }
+}" 
+@open-route-modal.window="selectedRoute = $event.detail; routeModalOpen = true"
+@open-hotspot-modal.window="selectedHotspot = $event.detail; hotspotModalOpen = true"
+@open-sos-modal.window="sosModalOpen = true"
+@open-download-modal.window="downloadModalOpen = true">
+
+    <!-- ========================================== -->
+    <!-- 1. NAVBAR ESTILO APPLE.COM                 -->
+    <!-- ========================================== -->
+    <header class="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-md border-b border-white/[0.08]">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#hero" class="flex items-center gap-2.5 group">
+                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-black shadow-md group-hover:scale-105 transition-transform duration-200">
+                    <i data-lucide="mountain-snow" class="w-4 h-4"></i>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                    <span class="font-bold tracking-tight text-sm text-white">
+                        HUAGURUNCHO<span class="text-apple-blue font-mono font-normal"> 360</span>
+                    </span>
+                    <span class="text-[10px] font-mono text-apple-gray hidden sm:inline">5,742m</span>
+                </div>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-7 text-xs font-medium text-slate-300">
+                <a href="#experiencia" class="hover:text-white transition-colors">La Aventura</a>
+                <a href="#tour360" class="hover:text-white transition-colors flex items-center gap-1">
+                    <span>Tour 360°</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-white/10 text-apple-blue">VR</span>
+                </a>
+                <a href="#rutas" class="hover:text-white transition-colors">Senderos</a>
+                <a href="#seguridad" class="hover:text-white transition-colors">Soroche & Salud</a>
+                <a href="#guardian" class="hover:text-white transition-colors">Pasaporte</a>
+                <a href="#cultura" class="hover:text-white transition-colors">Huachón & Gastronomía</a>
+                <a href="#faq" class="hover:text-white transition-colors">Preguntas</a>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3">
+                <a href="{% url 'admin:index' %}" target="_blank" class="hidden lg:flex items-center gap-1.5 text-xs text-apple-gray hover:text-white transition-colors font-medium">
+                    <i data-lucide="sliders" class="w-3.5 h-3.5 text-apple-gold"></i>
+                    <span>Admin CMS</span>
+                </a>
+                <button 
+                    @click="downloadModalOpen = true"
+                    class="apple-btn-primary px-4 py-1.5 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+                    <span>Obtener App</span>
+                </button>
+                <!-- Mobile Toggle -->
+                <button 
+                    @click="mobileMenuOpen = !mobileMenuOpen"
+                    class="md:hidden p-1.5 text-apple-gray hover:text-white">
+                    <i data-lucide="menu" class="w-5 h-5" x-show="!mobileMenuOpen"></i>
+                    <i data-lucide="x" class="w-5 h-5" x-show="mobileMenuOpen" style="display: none;"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Drawer -->
+        <div 
+            x-show="mobileMenuOpen" 
+            x-transition
+            class="md:hidden bg-black/95 border-b border-white/[0.08] px-6 py-6 space-y-4 text-sm font-medium"
+            style="display: none;">
+            <a @click="mobileMenuOpen = false" href="#experiencia" class="block py-2 text-slate-300 hover:text-white">La Aventura</a>
+            <a @click="mobileMenuOpen = false" href="#tour360" class="block py-2 text-slate-300 hover:text-white">Tour 360° Espacial</a>
+            <a @click="mobileMenuOpen = false" href="#rutas" class="block py-2 text-slate-300 hover:text-white">Senderos & Altimetría</a>
+            <a @click="mobileMenuOpen = false" href="#seguridad" class="block py-2 text-slate-300 hover:text-white">Soroche & Salud de Montaña</a>
+            <a @click="mobileMenuOpen = false" href="#guardian" class="block py-2 text-slate-300 hover:text-white">Pasaporte & Sellos</a>
+            <a @click="mobileMenuOpen = false" href="#cultura" class="block py-2 text-slate-300 hover:text-white">Huachón & Gastronomía</a>
+            <a @click="mobileMenuOpen = false" href="#faq" class="block py-2 text-slate-300 hover:text-white">Preguntas Frecuentes</a>
+            <div class="pt-3 border-t border-white/[0.08] flex flex-col gap-2">
+                <button 
+                    @click="mobileMenuOpen = false; downloadModalOpen = true"
+                    class="apple-btn-primary w-full py-2.5 text-xs text-center">
+                    Descargar App Móvil Gratis
+                </button>
+                <a href="{% url 'admin:index' %}" class="apple-btn-secondary w-full py-2 text-xs text-center">
+                    Panel Admin CMS
+                </a>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- ========================================== -->
+    <!-- 2. HERO SECTION CON CMS & NIEVE            -->
+    <!-- ========================================== -->
+    <section id="hero" class="relative pt-14 pb-20 md:pt-20 md:pb-28 px-4 sm:px-8 max-w-7xl mx-auto w-full text-center overflow-hidden rounded-[40px] my-2">
+        
+        <!-- Imagen de Fondo del Nevado (Administrable desde Django Admin) -->
+        <div class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden rounded-[40px]">
+            {% if hero_config.hero_background_image %}
+                <img 
+                    src="{{ hero_config.hero_background_image.url }}" 
+                    alt="Nevado Huaguruncho Glaciar" 
+                    class="w-full h-full object-cover opacity-25 scale-105 transition-transform duration-1000">
+            {% else %}
+                <img 
+                    src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2400&q=85" 
+                    alt="Nevado Huaguruncho Glaciar" 
+                    class="w-full h-full object-cover opacity-25 scale-105 transition-transform duration-1000">
+            {% endif %}
+            
+            <!-- Degradado Vignette Superior e Inferior -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,transparent_20%,rgba(0,0,0,0.85)_80%)]"></div>
+        </div>
+
+        <!-- Canvas de Partículas de Nieve Animadas -->
+        {% if hero_config.enable_snow_effect|default:True %}
+            <canvas id="snow-particles-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+        {% endif %}
+
+        <!-- Contenido del Hero (Z-Index Superior) -->
+        <div class="relative z-10">
+            <!-- Header Pill Administrable -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.12] text-xs font-semibold text-slate-200 mb-8 backdrop-blur-xl animate-fade-in shadow-md">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>{{ hero_config.season_badge|default:"Descubre la Joya Glaciar de Pasco • Temporada 2026" }}</span>
+            </div>
+
+            <!-- Grand Display Headline Administrable -->
+            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.04] mb-6 max-w-5xl mx-auto">
+                <span class="apple-headline-gradient block">{{ hero_config.title_line_1|default:"Explora el Apu Sagrado." }}</span>
+                <span class="apple-blue-gradient block">{{ hero_config.title_line_2|default:"En la Palma de tu Mano." }}</span>
+            </h1>
+
+            <!-- Subtitle Administrable -->
+            <p class="text-apple-gray text-base sm:text-xl max-w-3xl mx-auto font-normal leading-relaxed mb-10">
+                {{ hero_config.subtitle|default:"Descubre los glaciares milenarios y lagunas turquesas del Nevado Huaguruncho (5,742 m) con mapas que funcionan sin internet, visitas virtuales en 360° y asistencia médica para la altura." }}
+            </p>
+
+            <!-- Primary Action Badges (App Store & Google Play & APK Directo) -->
+            <div class="flex flex-wrap items-center justify-center gap-4 mb-14">
+                <!-- App Store Badge -->
+                <a 
+                    href="{{ hero_config.app_store_url|default:'https://apple.com/app-store' }}" 
+                    target="_blank"
+                    class="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.15] text-white transition-all duration-200 shadow-xl group">
+                    <i data-lucide="apple" class="w-7 h-7 fill-current group-hover:scale-110 transition-transform"></i>
+                    <div class="text-left leading-tight">
+                        <span class="text-[10px] text-apple-gray block uppercase font-mono tracking-wider">Disponible en</span>
+                        <span class="text-sm font-bold text-white">App Store</span>
+                    </div>
+                </a>
+
+                <!-- Google Play Badge -->
+                <a 
+                    href="{{ hero_config.google_play_url|default:'https://play.google.com/store/apps' }}" 
+                    target="_blank"
+                    class="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.15] text-white transition-all duration-200 shadow-xl group">
+                    <i data-lucide="play" class="w-7 h-7 text-emerald-400 fill-current group-hover:scale-110 transition-transform"></i>
+                    <div class="text-left leading-tight">
+                        <span class="text-[10px] text-apple-gray block uppercase font-mono tracking-wider">Disponible en</span>
+                        <span class="text-sm font-bold text-white">Google Play</span>
+                    </div>
+                </a>
+
+                <!-- Direct APK Button -->
+                {% if hero_config.apk_file %}
+                    <a 
+                        href="{{ hero_config.apk_file.url }}" 
+                        download
+                        class="apple-btn-primary px-6 py-3 text-sm font-bold flex items-center gap-2 shadow-2xl hover:scale-105 transition-all">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Descarga APK ({{ hero_config.apk_size_mb|default:"48 MB" }})</span>
+                    </a>
+                {% else %}
+                    <button 
+                        @click="downloadModalOpen = true"
+                        class="apple-btn-primary px-6 py-3 text-sm font-bold flex items-center gap-2 shadow-2xl hover:scale-105 transition-all">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Descarga Directa APK</span>
+                    </button>
+                {% endif %}
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SMARTPHONE TITANIUM SHOWCASE               -->
+            <!-- ========================================== -->
+            <div class="relative max-w-4xl mx-auto flex flex-col items-center">
+                
+                <!-- Ambient Spotlight Glow -->
+                <div class="absolute w-[600px] h-[400px] bg-apple-blue/15 rounded-full blur-3xl -top-10 -z-10 animate-pulse-glow"></div>
+
+                <!-- Floating Specs Badges -->
+                <div class="absolute -top-6 -left-4 sm:left-4 apple-glass rounded-full px-4 py-2 hidden sm:flex items-center gap-2 text-xs font-mono z-30 animate-float-subtle">
+                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
+                    <span class="text-white font-semibold">100% Sin Señal:</span>
+                    <span class="text-apple-blue">Mapas Precargados</span>
+                </div>
+
+                <div class="absolute bottom-20 -right-4 sm:right-4 apple-glass rounded-full px-4 py-2 hidden sm:flex items-center gap-2 text-xs font-mono z-30 animate-float-subtle" style="animation-delay: 2s;">
+                    <i data-lucide="mountain" class="w-3.5 h-3.5 text-apple-gold"></i>
+                    <span class="text-white font-semibold">Laguna Huascacocha:</span>
+                    <span class="text-apple-gold">4,250 msnm</span>
+                </div>
+
+                <!-- Titanium Phone Mockup -->
+                <div class="w-[300px] sm:w-[340px] rounded-[52px] p-3.5 bg-gradient-to-b from-neutral-700 via-neutral-900 to-black border-[3px] border-neutral-600/80 shadow-[0_25px_70px_rgba(0,0,0,0.9)] relative overflow-hidden">
+                    
+                    <!-- Dynamic Island -->
+                    <div class="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-full z-40 flex items-center justify-between px-2.5">
+                        <span class="w-2 h-2 rounded-full bg-blue-950"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-neutral-900 border border-neutral-700"></span>
+                    </div>
+
+                    <!-- Phone Screen -->
+                    <div class="w-full aspect-[9/19] rounded-[42px] bg-obsidian-950 overflow-hidden relative flex flex-col justify-between border border-white/[0.08] text-white select-none">
+                        
+                        <!-- Top Status Bar -->
+                        <div class="pt-6 px-6 flex justify-between items-center text-[10px] font-mono text-apple-gray z-20">
+                            <span>09:41</span>
+                            <div class="flex items-center gap-1.5">
+                                <i data-lucide="wifi-off" class="w-3 h-3 text-emerald-400"></i>
+                                <span>100%</span>
+                            </div>
+                        </div>
+
+                        <!-- Screen Content -->
+                        <!-- 1. SCREEN: TOUR 360 -->
+                        <div x-show="activePhoneTab === 'tour'" class="flex-1 flex flex-col justify-between p-4 relative">
+                            <img 
+                                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" 
+                                alt="Tour 360 Screen" 
+                                class="absolute inset-0 w-full h-full object-cover opacity-75">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+
+                            <div class="relative z-10 mt-3 text-left">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-mono bg-apple-blue text-white font-bold">VISTA 360°</span>
+                                <h4 class="font-bold text-sm text-white mt-1">Laguna Huascacocha</h4>
+                                <p class="text-[10px] text-apple-gray font-mono">4,250 m s.n.m. • Huachón</p>
+                            </div>
+
+                            <div class="relative z-10 flex items-center justify-center my-auto">
+                                <div class="w-10 h-10 rounded-full bg-apple-blue/20 animate-pulse-glow absolute"></div>
+                                <div class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center shadow-2xl">
+                                    <i data-lucide="compass" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+
+                            <div class="relative z-10 apple-glass p-2.5 rounded-2xl border border-white/[0.08] text-[10px] text-left">
+                                <div class="flex justify-between font-mono text-apple-blue mb-1">
+                                    <span>Giro Táctil Panorámico</span>
+                                    <span>60 FPS</span>
+                                </div>
+                                <div class="w-full bg-white/20 h-1 rounded-full overflow-hidden">
+                                    <div class="bg-apple-blue h-full w-3/4"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. SCREEN: GPS OFFLINE -->
+                        <div x-show="activePhoneTab === 'gps'" class="flex-1 flex flex-col justify-between p-4 relative" style="display: none;">
+                            <div class="mt-3 space-y-2 text-left">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-mono bg-emerald-500 text-black font-bold">100% SIN SEÑAL</span>
+                                <h4 class="font-bold text-sm text-white">Sendero Huachón - Glaciar</h4>
+                                <div class="p-2.5 rounded-xl bg-neutral-900 border border-white/[0.08] font-mono text-[10px] space-y-1">
+                                    <div class="flex justify-between text-apple-gray">
+                                        <span>Distancia:</span>
+                                        <span class="text-white font-bold">14.5 km</span>
+                                    </div>
+                                    <div class="flex justify-between text-apple-gray">
+                                        <span>Desnivel +:</span>
+                                        <span class="text-apple-blue font-bold">+1,280 m</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SVG Altimetry Line -->
+                            <div class="apple-glass p-2.5 rounded-2xl border border-white/[0.08] my-auto">
+                                <span class="text-[9px] font-mono text-apple-gray block mb-1">Altimetría (3,400m ➔ 4,680m)</span>
+                                <svg class="w-full h-16 text-apple-blue" viewBox="0 0 100 40" fill="none">
+                                    <path d="M0 35 Q 25 30, 45 20 T 80 10 L 100 5 L 100 40 L 0 40 Z" fill="rgba(41, 151, 255, 0.15)" />
+                                    <path d="M0 35 Q 25 30, 45 20 T 80 10 L 100 5" stroke="#2997FF" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                            </div>
+
+                            <div class="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center text-[10px] font-semibold text-emerald-400">
+                                ✔ Mapas y Rutas Disponibles Offline
+                            </div>
+                        </div>
+
+                        <!-- 3. SCREEN: ECO-REPORTES -->
+                        <div x-show="activePhoneTab === 'reports'" class="flex-1 flex flex-col justify-between p-4 relative text-left" style="display: none;">
+                            <div class="mt-3 space-y-1.5">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-mono bg-apple-gold text-black font-bold">PASAPORTE VERDE</span>
+                                <h4 class="font-bold text-sm text-white">Sello de Cumbre</h4>
+                                <p class="text-[10px] text-apple-gray">Registra tu ascenso y cuida el glaciar.</p>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-white/[0.04] border border-dashed border-white/20 text-center my-auto space-y-1.5">
+                                <i data-lucide="camera" class="w-6 h-6 text-apple-blue mx-auto"></i>
+                                <span class="text-[10px] font-bold text-white block">Foto de Paisaje</span>
+                                <span class="text-[9px] font-mono text-apple-gray block">Mirador Huaguruncho</span>
+                            </div>
+
+                            <div class="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center text-[10px] font-semibold text-amber-400">
+                                ⭐ +75 Eco-Puntos Ganados
+                            </div>
+                        </div>
+
+                        <!-- 4. SCREEN: SOS -->
+                        <div x-show="activePhoneTab === 'sos'" class="flex-1 flex flex-col justify-between p-4 relative text-center" style="display: none;">
+                            <div class="mt-3 space-y-1">
+                                <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto animate-ping"></div>
+                                <h4 class="font-bold text-sm text-rose-400">AYUDA & SOS 24H</h4>
+                                <p class="text-[10px] text-apple-gray">Directorio de Rescate y Emergencias</p>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-[10px] space-y-1.5 my-auto text-left">
+                                <div class="flex justify-between text-rose-300">
+                                <span>PNP Huachón:</span>
+                                <strong class="font-mono text-white">105 Directo</strong>
+                            </div>
+                            <div class="flex justify-between text-rose-300">
+                                <span>Centro de Salud:</span>
+                                <strong class="font-mono text-white">Atención 24 Horas</strong>
+                            </div>
+                        </div>
+
+                        <button class="w-full py-2.5 rounded-full bg-rose-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg">
+                            Contactar Asistencia
+                        </button>
+                    </div>
+
+                    <!-- Bottom Bar -->
+                    <div class="pb-2 flex justify-center">
+                        <div class="w-24 h-1 bg-white/30 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone Tab Controller -->
+            <div class="flex items-center gap-1.5 mt-8 p-1.5 rounded-full bg-neutral-900/90 border border-white/[0.08] text-xs font-semibold">
+                <button 
+                    @click="activePhoneTab = 'tour'" 
+                    :class="activePhoneTab === 'tour' ? 'bg-white text-black shadow-md' : 'text-apple-gray hover:text-white'"
+                    class="px-4 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
+                    <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                    <span>Tour 360</span>
+                </button>
+                <button 
+                    @click="activePhoneTab = 'gps'" 
+                    :class="activePhoneTab === 'gps' ? 'bg-white text-black shadow-md' : 'text-apple-gray hover:text-white'"
+                    class="px-4 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
+                    <i data-lucide="map" class="w-3.5 h-3.5"></i>
+                    <span>Mapas Offline</span>
+                </button>
+                <button 
+                    @click="activePhoneTab = 'reports'" 
+                    :class="activePhoneTab === 'reports' ? 'bg-white text-black shadow-md' : 'text-apple-gray hover:text-white'"
+                    class="px-4 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
+                    <i data-lucide="leaf" class="w-3.5 h-3.5"></i>
+                    <span>Sellos & Retos</span>
+                </button>
+                <button 
+                    @click="activePhoneTab = 'sos'" 
+                    :class="activePhoneTab === 'sos' ? 'bg-rose-500 text-white shadow-md' : 'text-apple-gray hover:text-white'"
+                    class="px-4 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
+                    <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i>
+                    <span>SOS 24h</span>
+                </button>
+            </div>
+
+        </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 3. GRAND SCALE NUMERICAL SHOWCASE (CMS)    -->
+    <!-- ========================================== -->
+    <section class="border-y border-white/[0.08] bg-obsidian-900/60 py-12 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {% if cms_metrics %}
+                {% for m in cms_metrics %}
+                    <div class="space-y-1 {% if not forloop.first %}border-l border-white/[0.08]{% endif %}">
+                        <span class="text-4xl sm:text-5xl font-black font-mono tracking-tight {{ m.color_class }} block">{{ m.value }}</span>
+                        <span class="text-xs text-apple-gray uppercase tracking-widest font-semibold">{{ m.label }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="space-y-1">
+                    <span class="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white block">5,742 m</span>
+                    <span class="text-xs text-apple-gray uppercase tracking-widest font-semibold">Cumbre del Nevado</span>
+                </div>
+                <div class="space-y-1 border-l border-white/[0.08]">
+                    <span class="text-4xl sm:text-5xl font-black font-mono tracking-tight text-apple-blue block">100%</span>
+                    <span class="text-xs text-apple-gray uppercase tracking-widest font-semibold">Navegación Sin Conexión</span>
+                </div>
+                <div class="space-y-1 border-l border-white/[0.08]">
+                    <span class="text-4xl sm:text-5xl font-black font-mono tracking-tight text-apple-gold block">360°</span>
+                    <span class="text-xs text-apple-gray uppercase tracking-widest font-semibold">Panoramas Virtuales</span>
+                </div>
+                <div class="space-y-1 border-l border-white/[0.08]">
+                    <span class="text-4xl sm:text-5xl font-black font-mono tracking-tight text-emerald-400 block">4 Lagunas</span>
+                    <span class="text-xs text-apple-gray uppercase tracking-widest font-semibold">Espejos Glaciares Vírgenes</span>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 4. TOUR 360° SPATIAL REALITY CINEMA        -->
+    <!-- ========================================== -->
+    <section id="tour360" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full">
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto mb-14 space-y-4">
+            <span class="text-xs font-mono font-bold text-apple-blue uppercase tracking-widest block">
+                EXPERIENCIA INMERSIVA 360°
+            </span>
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-white">
+                Siente la cordillera antes de viajar.
+            </h2>
+            <p class="text-apple-gray text-base leading-relaxed">
+                Haz clic y arrastra para girar la vista panorámica en 360 grados. Descubre los miradores del glaciar, las lagunas de deshielo y los santuarios de flores sagradas.
+            </p>
+        </div>
+
+        <!-- Cinema Viewport HTMX -->
+        <div id="tour-scene-viewport">
+            {% include "landing/partials/_tour_scene.html" %}
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 5. BENTO GRID: BENEFICIOS (CMS)            -->
+    <!-- ========================================== -->
+    <section id="experiencia" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full border-t border-white/[0.08]">
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest block">
+                PREPARADO PARA LA MONTAÑA
+            </span>
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-white">
+                Todo lo que necesitas para tu expedición.
+            </h2>
+            <p class="text-apple-gray text-base">
+                Disfruta de la naturaleza más pura con la tranquilidad de contar con mapas seguros, guías locales y monitoreo en tiempo real.
+            </p>
+        </div>
+
+        <!-- Bento Grid Administrable -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% if cms_features %}
+                {% for f in cms_features %}
+                    <div class="apple-glass-card rounded-[32px] p-8 flex flex-col justify-between space-y-6">
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center {{ f.icon_color }}">
+                                <i data-lucide="{{ f.icon_name }}" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white">{{ f.title }}</h3>
+                            <p class="text-apple-gray text-sm leading-relaxed">
+                                {{ f.description }}
+                            </p>
+                        </div>
+                        {% if f.badge_text %}
+                            <div class="p-3.5 rounded-2xl {% if f.badge_color == 'emerald' %}bg-emerald-500/10 border-emerald-500/20 text-emerald-400{% elif f.badge_color == 'gold' %}bg-amber-500/10 border-amber-500/20 text-amber-400{% elif f.badge_color == 'rose' %}bg-rose-500/10 border-rose-500/20 text-rose-400{% else %}bg-apple-blue/10 border-apple-blue/20 text-apple-blue{% endif %} border text-xs font-semibold flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                <span>{{ f.badge_text }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- Bento 1: Mapas Offline -->
+                <div class="apple-glass-card rounded-[32px] p-8 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-2xl bg-apple-blue/10 border border-apple-blue/20 flex items-center justify-center text-apple-blue">
+                            <i data-lucide="map-pin" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Mapas 100% Sin Internet</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed">
+                            Descarga el sendero completo antes de salir de Huachón. Tu posición GPS funcionará con precisión incluso en los valles más profundos.
+                        </p>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400 flex items-center gap-2">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        <span>GPS Satelital Activo sin Cobertura Móvil</span>
+                    </div>
+                </div>
+
+                <!-- Bento 2: Salud y Soroche -->
+                <div class="apple-glass-card rounded-[32px] p-8 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-apple-gold">
+                            <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Calculadora Anti-Soroche</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed">
+                            Recomendaciones personalizadas de aclimatación, hidratación y pausas de respiración según la altitud de tu ruta.
+                        </p>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-400 flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Monitoreo de Oxigenación y Ritmo Cardíaco</span>
+                    </div>
+                </div>
+
+                <!-- Bento 3: Conservación y Pasaporte -->
+                <div class="apple-glass-card rounded-[32px] p-8 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Pasaporte & Sellos Andinos</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed">
+                            Colecciona sellos digitales en cada mirador, suma Eco-Puntos y desbloquea insignias mientras ayudas a proteger el glaciar.
+                        </p>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-apple-blue/10 border border-apple-blue/20 text-xs font-semibold text-apple-blue flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Retos Comunitarios de Ecoturismo</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 6. EXPLORADOR DE RUTAS & ALTIMETRÍA (CMS)  -->
+    <!-- ========================================== -->
+    <section id="rutas" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full border-t border-white/[0.08]">
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div class="space-y-3 max-w-2xl">
+                <span class="text-xs font-mono font-bold text-apple-blue uppercase tracking-widest block">
+                    SENDEROS OFICIALES
+                </span>
+                <h2 class="text-4xl font-black tracking-tight text-white">
+                    Elige tu Aventura en Huaguruncho
+                </h2>
+                <p class="text-apple-gray text-base">
+                    Desde caminatas familiares alrededor de lagunas hasta ascensiones técnicas de alta cumbre.
+                </p>
+            </div>
+
+            <!-- HTMX Filter Pills -->
+            <div class="apple-glass p-1.5 rounded-full flex items-center gap-1 text-xs font-semibold overflow-x-auto custom-scrollbar">
+                <button 
+                    hx-get="{% url 'landing:htmx-routes' %}?difficulty=all" 
+                    hx-target="#routes-container" 
+                    hx-swap="innerHTML"
+                    class="px-5 py-2 rounded-full bg-white text-black shadow-md transition-all">
+                    Todas las Rutas
+                </button>
+                <button 
+                    hx-get="{% url 'landing:htmx-routes' %}?difficulty=facil" 
+                    hx-target="#routes-container" 
+                    hx-swap="innerHTML"
+                    class="px-4 py-2 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all whitespace-nowrap">
+                    🟢 Fácil (Familia)
+                </button>
+                <button 
+                    hx-get="{% url 'landing:htmx-routes' %}?difficulty=moderada" 
+                    hx-target="#routes-container" 
+                    hx-swap="innerHTML"
+                    class="px-4 py-2 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all whitespace-nowrap">
+                    🟡 Moderada (Trekking)
+                </button>
+                <button 
+                    hx-get="{% url 'landing:htmx-routes' %}?difficulty=dificil" 
+                    hx-target="#routes-container" 
+                    hx-swap="innerHTML"
+                    class="px-4 py-2 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all whitespace-nowrap">
+                    🔴 Alta Cumbre (Montañismo)
+                </button>
+            </div>
+        </div>
+
+        <!-- Routes Grid HTMX Container -->
+        <div id="routes-container">
+            {% include "landing/partials/_route_cards.html" %}
+        </div>
+
+        <!-- Perfil Altimétrico Interactivo Administrable -->
+        <div class="mt-14 apple-glass-card rounded-[32px] p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="text-[10px] font-mono text-apple-blue uppercase tracking-widest font-bold block mb-1">
+                        PERFIL DE ELEVACIÓN INTERACTIVO
+                    </span>
+                    <h4 class="text-xl font-bold text-white">De Huachón a la Cumbre del Huaguruncho</h4>
+                </div>
+                <div class="apple-glass px-4 py-2 rounded-full text-xs font-mono text-apple-gold flex items-center gap-2">
+                    <span x-text="hoveredWaypoint.name" class="font-bold text-white"></span>
+                    <span x-text="'(' + hoveredWaypoint.alt + ')'" class="text-apple-blue"></span>
+                </div>
+            </div>
+
+            <!-- Gráfico Interactivo SVG con Hitos -->
+            <div class="relative py-4">
+                <svg class="w-full h-36 text-apple-blue" viewBox="0 0 1000 200" fill="none">
+                    <defs>
+                        <linearGradient id="altitudeGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#2997FF" stop-opacity="0.35" />
+                            <stop offset="100%" stop-color="#2997FF" stop-opacity="0.0" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M0,180 L180,150 L380,110 L620,70 L820,35 L1000,10 L1000,200 L0,200 Z" fill="url(#altitudeGradient)" />
+                    <path d="M0,180 L180,150 L380,110 L620,70 L820,35 L1000,10" stroke="#2997FF" stroke-width="3" stroke-linecap="round" />
+                </svg>
+
+                <!-- Hitos Interactivos Dinámicos del CMS -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-6 text-center text-xs">
+                    {% if cms_waypoints %}
+                        {% for wp in cms_waypoints %}
+                            <div 
+                                @mouseenter="hoveredWaypoint = { name: '{{ wp.name|escapejs }}', alt: '{{ wp.altitude_m }} m', desc: '{{ wp.description|escapejs }}' }"
+                                class="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] cursor-pointer transition-all">
+                                <span class="font-mono text-apple-gray text-[10px] block">{{ wp.distance_km }} km</span>
+                                <strong class="text-white block mt-1">{{ wp.name }}</strong>
+                                <span class="text-[11px] font-mono {{ wp.badge_color }}">{{ wp.altitude_m }} m</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div 
+                            @mouseenter="hoveredWaypoint = { name: 'Pueblo de Huachón', alt: '3,400 m', desc: 'Aclimatación y hospedajes típicos' }"
+                            class="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] cursor-pointer transition-all">
+                            <span class="font-mono text-apple-gray text-[10px] block">0 km</span>
+                            <strong class="text-white block mt-1">Huachón</strong>
+                            <span class="text-[11px] font-mono text-apple-blue">3,400 m</span>
+                        </div>
+                        <div 
+                            @mouseenter="hoveredWaypoint = { name: 'Bosque de Queñuales', alt: '3,720 m', desc: 'Árboles de papel milenarios y aves' }"
+                            class="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] cursor-pointer transition-all">
+                            <span class="font-mono text-apple-gray text-[10px] block">4.2 km</span>
+                            <strong class="text-white block mt-1">Queñuales</strong>
+                            <span class="text-[11px] font-mono text-apple-blue">3,720 m</span>
+                        </div>
+                        <div 
+                            @mouseenter="hoveredWaypoint = { name: 'Laguna Huascacocha', alt: '4,250 m', desc: 'Campamento base y aguas turquesas' }"
+                            class="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] cursor-pointer transition-all">
+                            <span class="font-mono text-apple-gray text-[10px] block">9.0 km</span>
+                            <strong class="text-white block mt-1">Huascacocha</strong>
+                            <span class="text-[11px] font-mono text-apple-gold">4,250 m</span>
+                        </div>
+                        <div 
+                            @mouseenter="hoveredWaypoint = { name: 'Mirador Glaciar', alt: '4,680 m', desc: 'Frente de hielo y morrenas' }"
+                            class="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] cursor-pointer transition-all">
+                            <span class="font-mono text-apple-gray text-[10px] block">13.5 km</span>
+                            <strong class="text-white block mt-1">Mirador Glaciar</strong>
+                            <span class="text-[11px] font-mono text-rose-400">4,680 m</span>
+                        </div>
+                        <div 
+                            @mouseenter="hoveredWaypoint = { name: 'Cumbre Huaguruncho', alt: '5,742 m', desc: 'Cumbre máxima de la Cordillera' }"
+                            class="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] cursor-pointer transition-all">
+                            <span class="font-mono text-apple-gray text-[10px] block">21.0 km</span>
+                            <strong class="text-white block mt-1">Cumbre Máxima</strong>
+                            <span class="text-[11px] font-mono text-emerald-400">5,742 m</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 7. SOROCHE ADVISOR & APPLE WEATHER         -->
+    <!-- ========================================== -->
+    <section id="seguridad" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full border-t border-white/[0.08]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            
+            <!-- Left: Interactive Form HTMX -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="space-y-3">
+                    <span class="text-xs font-mono font-bold text-apple-gold uppercase tracking-widest block">
+                        SALUD & PREVENCIÓN
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                        Calculadora Anti-Soroche
+                    </h2>
+                    <p class="text-apple-gray text-sm leading-relaxed">
+                        Conoce cuánto oxígeno efectivo tendrás en tu caminata y recibe consejos prácticos de hidratación y aclimatación para disfrutar sin mal de altura.
+                    </p>
+                </div>
+
+                <form 
+                    hx-post="{% url 'landing:htmx-safety-check' %}" 
+                    hx-target="#safety-result-container" 
+                    hx-swap="innerHTML"
+                    class="apple-glass-card rounded-[32px] p-7 space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Altitude Range -->
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label for="altitude-slider" class="text-xs font-semibold text-slate-200">¿A qué altitud planeas llegar?</label>
+                            <span id="altitude-display" class="font-mono text-sm font-bold text-apple-blue">4,250 m</span>
+                        </div>
+                        <input 
+                            type="range" 
+                            id="altitude-slider"
+                            name="target_altitude" 
+                            min="3400" 
+                            max="5742" 
+                            step="50" 
+                            value="4250"
+                            oninput="document.getElementById('altitude-display').innerText = Number(this.value).toLocaleString() + ' m'"
+                            class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-apple-blue">
+                        <div class="flex justify-between text-[10px] font-mono text-apple-gray mt-2">
+                            <span>Huachón (3,400m)</span>
+                            <span>Laguna (4,250m)</span>
+                            <span>Cumbre (5,742m)</span>
+                        </div>
+                    </div>
+
+                    <!-- Experience Level -->
+                    <div>
+                        <label class="text-xs font-semibold text-slate-200 block mb-2.5">Tu experiencia en caminatas:</label>
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="experience" value="principiante" class="peer sr-only">
+                                <div class="p-2.5 rounded-xl bg-white/[0.04] peer-checked:bg-white peer-checked:text-black border border-white/[0.08] text-center font-semibold text-slate-300 transition-all">
+                                    Primera Vez
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="experience" value="intermedio" checked class="peer sr-only">
+                                <div class="p-2.5 rounded-xl bg-white/[0.04] peer-checked:bg-white peer-checked:text-black border border-white/[0.08] text-center font-semibold text-slate-300 transition-all">
+                                    Ocasional
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="experience" value="avanzado" class="peer sr-only">
+                                <div class="p-2.5 rounded-xl bg-white/[0.04] peer-checked:bg-white peer-checked:text-black border border-white/[0.08] text-center font-semibold text-slate-300 transition-all">
+                                    Experto
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Acclimatization Days -->
+                    <div>
+                        <label for="acclimatization-days-select" class="text-xs font-semibold text-slate-200 block mb-2">Días previos de descanso en la sierra:</label>
+                        <select 
+                            id="acclimatization-days-select"
+                            name="acclimatization_days" 
+                            class="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/[0.12] text-slate-200 text-xs font-medium focus:outline-none focus:border-apple-blue">
+                            <option value="0">0 días (Llegada directa)</option>
+                            <option value="1" selected>1 día de reposo (Recomendado)</option>
+                            <option value="2">2 días (Muy seguro)</option>
+                            <option value="3">3+ días (Aclimatación ideal)</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit -->
+                    <button 
+                        type="submit" 
+                        class="apple-btn-primary w-full py-3 text-xs font-semibold flex items-center justify-center gap-2">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                        <span>Calcular Mi Diagnóstico de Altura</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right: Results & Live Telemetry -->
+            <div class="lg:col-span-7 space-y-6">
+                <div id="safety-result-container">
+                    <div class="apple-glass-card rounded-[32px] p-8 text-center py-14">
+                        <div class="w-12 h-12 rounded-full bg-apple-blue/10 text-apple-blue flex items-center justify-center mx-auto mb-3 border border-apple-blue/20">
+                            <i data-lucide="heart" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-base mb-1">Calculadora Lista</h4>
+                        <p class="text-xs text-apple-gray max-w-sm mx-auto">
+                            Selecciona la altitud de tu ruta y pulsa el botón para ver la saturación estimada y consejos de salud.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Weather Telemetry -->
+                <div id="clima">
+                    <div class="text-xs font-mono font-bold text-apple-gray uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i data-lucide="satellite" class="w-3.5 h-3.5 text-apple-blue"></i>
+                        <span>Clima Actual en Campamento Base Huascacocha</span>
+                    </div>
+                    <div id="weather-telemetry-container">
+                        {% include "landing/partials/_weather_telemetry.html" %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 8. ECO-GUARDIÁN & PASAPORTE DIGITAL        -->
+    <!-- ========================================== -->
+    <section id="guardian" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full border-t border-white/[0.08]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <div class="lg:col-span-6 space-y-6">
+                <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest block">
+                    PASAPORTE DIGITAL & MEDALLAS
+                </span>
+                <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+                    Colecciona sellos en la cordillera.
+                </h2>
+                <p class="text-apple-gray text-base leading-relaxed">
+                    Tu teléfono registra automáticamente tus ascensos mediante GPS. Al llegar a las lagunas y miradores, desbloqueas sellos oficiales de montaña e insignias de Guardián del Glaciar.
+                </p>
+
+                <div class="space-y-4 pt-2">
+                    <div class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-2xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-apple-blue shrink-0">
+                            <i data-lucide="stamp" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Sellos Automáticos por GPS</h4>
+                            <p class="text-xs text-apple-gray">Se desbloquean al estar a menos de 50 metros del hito.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-2xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-apple-gold shrink-0">
+                            <i data-lucide="trophy" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Medallas & Descuentos Locales</h4>
+                            <p class="text-xs text-apple-gray">Canjea tus Eco-Puntos en restaurantes y guías de Huachón.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Stamp Demo HTMX -->
+            <div class="lg:col-span-6">
+                <div class="apple-glass-card rounded-[32px] p-7 space-y-6">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="wallet" class="w-4 h-4 text-apple-gold"></i>
+                            <span class="font-bold text-sm text-white">Prueba el Sellado Digital (Demo)</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-apple-blue bg-white/[0.06] px-2.5 py-0.5 rounded-full font-bold">PULSA UN SELLO</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button 
+                            hx-post="{% url 'landing:htmx-guardian-stamp' %}"
+                            hx-vals='{"stamp_name": "Mirador Glaciar Huaguruncho", "altitude": "4,680 m s.n.m."}'
+                            hx-target="#stamp-result-box"
+                            hx-swap="innerHTML"
+                            class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] text-left transition-all group">
+                            {% csrf_token %}
+                            <div class="flex items-center justify-between mb-2">
+                                <i data-lucide="mountain-snow" class="w-5 h-5 text-apple-blue group-hover:scale-110 transition-transform"></i>
+                                <span class="text-[10px] font-mono text-emerald-400 font-bold">+75 pts</span>
+                            </div>
+                            <h5 class="font-bold text-xs text-white">Sello Mirador Glaciar</h5>
+                            <span class="text-[10px] text-apple-gray font-mono">4,680 msnm</span>
+                        </button>
+
+                        <button 
+                            hx-post="{% url 'landing:htmx-guardian-stamp' %}"
+                            hx-vals='{"stamp_name": "Laguna Huascacocha", "altitude": "4,250 m s.n.m."}'
+                            hx-target="#stamp-result-box"
+                            hx-swap="innerHTML"
+                            class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] text-left transition-all group">
+                            {% csrf_token %}
+                            <div class="flex items-center justify-between mb-2">
+                                <i data-lucide="droplet" class="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-[10px] font-mono text-emerald-400 font-bold">+50 pts</span>
+                            </div>
+                            <h5 class="font-bold text-xs text-white">Sello Laguna Huascacocha</h5>
+                            <span class="text-[10px] text-apple-gray font-mono">4,250 msnm</span>
+                        </button>
+                    </div>
+
+                    <div id="stamp-result-box">
+                        <div class="p-6 rounded-2xl bg-black/40 border border-dashed border-white/[0.08] text-center text-xs text-apple-gray">
+                            Haz clic en un sello arriba para simular tu llegada al punto de control.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 9. CULTURA VIVA, GASTRONOMÍA & CMS         -->
+    <!-- ========================================== -->
+    <section id="cultura" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full border-t border-white/[0.08]">
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <span class="text-xs font-mono font-bold text-apple-gold uppercase tracking-widest block">
+                CULTURA VIVA & GASTRONOMÍA
+            </span>
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-white">
+                Huachón te recibe con los brazos abiertos.
+            </h2>
+            <p class="text-apple-gray text-base">
+                La experiencia no termina en la montaña. Conoce la hospitalidad de las familias locales, saborea la auténtica cocina de altura y escucha las leyendas milenarias.
+            </p>
+        </div>
+
+        <!-- Grid de Experiencias Administrables -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {% if cms_experiences %}
+                {% for exp in cms_experiences %}
+                    <div class="apple-glass-card rounded-[32px] p-7 space-y-4">
+                        <div class="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-2xl">
+                            {{ exp.icon_or_emoji }}
+                        </div>
+                        <h3 class="text-xl font-bold text-white">{{ exp.title }}</h3>
+                        <p class="text-apple-gray text-xs sm:text-sm leading-relaxed">
+                            {{ exp.description }}
+                        </p>
+                        {% if exp.highlight_tag %}
+                            <div class="text-xs {{ exp.tag_color }} font-medium">
+                                {{ exp.highlight_tag }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- Gastronomía -->
+                <div class="apple-glass-card rounded-[32px] p-7 space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-apple-gold flex items-center justify-center text-2xl">
+                        🍲
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Gastronomía Andina</h3>
+                    <p class="text-apple-gray text-xs sm:text-sm leading-relaxed">
+                        Prueba la trucha frita recién pescada de la laguna Huascacocha, la tradicional pachamanca de tres carnes y el caldo de cordero reconfortante.
+                    </p>
+                    <div class="text-xs text-apple-gold font-medium">
+                        ⭐ Restaurantes familiares en Huachón
+                    </div>
+                </div>
+
+                <!-- Hospedajes & Arrieros -->
+                <div class="apple-glass-card rounded-[32px] p-7 space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl">
+                        🏡
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Hospedajes & Guías</h3>
+                    <p class="text-apple-gray text-xs sm:text-sm leading-relaxed">
+                        Alójate en acogedoras casas rurales, contrata arrieros con caballos para llevar tu equipaje y camina junto a guías locales certificados.
+                    </p>
+                    <div class="text-xs text-emerald-400 font-medium">
+                        ⭐ Apoyo directo a la economía comunal
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Reproductor de Audio Andino Funcional (CMS) -->
+            <div class="apple-glass-card rounded-[32px] p-7 space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-apple-blue/10 text-apple-blue flex items-center justify-center text-2xl">
+                    🎙️
+                </div>
+                <h3 class="text-xl font-bold text-white">{{ cms_audio_guide.title|default:"Leyenda del Apu Huaguruncho" }}</h3>
+                <p class="text-apple-gray text-xs sm:text-sm leading-relaxed">
+                    {{ cms_audio_guide.narrator|default:"Don Eustaquio • Anciano de Huachón" }} ({{ cms_audio_guide.languages|default:"Quechua / Español" }}).
+                </p>
+                
+                <!-- Audio Player Widget -->
+                <div class="pt-2 border-t border-white/[0.08] flex items-center justify-between gap-3">
+                    <button 
+                        @click="toggleAudio()"
+                        class="px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                        :class="audioPlaying ? 'bg-rose-500 text-white animate-pulse' : 'bg-white text-black hover:bg-neutral-200'">
+                        <i data-lucide="volume-2" class="w-3.5 h-3.5" x-show="!audioPlaying"></i>
+                        <i data-lucide="square" class="w-3.5 h-3.5" x-show="audioPlaying" style="display: none;"></i>
+                        <span x-text="audioPlaying ? 'Pausar Relato' : 'Escuchar Muestra'"></span>
+                    </button>
+                    
+                    <!-- Animación de Ondas -->
+                    <div class="flex items-center gap-1 h-4">
+                        <div class="w-1 bg-apple-gold h-2 rounded-full" :class="audioPlaying ? 'animate-bounce' : ''"></div>
+                        <div class="w-1 bg-apple-gold h-4 rounded-full" :class="audioPlaying ? 'animate-bounce' : ''" style="animation-delay: 0.1s;"></div>
+                        <div class="w-1 bg-apple-gold h-3 rounded-full" :class="audioPlaying ? 'animate-bounce' : ''" style="animation-delay: 0.2s;"></div>
+                        <div class="w-1 bg-apple-gold h-4 rounded-full" :class="audioPlaying ? 'animate-bounce' : ''" style="animation-delay: 0.3s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 10. PREGUNTAS FRECUENTES (CMS)             -->
+    <!-- ========================================== -->
+    <section id="faq" class="py-24 px-4 sm:px-8 max-w-4xl mx-auto w-full border-t border-white/[0.08]">
+        <div class="text-center mb-14 space-y-3">
+            <span class="text-xs font-mono font-bold text-apple-blue uppercase tracking-widest block">
+                RESOLVEMOS TUS DUDAS
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                Preguntas Frecuentes
+            </h2>
+            <p class="text-apple-gray text-sm">
+                Todo lo que debes saber antes de planificar tu viaje al Nevado Huaguruncho.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            {% if cms_faqs %}
+                {% for faq in cms_faqs %}
+                    <div class="apple-glass-card rounded-[24px] p-6 cursor-pointer" @click="activeFaq = activeFaq === {{ forloop.counter }} ? null : {{ forloop.counter }}">
+                        <div class="flex items-center justify-between text-base font-bold text-white">
+                            <span>{{ faq.question }}</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-apple-blue transition-transform duration-200" :class="activeFaq === {{ forloop.counter }} ? 'rotate-180' : ''"></i>
+                        </div>
+                        <p x-show="activeFaq === {{ forloop.counter }}" x-transition class="mt-3 text-xs sm:text-sm text-apple-gray leading-relaxed" style="display: none;">
+                            {{ faq.answer }}
+                        </p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="apple-glass-card rounded-[24px] p-6 cursor-pointer" @click="activeFaq = activeFaq === 1 ? null : 1">
+                    <div class="flex items-center justify-between text-base font-bold text-white">
+                        <span>¿La aplicación realmente funciona sin señal de internet?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-apple-blue transition-transform" :class="activeFaq === 1 ? 'rotate-180' : ''"></i>
+                    </div>
+                    <p x-show="activeFaq === 1" x-transition class="mt-3 text-xs sm:text-sm text-apple-gray leading-relaxed">
+                        ¡Sí, 100%! Todos los mapas topográficos, rutas de senderismo y perfiles de elevación quedan guardados en tu celular al descargar la app.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 11. DOWNLOAD & CTA FINAL (CMS)             -->
+    <!-- ========================================== -->
+    <section id="download" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full border-t border-white/[0.08]">
+        <div class="apple-glass-card rounded-[40px] p-8 sm:p-14 text-center max-w-3xl mx-auto space-y-6 border border-white/[0.12] shadow-2xl relative overflow-hidden">
+            <!-- Spotlight Glow -->
+            <div class="absolute w-80 h-80 bg-apple-blue/15 rounded-full blur-3xl -top-20 -right-20 pointer-events-none"></div>
+
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.08] text-apple-blue text-xs font-semibold font-mono">
+                <span>APLICACIÓN OFICIAL {{ hero_config.apk_version|default:"v1.0.4" }}</span>
+            </div>
+
+            <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                Empieza tu aventura hoy mismo.
+            </h2>
+
+            <p class="text-apple-gray text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                Descarga gratis la app en tu teléfono o ingresa tu correo/WhatsApp para recibir el enlace directo de descarga.
+            </p>
+
+            <!-- Badges de Descarga Administrables -->
+            <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+                {% if hero_config.apk_file %}
+                    <a 
+                        href="{{ hero_config.apk_file.url }}" 
+                        download
+                        class="apple-btn-primary px-7 py-3 text-sm font-bold flex items-center gap-2 shadow-2xl hover:scale-105 transition-all">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Descargar APK ({{ hero_config.apk_size_mb|default:"48 MB" }})</span>
+                    </a>
+                {% else %}
+                    <button 
+                        @click="downloadModalOpen = true"
+                        class="apple-btn-primary px-7 py-3 text-sm font-bold flex items-center gap-2 shadow-2xl hover:scale-105 transition-all">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Descargar APK Gratis (48 MB)</span>
+                    </button>
+                {% endif %}
+            </div>
+
+            <!-- Formulario de Enlace Directo -->
+            <div id="subscribe-container" class="pt-4">
+                <form 
+                    hx-post="{% url 'landing:htmx-subscribe' %}"
+                    hx-target="#subscribe-container"
+                    hx-swap="innerHTML"
+                    class="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto">
+                    {% csrf_token %}
+                    <input 
+                        type="text" 
+                        name="email_or_phone" 
+                        required
+                        placeholder="Ingresa tu correo o WhatsApp..."
+                        class="flex-1 px-5 py-3 rounded-full bg-black/80 border border-white/[0.15] text-white text-xs font-medium focus:outline-none focus:border-apple-blue placeholder:text-neutral-500">
+                    <button 
+                        type="submit"
+                        class="apple-btn-primary px-6 py-3 text-xs font-semibold shrink-0">
+                        Enviar Enlace
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex items-center justify-center gap-6 pt-4 text-xs text-apple-gray font-mono">
+                <span>Compatible con Android & iOS</span>
+                <span>•</span>
+                <span>Sin Publicidad</span>
+                <span>•</span>
+                <span>100% Gratuita</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 12. FOOTER MINIMALISTA                     -->
+    <!-- ========================================== -->
+    <footer class="border-t border-white/[0.08] bg-black py-16 px-4 sm:px-8 text-apple-gray text-xs">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 pb-12 border-b border-white/[0.08]">
+            
+            <div class="col-span-2 space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-white flex items-center justify-center text-black">
+                        <i data-lucide="mountain-snow" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <span class="font-bold text-sm text-white">HUAGURUNCHO 360</span>
+                </div>
+                <p class="text-xs text-apple-gray max-w-sm leading-relaxed">
+                    Plataforma oficial de ecoturismo y visitas 360° del Nevado Huaguruncho (5,742 msnm). Impulsando el desarrollo sostenible de la comunidad andina de Huachón.
+                </p>
+                <div class="text-[11px] font-mono text-neutral-500">
+                    Municipalidad Distrital de Huachón & DIRCETUR Pasco • 2026
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <span class="font-semibold text-white block uppercase tracking-wider text-[11px]">Explorar</span>
+                <a href="#experiencia" class="block hover:text-white transition-colors">La Aventura</a>
+                <a href="#tour360" class="block hover:text-white transition-colors">Tour 360° VR</a>
+                <a href="#rutas" class="block hover:text-white transition-colors">Senderos & Mapas</a>
+                <a href="#cultura" class="block hover:text-white transition-colors">Gastronomía Huachón</a>
+            </div>
+
+            <div class="space-y-2">
+                <span class="font-semibold text-white block uppercase tracking-wider text-[11px]">Seguridad</span>
+                <a href="#seguridad" class="block hover:text-white transition-colors">Calculadora Soroche</a>
+                <a href="#clima" class="block hover:text-white transition-colors">Clima en Vivo</a>
+                <a href="#faq" class="block hover:text-white transition-colors">Preguntas Frecuentes</a>
+            </div>
+
+            <div class="space-y-2">
+                <span class="font-semibold text-rose-400 block uppercase tracking-wider text-[11px]">Rescate & SOS</span>
+                <p class="text-slate-300">PNP Huachón: <strong class="text-white font-mono">105</strong></p>
+                <p class="text-slate-300">Centro Salud: <strong class="text-white font-mono">24h</strong></p>
+                <p class="text-slate-300">Guías Locales: <strong class="text-white font-mono">(063) 421-120</strong></p>
+            </div>
+
+        </div>
+
+        <div class="max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500">
+            <div>
+                Copyright © 2026 HUAGURUNCHO 360. Todos los derechos reservados.
+            </div>
+            <div class="flex items-center gap-4">
+                <span>Huachón, Pasco, Perú</span>
+                <span>•</span>
+                <span>5,742 m s.n.m.</span>
+                <span>•</span>
+                <a href="{% url 'admin:index' %}" class="text-apple-gold hover:underline">Panel CMS</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- ========================================== -->
+    <!-- MODALES INTERACTIVOS (ALPINE.JS)          -->
+    <!-- ========================================== -->
+    
+    <!-- 1. Modal Ficha de Ruta -->
+    <div 
+        x-show="routeModalOpen" 
+        x-transition
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+        style="display: none;">
+        <div 
+            @click.outside="routeModalOpen = false"
+            class="apple-glass-card rounded-[32px] p-7 max-w-lg w-full border border-white/[0.15] shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-apple-blue font-semibold">DETALLES DEL SENDERO</span>
+                <button @click="routeModalOpen = false" class="p-1 rounded-full bg-white/10 text-apple-gray hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-bold text-white mb-2" x-text="selectedRoute.name"></h3>
+                <p class="text-xs text-apple-gray leading-relaxed" x-text="selectedRoute.desc"></p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-black/60 border border-white/[0.08] font-mono text-xs text-center">
+                <div>
+                    <span class="text-[10px] text-apple-gray block font-sans">Distancia</span>
+                    <span class="font-bold text-white" x-text="selectedRoute.dist + ' km'"></span>
+                </div>
+                <div class="border-x border-white/[0.08]">
+                    <span class="text-[10px] text-apple-gray block font-sans">Cota Máxima</span>
+                    <span class="font-bold text-apple-gold" x-text="selectedRoute.altMax + ' m'"></span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-apple-gray block font-sans">Desnivel +</span>
+                    <span class="font-bold text-apple-blue" x-text="'+' + selectedRoute.gain + ' m'"></span>
+                </div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-xs text-slate-300">
+                <strong class="text-apple-gold block mb-1">Recomendación Oficial:</strong>
+                <span x-text="selectedRoute.safety"></span>
+            </div>
+
+            <button 
+                @click="routeModalOpen = false; downloadModalOpen = true"
+                class="apple-btn-primary w-full py-3 text-xs font-semibold uppercase tracking-wider">
+                Descargar Mapa en App Móvil
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Modal Hotspot -->
+    <div 
+        x-show="hotspotModalOpen" 
+        x-transition
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+        style="display: none;">
+        <div 
+            @click.outside="hotspotModalOpen = false"
+            class="apple-glass-card rounded-[32px] p-7 max-w-md w-full border border-white/[0.15] shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-apple-blue font-semibold" x-text="'PUNTO DE INTERÉS • ' + selectedHotspot.type"></span>
+                <button @click="hotspotModalOpen = false" class="p-1 rounded-full bg-white/10 text-apple-gray hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <h4 class="text-xl font-bold text-white" x-text="selectedHotspot.title"></h4>
+            <p class="text-xs text-apple-gray leading-relaxed" x-text="selectedHotspot.desc"></p>
+            <button @click="hotspotModalOpen = false" class="apple-btn-secondary w-full py-2.5 text-xs font-semibold">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. Modal SOS -->
+    <div 
+        x-show="sosModalOpen" 
+        x-transition
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+        style="display: none;">
+        <div 
+            @click.outside="sosModalOpen = false"
+            class="apple-glass-card rounded-[32px] p-7 max-w-md w-full border border-rose-500/30 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+                <div class="flex items-center gap-2 text-rose-400 font-bold text-sm">
+                    <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+                    <span>DIRECTORIO DE EMERGENCIAS HUACHÓN</span>
+                </div>
+                <button @click="sosModalOpen = false" class="p-1 rounded-full bg-white/10 text-apple-gray hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+                {% for contact in emergency_contacts %}
+                    <div class="p-3 rounded-2xl bg-black/60 border border-white/[0.08] flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-white block">{{ contact.title }}</span>
+                            <span class="text-[10px] text-apple-gray">{{ contact.description|truncatewords:8 }}</span>
+                        </div>
+                        <a href="tel:{{ contact.full_number|default:contact.short_phone }}" class="px-3.5 py-1.5 rounded-full bg-rose-500 text-white font-mono font-bold flex items-center gap-1.5">
+                            <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                            <span>{{ contact.short_phone }}</span>
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="p-3 rounded-2xl bg-black/60 border border-white/[0.08] flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-white block">PNP Comisaría Huachón</span>
+                            <span class="text-[10px] text-apple-gray">Emergencias 24h</span>
+                        </div>
+                        <a href="tel:105" class="px-3.5 py-1.5 rounded-full bg-rose-500 text-white font-mono font-bold">105</a>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button @click="sosModalOpen = false" class="apple-btn-secondary w-full py-2.5 text-xs font-semibold">
+                Cerrar Directorio
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. Modal Descarga -->
+    <div 
+        x-show="downloadModalOpen" 
+        x-transition
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+        style="display: none;">
+        <div 
+            @click.outside="downloadModalOpen = false"
+            class="apple-glass-card rounded-[32px] p-8 max-w-md w-full border border-white/[0.15] shadow-2xl space-y-6 text-center">
+            <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+                <span class="text-xs font-mono font-bold text-apple-blue uppercase tracking-widest">OBTENER APP GRATIS</span>
+                <button @click="downloadModalOpen = false" class="p-1 rounded-full bg-white/10 text-apple-gray hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="p-3 bg-white rounded-2xl w-32 h-32 mx-auto shadow-2xl flex items-center justify-center">
+                    {% if hero_config.qr_code_image %}
+                        <img 
+                            src="{{ hero_config.qr_code_image.url }}" 
+                            alt="QR Code" 
+                            class="w-28 h-28 object-contain">
+                    {% else %}
+                        <img 
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://huaguruncho.pe/download" 
+                            alt="QR Code" 
+                            class="w-28 h-28">
+                    {% endif %}
+                </div>
+                <h4 class="font-bold text-white text-base">Escanea desde tu Celular</h4>
+                <p class="text-xs text-apple-gray">
+                    Descarga directa del instalador APK para Android o versión iOS.
+                </p>
+            </div>
+
+            <div class="space-y-2.5">
+                {% if hero_config.apk_file %}
+                    <a 
+                        href="{{ hero_config.apk_file.url }}" 
+                        download
+                        class="apple-btn-primary w-full py-3 text-xs font-bold block text-center shadow-lg">
+                        Descargar APK Oficial ({{ hero_config.apk_size_mb|default:"48 MB" }})
+                    </a>
+                {% else %}
+                    <a 
+                        href="#download" 
+                        @click="downloadModalOpen = false" 
+                        class="apple-btn-primary w-full py-3 text-xs font-bold block text-center shadow-lg">
+                        Descargar Archivo APK (48 MB)
+                    </a>
+                {% endif %}
+                <div class="text-[11px] text-apple-gray">
+                    ✔ Versión {{ hero_config.apk_version|default:"v1.0.4" }} • 100% Gratuita
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Motor de Partículas de Nieve (Canvas Glaciar) -->
+<script>
+    (function () {
+        function initSnow() {
+            const canvas = document.getElementById('snow-particles-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            const particleCount = 65;
+
+            function resizeCanvas() {
+                const hero = document.getElementById('hero');
+                if (!hero) return;
+                width = canvas.width = hero.offsetWidth;
+                height = canvas.height = hero.offsetHeight;
+            }
+
+            function createParticles() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 2.2 + 0.8,
+                        density: Math.random() * particleCount,
+                        opacity: Math.random() * 0.65 + 0.25,
+                        speedY: Math.random() * 1.1 + 0.35,
+                        speedX: Math.random() * 0.5 - 0.25,
+                        swing: Math.random() * 2 * Math.PI,
+                        swingSpeed: Math.random() * 0.02 + 0.005
+                    });
+                }
+            }
+
+            function render() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (let i = 0; i < particleCount; i++) {
+                    const p = particles[i];
+                    p.swing += p.swingSpeed;
+                    p.y += p.speedY;
+                    p.x += Math.sin(p.swing) * 0.5 + p.speedX;
+
+                    // Reinicio al salir de la vista
+                    if (p.y > height) {
+                        p.y = -10;
+                        p.x = Math.random() * width;
+                    }
+                    if (p.x > width + 10) p.x = -10;
+                    if (p.x < -10) p.x = width + 10;
+
+                    // Dibujo de copo de nieve con halo de luz
+                    ctx.beginPath();
+                    const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2);
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${p.opacity})`);
+                    gradient.addColorStop(0.5, `rgba(224, 247, 247, ${p.opacity * 0.6})`);
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.arc(p.x, p.y, p.radius * 2, 0, Math.PI * 2, false);
+                    ctx.fill();
+                }
+
+                requestAnimationFrame(render);
+            }
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                createParticles();
+            });
+
+            resizeCanvas();
+            createParticles();
+            requestAnimationFrame(render);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSnow);
+        } else {
+            initSnow();
+        }
+    })();
+</script>
+{% endblock %}
