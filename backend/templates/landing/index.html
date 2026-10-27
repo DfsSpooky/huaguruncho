@@ -6,9 +6,8 @@
     mobileMenuOpen: false,
     routeModalOpen: false,
     selectedRoute: null,
-    waypointModalOpen: false,
-    selectedWaypoint: { name: 'Cumbre Nevado Huaguruncho', alt: '5,742 m s.n.m.', desc: 'Punto culminante de la Cordillera de Huaguruncho. Pirámide glacial de hielo fósil.', coord: '10°31\'48\"S 75°55\'48\"W', sector: 'Pilar Central' },
-    sosModalOpen: false,
+    activeScene: 'laguna',
+    activePhoneTab: '360',
     downloadModalOpen: false,
     activeLayer: 'topo',
     selectedRouteFilter: 'all',
@@ -16,15 +15,11 @@
     openRoute(route) {
         this.selectedRoute = route;
         this.routeModalOpen = true;
-    },
-    openWaypoint(name, alt, desc, coord, sector) {
-        this.selectedWaypoint = { name, alt, desc, coord, sector };
-        this.waypointModalOpen = true;
     }
 }">
 
     <!-- ======================================================== -->
-    <!-- 1. LIVE TELEMETRY RIBBON (ESTACIÓN CENTRAL DE CAMPO)     -->
+    <!-- 1. LIVE TELEMETRY RIBBON (ESTACIÓN CIENTÍFICA UNDAC)     -->
     <!-- ======================================================== -->
     <div class="border-b border-[#DCE0DC] bg-[#ECEEF2] text-[11px] font-mono text-[#575D5F]">
         <div class="max-w-[1380px] mx-auto px-4 md:px-8 py-2 flex flex-wrap items-center justify-between gap-y-2">
@@ -42,27 +37,27 @@
                     <span class="text-[#6E767D]">TEMPERATURA</span>
                     <span class="font-bold text-[#191C1F]">-4.2°C (ALTA MONTAÑA)</span>
                 </div>
-                <div class="pl-4 flex items-center gap-1.5">
-                    <span class="text-[#6E767D]">VIENTO</span>
-                    <span class="font-bold text-[#191C1F]">28 km/h NW</span>
-                </div>
                 <div class="pl-4 hidden sm:flex items-center gap-1.5 text-yareta font-bold">
-                    <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
-                    <span>GPS CARTOGRAFÍA: 100% OFFLINE</span>
+                    <span class="material-symbols-outlined text-[14px]">smartphone</span>
+                    <span>APP MÓVIL DISPONIBLE · ANDROID & iOS</span>
+                </div>
+                <div class="pl-4 hidden lg:flex items-center gap-1.5 text-[#191C1F] font-bold">
+                    <span class="material-symbols-outlined text-[14px]">school</span>
+                    <span>PROYECTO IMPULSADO POR OFICINA DE INVESTIGACIÓN UNDAC</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ======================================================== -->
-    <!-- 2. NAVBAR EDITORIAL DE ALTA PRECISIÓN                   -->
+    <!-- 2. NAVBAR: ENFOCADO EN DESCARGA DE LA APLICACIÓN         -->
     <!-- ======================================================== -->
     <header class="bg-white/95 backdrop-blur-md border-b border-[#DCE0DC] sticky top-0 z-40">
         <div class="max-w-[1380px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
             <!-- Brand -->
             <div class="flex items-center gap-3">
                 <a href="#hero" class="flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-[#191C1F] flex items-center justify-center text-white font-mono font-bold text-xs shadow-sm">
+                    <div class="w-9 h-9 rounded bg-[#191C1F] flex items-center justify-center text-white font-mono font-bold text-xs shadow-sm">
                         H360
                     </div>
                     <div class="flex flex-col">
@@ -70,7 +65,7 @@
                             HUAGURUNCHO<span class="text-ochre"> 360</span>
                         </span>
                         <span class="text-[10px] font-mono text-[#6E767D] leading-none mt-1">
-                            COLOSO DE PASCO · 5,742M
+                            APP OFICIAL DE ALTA MONTAÑA
                         </span>
                     </div>
                 </a>
@@ -78,34 +73,43 @@
 
             <!-- Links de Navegación -->
             <nav class="hidden md:flex items-center space-x-7 text-xs font-heading font-bold uppercase tracking-wider text-[#575D5F]">
-                <a href="#hero" class="hover:text-ochre transition-colors py-1">Expedición</a>
+                <a href="#app-features" class="hover:text-ochre transition-colors py-1">La Aplicación</a>
                 <a href="#panoramic-hud" class="hover:text-ochre transition-colors py-1 flex items-center gap-1">
                     <span>Tour 360°</span>
-                    <span class="px-1.5 py-0.2 rounded bg-glacial text-ochre text-[10px] font-mono font-bold">HUD</span>
+                    <span class="px-1.5 py-0.2 rounded bg-glacial text-ochre text-[10px] font-mono font-bold">VR</span>
                 </a>
-                <a href="#rutas-topo" class="hover:text-ochre transition-colors py-1">Rutas Técnicas</a>
-                <a href="#huella-cero" class="hover:text-ochre transition-colors py-1">Huella Cero</a>
-                <a href="#huachon" class="hover:text-ochre transition-colors py-1">Huachón & Cultura</a>
-                <a href="#seguridad" class="hover:text-ochre transition-colors py-1">Salud & Soroche</a>
+                <a href="#rutas-topo" class="hover:text-ochre transition-colors py-1">Rutas & Mapas</a>
+                <a href="#huella-cero" class="hover:text-ochre transition-colors py-1">Pacto Huella Cero</a>
+                <a href="#huachon" class="hover:text-ochre transition-colors py-1">Huachón</a>
             </nav>
 
-            <!-- Acciones -->
-            <div class="flex items-center gap-3">
+            <!-- Botones de Descarga en Navbar (Reemplazan SOS y Pack offline como solicitaste) -->
+            <div class="flex items-center gap-2.5">
+                <!-- Botón Google Play -->
                 <button 
-                    @click="sosModalOpen = true"
-                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#ba1a1a]/40 bg-[#ba1a1a]/10 hover:bg-[#ba1a1a]/20 text-[#ba1a1a] text-xs font-mono font-bold rounded transition-colors">
-                    <span class="material-symbols-outlined text-[16px]">e911_emergency</span>
-                    <span>SOS MONTAÑA</span>
+                    @click="downloadModalOpen = true"
+                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F2F3F8] text-[#191C1F] text-xs font-mono font-bold rounded border border-[#DCE0DC] shadow-sm transition-all">
+                    <span class="material-symbols-outlined text-[16px] text-yareta">play_arrow</span>
+                    <span>Google Play</span>
                 </button>
 
+                <!-- Botón App Store -->
+                <button 
+                    @click="downloadModalOpen = true"
+                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F2F3F8] text-[#191C1F] text-xs font-mono font-bold rounded border border-[#DCE0DC] shadow-sm transition-all">
+                    <span class="material-symbols-outlined text-[16px] text-[#191C1F]">phone_iphone</span>
+                    <span>App Store</span>
+                </button>
+
+                <!-- CTA Principal Descarga -->
                 <button 
                     @click="downloadModalOpen = true"
                     class="inline-flex items-center gap-2 px-4 py-2 bg-ochre hover:bg-ochre-hover text-white text-xs font-heading font-bold uppercase tracking-wider rounded border border-ochre shadow-sm transition-all active:translate-y-[1px]">
-                    <span class="material-symbols-outlined text-[16px]">download_for_offline</span>
-                    <span>PACK OFFLINE</span>
+                    <span class="material-symbols-outlined text-[16px]">download</span>
+                    <span>OBTENER APP</span>
                 </button>
 
-                <!-- Menú Móvil Hamburguesa -->
+                <!-- Toggle Menú Móvil -->
                 <button 
                     @click="mobileMenuOpen = !mobileMenuOpen"
                     class="md:hidden p-2 text-[#575D5F] hover:text-[#191C1F]">
@@ -120,127 +124,244 @@
             x-transition
             class="md:hidden bg-white border-b border-[#DCE0DC] px-6 py-5 space-y-3 text-sm font-heading font-semibold"
             style="display: none;">
-            <a @click="mobileMenuOpen = false" href="#hero" class="block py-1.5 text-[#191C1F] hover:text-ochre">Expedición</a>
-            <a @click="mobileMenuOpen = false" href="#panoramic-hud" class="block py-1.5 text-[#191C1F] hover:text-ochre">Visor 360° de Alta Montaña</a>
-            <a @click="mobileMenuOpen = false" href="#rutas-topo" class="block py-1.5 text-[#191C1F] hover:text-ochre">Rutas Técnicas & Altimetría</a>
-            <a @click="mobileMenuOpen = false" href="#huella-cero" class="block py-1.5 text-[#191C1F] hover:text-ochre">Pacto Ecológico Huella Cero</a>
+            <a @click="mobileMenuOpen = false" href="#app-features" class="block py-1.5 text-[#191C1F] hover:text-ochre">Funciones de la App</a>
+            <a @click="mobileMenuOpen = false" href="#panoramic-hud" class="block py-1.5 text-[#191C1F] hover:text-ochre">Visor 360° en Realidad Virtual</a>
+            <a @click="mobileMenuOpen = false" href="#rutas-topo" class="block py-1.5 text-[#191C1F] hover:text-ochre">Rutas Técnicas & GPS Offline</a>
+            <a @click="mobileMenuOpen = false" href="#huella-cero" class="block py-1.5 text-[#191C1F] hover:text-ochre">Pasaporte Ecológico Huella Cero</a>
             <a @click="mobileMenuOpen = false" href="#huachon" class="block py-1.5 text-[#191C1F] hover:text-ochre">Huachón & Gastronomía</a>
-            <a @click="mobileMenuOpen = false" href="#seguridad" class="block py-1.5 text-[#191C1F] hover:text-ochre">Salud de Altura & Soroche</a>
-            <div class="pt-3 border-t border-[#DCE0DC] flex gap-2">
-                <button @click="mobileMenuOpen = false; sosModalOpen = true" class="flex-1 py-2 bg-[#ba1a1a]/10 text-[#ba1a1a] text-xs font-mono font-bold rounded border border-[#ba1a1a]/40 text-center">
-                    SOS MONTAÑA
-                </button>
-                <button @click="mobileMenuOpen = false; downloadModalOpen = true" class="flex-1 py-2 bg-ochre text-white text-xs font-heading font-bold rounded text-center">
-                    PACK OFFLINE
+            <div class="pt-3 border-t border-[#DCE0DC] flex flex-col gap-2">
+                <button @click="mobileMenuOpen = false; downloadModalOpen = true" class="w-full py-2.5 bg-ochre text-white text-xs font-heading font-bold rounded text-center">
+                    DESCARGAR PARA ANDROID O iOS
                 </button>
             </div>
         </div>
     </header>
 
     <!-- ======================================================== -->
-    <!-- 3. ASYMMETRIC EXPEDITION HERO (DOCUMENTAL)               -->
+    <!-- 3. HERO: PRESENTACIÓN ESTELAR DE LA APP MÓVIL            -->
     <!-- ======================================================== -->
-    <main id="hero" class="carto-grid border-b border-[#DCE0DC] py-10 md:py-16">
+    <main id="hero" class="carto-grid border-b border-[#DCE0DC] py-12 md:py-20">
         <div class="max-w-[1380px] mx-auto px-4 md:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 
-                <!-- Columna Izquierda Editorial (7 Cols) -->
-                <div class="lg:col-span-7 flex flex-col justify-between">
-                    <div>
-                        <!-- Badge Territorial -->
-                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white border border-[#DCE0DC] text-xs font-mono font-semibold text-[#575D5F] rounded mb-5 shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-yareta"></span>
-                            <span>ÁREA DE CONSERVACIÓN REGIONAL · HUACHÓN, PASCO</span>
-                        </div>
-
-                        <!-- Titular Asimétrico de Alto Carácter -->
-                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight leading-[1.08] text-[#191C1F] mb-6">
-                            Expedición al Coloso de Pasco.
-                            <span class="text-ochre block mt-1">Nevado Huaguruncho · 5,742m</span>
-                        </h1>
-
-                        <!-- Texto Contextual Humano -->
-                        <p class="text-[#575D5F] text-base sm:text-lg leading-relaxed max-w-2xl font-body mb-8">
-                            Cartografía topográfica que opera sin cobertura celular, fotogrametría gigapíxel en 360°, monitoreo activo del glaciar milenario y pasaporte de montaña con pesaje estricto de residuos <strong>Huella Cero</strong>.
-                        </p>
-
-                        <!-- Matriz Técnica de Telemetría de Campo -->
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-white border border-[#DCE0DC] rounded shadow-sm mb-8">
-                            <div class="border-r border-[#DCE0DC] pr-2">
-                                <span class="block text-[10px] font-mono text-[#6E767D] uppercase">CUMBRE MÁXIMA</span>
-                                <span class="text-lg font-mono font-bold text-[#191C1F]">5,742 m</span>
-                                <span class="block text-[10px] font-mono text-[#6E767D]">Pilar Central</span>
-                            </div>
-                            <div class="border-r border-[#DCE0DC] pr-2 sm:pl-2">
-                                <span class="block text-[10px] font-mono text-[#6E767D] uppercase">LAGO AÑILCOCHA</span>
-                                <span class="text-lg font-mono font-bold text-yareta">4,280 m</span>
-                                <span class="block text-[10px] font-mono text-[#6E767D]">Campamento Base</span>
-                            </div>
-                            <div class="border-r border-[#DCE0DC] pr-2 sm:pl-2">
-                                <span class="block text-[10px] font-mono text-[#6E767D] uppercase">TEMPERATURA</span>
-                                <span class="text-lg font-mono font-bold text-ochre">-4.2°C</span>
-                                <span class="block text-[10px] font-mono text-[#6E767D]">Viento 28 km/h</span>
-                            </div>
-                            <div class="sm:pl-2">
-                                <span class="block text-[10px] font-mono text-[#6E767D] uppercase">ACCESO SENDEROS</span>
-                                <span class="text-lg font-mono font-bold text-yareta">ABIERTO</span>
-                                <span class="block text-[10px] font-mono text-[#6E767D]">Control Huachón</span>
-                            </div>
-                        </div>
+                <!-- Columna Izquierda: Mensaje Central & Badges de Tiendas (7 Cols) -->
+                <div class="lg:col-span-7 flex flex-col justify-center">
+                    <!-- Badge Oficial de la App -->
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-white border border-[#DCE0DC] text-xs font-mono font-semibold text-[#575D5F] rounded mb-5 shadow-sm w-fit">
+                        <span class="w-2 h-2 rounded-full bg-yareta"></span>
+                        <span>APLICACIÓN MÓVIL OFICIAL DE EXPEDICIÓN · PASCO, PERÚ</span>
                     </div>
 
-                    <!-- CTAs de Campo -->
-                    <div class="pt-4 border-t border-[#DCE0DC] flex flex-wrap items-center gap-4">
-                        <a href="#rutas-topo" class="px-6 py-3 bg-ochre hover:bg-ochre-hover text-white font-heading font-bold text-xs uppercase tracking-wider rounded border border-ochre shadow-sm transition-all flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">explore</span>
-                            <span>EXPLORAR RUTAS TÉCNICAS</span>
-                        </a>
-                        <a href="#panoramic-hud" class="px-5 py-3 bg-white hover:bg-[#F2F3F8] text-[#191C1F] font-heading font-bold text-xs uppercase tracking-wider rounded border border-[#DCE0DC] shadow-sm transition-all flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">view_in_ar</span>
-                            <span>INICIAR VISOR 360°</span>
-                        </a>
-                        <div class="text-[11px] font-mono text-[#6E767D] ml-auto hidden sm:block">
-                            REGISTRO SERNANP: ACR-PASCO-2024
+                    <!-- Titular de Lanzamiento de la Aplicación -->
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight leading-[1.08] text-[#191C1F] mb-6">
+                        La Cordillera de Pasco.
+                        <span class="text-ochre block mt-1">En la Palma de tu Mano.</span>
+                    </h1>
+
+                    <!-- Descripción de Valor Real de la App -->
+                    <p class="text-[#575D5F] text-base sm:text-lg leading-relaxed max-w-2xl font-body mb-8">
+                        Descubre los glaciares y lagunas del <strong>Nevado Huaguruncho (5,742 m)</strong> con la primera app de montaña del Perú diseñada para operar <strong>100% sin conexión a internet</strong>: cartografía satelital precisa, tours virtuales 360°, audioguías de los comuneros y pasaporte ecológico con pesaje de residuos.
+                    </p>
+
+                    <!-- BADGES OFICIALES DE DESCARGA (APP STORE, GOOGLE PLAY & APK) -->
+                    <div class="flex flex-wrap items-center gap-4 mb-8">
+                        <!-- Botón Google Play Oficial -->
+                        <button 
+                            @click="downloadModalOpen = true"
+                            class="flex items-center gap-3 px-5 py-2.5 rounded bg-[#14171A] hover:bg-black text-white transition-all shadow-md group">
+                            <span class="material-symbols-outlined text-[28px] text-yareta group-hover:scale-110 transition-transform">play_arrow</span>
+                            <div class="text-left leading-tight">
+                                <span class="text-[9px] text-[#A1A1A6] block uppercase font-mono tracking-wider">DISPONIBLE EN</span>
+                                <span class="text-sm font-heading font-bold text-white">Google Play</span>
+                            </div>
+                        </button>
+
+                        <!-- Botón App Store Oficial -->
+                        <button 
+                            @click="downloadModalOpen = true"
+                            class="flex items-center gap-3 px-5 py-2.5 rounded bg-[#14171A] hover:bg-black text-white transition-all shadow-md group">
+                            <span class="material-symbols-outlined text-[28px] text-white group-hover:scale-110 transition-transform">phone_iphone</span>
+                            <div class="text-left leading-tight">
+                                <span class="text-[9px] text-[#A1A1A6] block uppercase font-mono tracking-wider">CONSIGUE EN EL</span>
+                                <span class="text-sm font-heading font-bold text-white">App Store</span>
+                            </div>
+                        </button>
+
+                        <!-- Botón Descarga Directa APK (Android) -->
+                        <button 
+                            @click="downloadModalOpen = true"
+                            class="flex items-center gap-2 px-4 py-3 rounded bg-white hover:bg-[#F2F3F8] text-[#191C1F] border border-[#DCE0DC] transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-[20px] text-ochre">android</span>
+                            <div class="text-left leading-none font-mono">
+                                <span class="text-[9px] text-[#6E767D] block">DESCARGA DIRECTA</span>
+                                <span class="text-xs font-bold text-[#191C1F]">APK Android (48 MB)</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Métricas de Confianza de la App -->
+                    <div class="pt-6 border-t border-[#DCE0DC] flex flex-wrap items-center gap-6 text-xs font-mono text-[#575D5F]">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-yareta text-[18px]">verified</span>
+                            <span>Cartografía Satelital Offline</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-ochre text-[18px]">vr180_create2d</span>
+                            <span>Visor 360° Giroscópico</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-yareta text-[18px]">eco</span>
+                            <span>Huella Cero Certificada</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Columna Derecha Placa Fotográfica Documental (5 Cols) -->
-                <div class="lg:col-span-5 flex flex-col">
-                    <div class="bg-white border border-[#DCE0DC] p-3 shadow-sm rounded flex flex-col h-full">
-                        <div class="flex items-center justify-between pb-2 px-1 text-[11px] font-mono text-[#6E767D] border-b border-[#DCE0DC]/60">
-                            <span class="flex items-center gap-1.5 font-bold text-[#191C1F]">
-                                <span class="w-2 h-2 bg-ochre rounded-full"></span>
-                                REGISTRO FOTOGRÁFICO DE ALTA MONTAÑA
-                            </span>
-                            <span>SECTOR ARISTA SUROESTE</span>
+                <!-- Columna Derecha: Mockup Realista de Smartphone con la App (5 Cols) -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="relative w-[320px] sm:w-[350px]">
+                        
+                        <!-- Floating Chip 1: Offline GPS -->
+                        <div class="absolute -top-4 -left-6 z-20 bg-white border border-[#DCE0DC] px-3 py-1.5 rounded shadow-lg text-[11px] font-mono font-bold text-yareta flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-yareta animate-ping"></span>
+                            <span>100% OFFLINE · SIN COBERTURA</span>
                         </div>
 
-                        <div class="relative overflow-hidden mt-3 rounded bg-[#ECEEF2] flex-grow min-h-[320px] sm:min-h-[420px]">
-                            <img 
-                                src="{% static 'images/huaguruncho_hero.jpg' %}" 
-                                alt="Nevado Huaguruncho 5,742 msnm - Pasco, Perú" 
-                                class="w-full h-full object-cover">
+                        <!-- Floating Chip 2: VR 360 -->
+                        <div class="absolute -bottom-4 -right-6 z-20 bg-white border border-[#DCE0DC] px-3 py-1.5 rounded shadow-lg text-[11px] font-mono font-bold text-ochre flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
+                            <span>REALIDAD VIRTUAL 360°</span>
+                        </div>
+
+                        <!-- Chasis del Teléfono (Smartphone Frame) -->
+                        <div class="bg-[#14171A] p-3 rounded-[44px] shadow-2xl border-4 border-[#2E3134]">
                             
-                            <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm border border-[#DCE0DC] px-2.5 py-1 text-[11px] font-mono text-[#191C1F] rounded shadow-sm">
-                                COORD: 10°31'48"S 75°55'48"W // ELEV: 5,180M
+                            <!-- Dynamic Island / Cámara Frontal -->
+                            <div class="w-24 h-4 bg-black rounded-full mx-auto mb-2 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-[#2E3134]"></div>
                             </div>
-                            
-                            <div class="absolute bottom-3 right-3 bg-[#14171A]/90 text-white px-2.5 py-1 text-[10px] font-mono rounded">
-                                FOTOGRAFÍA OFICIAL HUACHÓN 2026
+
+                            <!-- Pantalla de la Aplicación -->
+                            <div class="bg-white rounded-[32px] overflow-hidden border border-[#DCE0DC] text-[#191C1F]">
+                                
+                                <!-- App Header Status -->
+                                <div class="bg-[#ECEEF2] px-4 py-2 border-b border-[#DCE0DC] flex justify-between items-center text-[10px] font-mono text-[#575D5F]">
+                                    <span class="font-bold">HUAGURUNCHO 360</span>
+                                    <span class="text-ochre font-bold">ALT: 5,742m</span>
+                                </div>
+
+                                <!-- Screen Content: Pestañas Interactivas en el Mockup -->
+                                <div class="p-3">
+                                    <div class="flex gap-1 mb-2 bg-[#F2F3F8] p-1 rounded text-[10px] font-mono">
+                                        <button 
+                                            @click="activePhoneTab = '360'"
+                                            :class="activePhoneTab === '360' ? 'bg-white shadow text-ochre font-bold' : 'text-[#6E767D]'"
+                                            class="flex-1 py-1 rounded text-center">
+                                            Tour 360°
+                                        </button>
+                                        <button 
+                                            @click="activePhoneTab = 'map'"
+                                            :class="activePhoneTab === 'map' ? 'bg-white shadow text-ochre font-bold' : 'text-[#6E767D]'"
+                                            class="flex-1 py-1 rounded text-center">
+                                            GPS Offline
+                                        </button>
+                                        <button 
+                                            @click="activePhoneTab = 'eco'"
+                                            :class="activePhoneTab === 'eco' ? 'bg-white shadow text-ochre font-bold' : 'text-[#6E767D]'"
+                                            class="flex-1 py-1 rounded text-center">
+                                            Huella Cero
+                                        </button>
+                                    </div>
+
+                                    <!-- Vista 1: Tour 360 en el Mockup -->
+                                    <div x-show="activePhoneTab === '360'" class="space-y-2">
+                                        <div class="relative h-[220px] rounded overflow-hidden">
+                                            <img 
+                                                src="{% static 'images/huaguruncho_hero.jpg' %}" 
+                                                alt="App Tour 360" 
+                                                class="w-full h-full object-cover">
+                                            <div class="absolute top-2 left-2 bg-black/70 text-white text-[9px] font-mono px-2 py-0.5 rounded">
+                                                HDG: 318° NW · GIROSCOPIO
+                                            </div>
+                                            <div class="absolute bottom-2 inset-x-2 bg-white/90 backdrop-blur-sm p-1.5 rounded text-[10px] font-mono flex justify-between">
+                                                <span class="font-bold text-[#191C1F]">Cumbre Principal</span>
+                                                <span class="text-ochre font-bold">5,742 m</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Vista 2: GPS Offline en el Mockup -->
+                                    <div x-show="activePhoneTab === 'map'" class="space-y-2" style="display: none;">
+                                        <div class="relative h-[220px] rounded overflow-hidden bg-[#ECEEF2] p-3 flex flex-col justify-between">
+                                            <img 
+                                                src="{% static 'images/huaguruncho_trekking.jpg' %}" 
+                                                alt="Mapa GPS" 
+                                                class="absolute inset-0 w-full h-full object-cover opacity-60">
+                                            <div class="relative z-10 bg-white/95 p-2 rounded text-[10px] font-mono border border-[#DCE0DC]">
+                                                <span class="text-yareta font-bold block">TRACK ACTIVO: Arista Suroeste</span>
+                                                <span>Distancia: 14.5 km · Desnivel: +1,280m</span>
+                                            </div>
+                                            <div class="relative z-10 bg-black/80 text-white p-2 rounded text-[9px] font-mono flex justify-between">
+                                                <span>PRECISIÓN GPS: ±3.2 M</span>
+                                                <span class="text-yareta font-bold">MAPA SIN INTERNET</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Vista 3: Huella Cero en el Mockup -->
+                                    <div x-show="activePhoneTab === 'eco'" class="space-y-2" style="display: none;">
+                                        <div class="h-[220px] rounded bg-[#F8F9FD] border border-[#DCE0DC] p-3 flex flex-col justify-between">
+                                            <div>
+                                                <div class="flex items-center gap-2 text-yareta font-bold text-[11px] mb-2">
+                                                    <span class="material-symbols-outlined text-[16px]">verified</span>
+                                                    <span>PASAPORTE ECOLÓGICO</span>
+                                                </div>
+                                                <p class="text-[10px] text-[#575D5F]">Registro de residuos pesados en Puesto Añilcocha.</p>
+                                                <div class="mt-3 p-2 bg-white border border-[#DCE0DC] rounded text-center">
+                                                    <span class="text-2xl font-bold text-yareta font-heading">1,420 kg</span>
+                                                    <span class="block text-[9px] font-mono text-[#6E767D]">RESIDUOS RETIRADOS</span>
+                                                </div>
+                                            </div>
+                                            <div class="p-1.5 bg-yareta text-white text-[9px] font-mono rounded text-center font-bold">
+                                                SELLO OFICIAL SERNANP / HUACHÓN
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Información del Waypoint -->
+                                    <div class="p-2.5 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-xs mt-2">
+                                        <div class="flex justify-between items-center text-[10px] font-mono">
+                                            <span class="text-ochre font-bold">SECTOR AÑILCOCHA</span>
+                                            <span class="text-[#6E767D]">Paso 01/04</span>
+                                        </div>
+                                        <p class="text-[11px] font-body text-[#575D5F] mt-1 leading-tight">
+                                            Laguna Huaguruncho (4,280m) · Aguas turquesas de deshielo.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Barra Inferior de Navegación del Celular -->
+                                <div class="bg-white border-t border-[#DCE0DC] px-4 py-2 flex justify-between text-[#6E767D]">
+                                    <div class="flex flex-col items-center text-ochre">
+                                        <span class="material-symbols-outlined text-[18px]">explore</span>
+                                        <span class="text-[8px] font-mono">Explorar</span>
+                                    </div>
+                                    <div class="flex flex-col items-center hover:text-ochre">
+                                        <span class="material-symbols-outlined text-[18px]">alt_route</span>
+                                        <span class="text-[8px] font-mono">Rutas</span>
+                                    </div>
+                                    <div class="flex flex-col items-center hover:text-ochre">
+                                        <span class="material-symbols-outlined text-[18px]">view_in_ar</span>
+                                        <span class="text-[8px] font-mono">360 VR</span>
+                                    </div>
+                                    <div class="flex flex-col items-center hover:text-ochre">
+                                        <span class="material-symbols-outlined text-[18px]">badge</span>
+                                        <span class="text-[8px] font-mono">Pasaporte</span>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
-                        <!-- Pie de Placa Documental -->
-                        <div class="pt-3 px-1 flex items-start justify-between gap-4 text-xs font-mono text-[#575D5F]">
-                            <div>
-                                <p class="font-bold text-[#191C1F]">EXP-26-HUA // ARISTA SUROESTE & LENGUA GLACIAR</p>
-                                <p class="text-[11px] text-[#6E767D]">Ascenso técnico guiado por comuneros certificados de Huachón en hielo fósil.</p>
-                            </div>
-                            <span class="shrink-0 px-2 py-0.5 border border-[#DCE0DC] bg-[#F2F3F8] text-[10px] font-bold rounded">
-                                PLACA 01
-                            </span>
-                        </div>
                     </div>
                 </div>
 
@@ -249,142 +370,197 @@
     </main>
 
     <!-- ======================================================== -->
-    <!-- 4. INTERACTIVE 360° ASCENT HUD VIEWPORT                  -->
+    <!-- 4. VITRINA DE FUNCIONALIDADES DE LA APP MÓVIL             -->
     <!-- ======================================================== -->
-    <section id="panoramic-hud" class="border-b border-[#DCE0DC] bg-[#ECEEF2] py-12">
+    <section id="app-features" class="py-16 bg-[#F8F9FD] border-b border-[#DCE0DC]">
         <div class="max-w-[1380px] mx-auto px-4 md:px-8">
             
-            <!-- Encabezado del Visor -->
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-4 pb-3 border-b border-[#DCE0DC] gap-2">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-ochre uppercase mb-2">
+                    <span class="material-symbols-outlined text-[16px]">devices</span>
+                    <span>TECNOLOGÍA DE MONTAÑA EN TU SMARTPHONE</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-heading font-black text-[#191C1F] tracking-tight">
+                    ¿Por qué descargar Huaguruncho 360?
+                </h2>
+                <p class="text-[#575D5F] text-base mt-2 font-body">
+                    Diseñada en colaboración con guías de Huachón y la Universidad Nacional Daniel Alcides Carrión para brindarte seguridad, educación ambiental y navegación real en la cordillera.
+                </p>
+            </div>
+
+            <!-- 4 Pilares de la App -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Pilar 1: Cartografía Offline -->
+                <div class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded bg-glacial flex items-center justify-center text-ochre mb-4">
+                            <span class="material-symbols-outlined text-[28px]">cloud_off</span>
+                        </div>
+                        <h3 class="text-lg font-heading font-bold text-[#191C1F] mb-2">
+                            Cartografía 100% Offline
+                        </h3>
+                        <p class="text-xs text-[#575D5F] leading-relaxed">
+                            Descarga el mapa satelital antes de salir. La app lee tu chip GPS nativo para posicionarte en curvas de nivel sin gastar datos ni requerir cobertura de red.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-[#DCE0DC] text-[11px] font-mono text-yareta font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                        <span>Cero señal celular necesaria</span>
+                    </div>
+                </div>
+
+                <!-- Pilar 2: Visor 360° VR -->
+                <div class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded bg-glacial flex items-center justify-center text-ochre mb-4">
+                            <span class="material-symbols-outlined text-[28px]">view_in_ar</span>
+                        </div>
+                        <h3 class="text-lg font-heading font-bold text-[#191C1F] mb-2">
+                            Visor 360° Inmersivo
+                        </h3>
+                        <p class="text-xs text-[#575D5F] leading-relaxed">
+                            Apunta tu teléfono y muévelo en el espacio: gracias al giroscopio podrás visualizar panoramas gigapíxel de lagunas y glaciares como si estuvieras allí.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-[#DCE0DC] text-[11px] font-mono text-ochre font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                        <span>Compatible con lentes VR</span>
+                    </div>
+                </div>
+
+                <!-- Pilar 3: Pasaporte Huella Cero -->
+                <div class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded bg-glacial flex items-center justify-center text-yareta mb-4">
+                            <span class="material-symbols-outlined text-[28px]">eco</span>
+                        </div>
+                        <h3 class="text-lg font-heading font-bold text-[#191C1F] mb-2">
+                            Pasaporte Huella Cero
+                        </h3>
+                        <p class="text-xs text-[#575D5F] leading-relaxed">
+                            Registra tus botellas y víveres al subir, valida el retorno de tus residuos con los guardaparques y colecciona insignias digitales de Guardián Andino.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-[#DCE0DC] text-[11px] font-mono text-yareta font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                        <span>Certificación SERNANP</span>
+                    </div>
+                </div>
+
+                <!-- Pilar 4: Audioguías & Relatos -->
+                <div class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded bg-glacial flex items-center justify-center text-[#191C1F] mb-4">
+                            <span class="material-symbols-outlined text-[28px]">headphones</span>
+                        </div>
+                        <h3 class="text-lg font-heading font-bold text-[#191C1F] mb-2">
+                            Audioguías Comunitarias
+                        </h3>
+                        <p class="text-xs text-[#575D5F] leading-relaxed">
+                            Escucha relatos orales narrados por los guías comunales de Huachón sobre las leyendas del Apu sagrado y la flora milenaria en cada parada.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-[#DCE0DC] text-[11px] font-mono text-[#191C1F] font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                        <span>Voces vivas de Huachón</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 5. DEMO VIRTUAL 360° (VISTA PREVIA DE LA APP)             -->
+    <!-- ======================================================== -->
+    <section id="panoramic-hud" class="border-b border-[#DCE0DC] bg-[#ECEEF2] py-14">
+        <div class="max-w-[1380px] mx-auto px-4 md:px-8">
+            
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 pb-3 border-b border-[#DCE0DC] gap-2">
                 <div>
                     <div class="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-ochre uppercase">
                         <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
-                        <span>MÓDULO DE FOTOGRAMETRÍA INMERSIVA GIGAPÍXEL</span>
+                        <span>EXPERIENCIA VIRTUAL DISPONIBLE EN LA APP</span>
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-heading font-black text-[#191C1F]">
-                        360° Ascent HUD: Cuenca Glaciar & Laguna Huaguruncho
+                        Explora la Cuenca Glaciar en 360°
                     </h2>
                 </div>
-                <div class="flex items-center gap-2 text-xs font-mono text-yareta font-bold">
-                    <span class="material-symbols-outlined text-[16px]">sensors</span>
-                    <span>ORIENTACIÓN ESPACIAL · TELEMETRÍA VIRTUAL</span>
+                <div class="flex items-center gap-2">
+                    <button 
+                        @click="activeScene = 'laguna'"
+                        :class="activeScene === 'laguna' ? 'bg-[#191C1F] text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC]'"
+                        class="px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors">
+                        Laguna Huaguruncho
+                    </button>
+                    <button 
+                        @click="activeScene = 'glaciar'"
+                        :class="activeScene === 'glaciar' ? 'bg-[#191C1F] text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC]'"
+                        class="px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors">
+                        Mirador Glaciar
+                    </button>
+                    <button 
+                        @click="activeScene = 'plaza'"
+                        :class="activeScene === 'plaza' ? 'bg-[#191C1F] text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC]'"
+                        class="px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors">
+                        Plaza Huachón
+                    </button>
                 </div>
             </div>
 
-            <!-- Escenario Inmersivo con Overlay HUD -->
+            <!-- Viewport 360 Interactivo -->
             <div class="relative bg-[#14171A] border border-[#191C1F] overflow-hidden rounded shadow-lg">
-                <!-- Imagen Panorámica Real -->
-                <div class="relative w-full h-[500px] md:h-[620px] overflow-hidden">
+                <div class="relative w-full h-[460px] md:h-[540px] overflow-hidden">
+                    
+                    <!-- Escena 1: Laguna -->
                     <img 
-                        src="{% static 'images/huaguruncho_trekking.jpg' %}" 
-                        alt="Vista panorámica inmersiva del Nevado Huaguruncho" 
+                        x-show="activeScene === 'laguna'"
+                        src="{% static 'images/scene_laguna_huaguruncho.jpg' %}" 
+                        alt="Laguna Huaguruncho 360" 
                         class="w-full h-full object-cover">
 
-                    <!-- Degradado Suave para Controles HUD -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40 pointer-events-none"></div>
+                    <!-- Escena 2: Glaciar -->
+                    <img 
+                        x-show="activeScene === 'glaciar'"
+                        src="{% static 'images/scene_mirador_glaciar.jpg' %}" 
+                        alt="Mirador Glaciar 360" 
+                        class="w-full h-full object-cover"
+                        style="display: none;">
 
-                    <!-- Brújula HUD Superior -->
+                    <!-- Escena 3: Plaza Huachón -->
+                    <img 
+                        x-show="activeScene === 'plaza'"
+                        src="{% static 'images/scene_huachon_plaza.jpg' %}" 
+                        alt="Plaza Huachón 360" 
+                        class="w-full h-full object-cover"
+                        style="display: none;">
+
+                    <!-- Overlay de Brújula HUD -->
                     <div class="absolute top-4 inset-x-4 flex items-center justify-between pointer-events-none">
                         <div class="bg-black/80 backdrop-blur-md text-white border border-white/20 px-3 py-1.5 rounded text-xs font-mono flex items-center gap-3">
                             <span class="text-ochre font-bold">HDG: 318° NW</span>
                             <span class="text-white/60">PITCH: +14°</span>
-                            <span class="text-white/60">FOV: 94°</span>
                         </div>
                         <div class="bg-black/80 backdrop-blur-md text-white border border-white/20 px-3 py-1.5 rounded text-xs font-mono flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-yareta animate-ping"></span>
-                            <span>GIMBAL 360° DISPONIBLE</span>
+                            <span>PANORAMA REAL 360°</span>
                         </div>
                     </div>
 
-                    <!-- Hotspots Interactivos Anclados en el Relieve -->
-                    <!-- Pin 1: Laguna Huaguruncho -->
-                    <div 
-                        @click="openWaypoint('Laguna Huaguruncho', '4,280 m s.n.m.', 'Espejo turquesa alimentado por el deshielo glaciar. Punto de aclimatación y pesca deportiva de trucha con los comuneros de Huachón.', '10°32\'10\"S 75°56\'04\"W', 'Cuenca Baja')"
-                        class="absolute top-[68%] left-[22%] -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-                        <div class="w-8 h-8 rounded-full bg-white border-2 border-ochre flex items-center justify-center shadow-lg group-hover:scale-125 transition-transform">
-                            <span class="material-symbols-outlined text-[16px] text-ochre">water_drop</span>
-                        </div>
-                        <div class="absolute left-9 top-1/2 -translate-y-1/2 bg-white/95 border border-[#DCE0DC] px-2.5 py-1 text-xs font-mono whitespace-nowrap shadow-md rounded">
-                            <span class="text-ochre font-bold">Laguna Huaguruncho</span>
-                            <span class="block text-[10px] text-[#6E767D]">4,280 m · Agua Glaciar</span>
-                        </div>
-                    </div>
-
-                    <!-- Pin 2: Campamento Base Añilcocha -->
-                    <div 
-                        @click="openWaypoint('Campamento Añilcocha', '4,320 m s.n.m.', 'Área oficial habilitada para pernocte seguro, provista de fuente de agua y letrina seca ecológica gestionada por la comunidad.', '10°31\'52\"S 75°55\'26\"W', 'Cuenca Media')"
-                        class="absolute top-[58%] left-[45%] -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-                        <div class="w-8 h-8 rounded-full bg-white border-2 border-yareta flex items-center justify-center shadow-lg group-hover:scale-125 transition-transform">
-                            <span class="material-symbols-outlined text-[16px] text-yareta">camping</span>
-                        </div>
-                        <div class="absolute left-9 top-1/2 -translate-y-1/2 bg-white/95 border border-[#DCE0DC] px-2.5 py-1 text-xs font-mono whitespace-nowrap shadow-md rounded">
-                            <span class="text-yareta font-bold">Campamento Base Añilcocha</span>
-                            <span class="block text-[10px] text-[#6E767D]">4,320 m · Refugio</span>
-                        </div>
-                    </div>
-
-                    <!-- Pin 3: Morrena y Zona de Grietas -->
-                    <div 
-                        @click="openWaypoint('Morrena y Campo de Grietas', '4,950 m s.n.m.', 'Límite donde comienza la nieve perenne. Obligatorio encordamiento, uso de grampones y casco técnico de alta montaña.', '10°31\'38\"S 75°55\'40\"W', 'Zona Glaciar')"
-                        class="absolute top-[44%] left-[68%] -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-                        <div class="w-8 h-8 rounded-full bg-white border-2 border-[#191C1F] flex items-center justify-center shadow-lg group-hover:scale-125 transition-transform">
-                            <span class="material-symbols-outlined text-[16px] text-[#191C1F]">warning</span>
-                        </div>
-                        <div class="absolute left-9 top-1/2 -translate-y-1/2 bg-white/95 border border-[#DCE0DC] px-2.5 py-1 text-xs font-mono whitespace-nowrap shadow-md rounded">
-                            <span class="text-[#191C1F] font-bold">Morrena & Grietas</span>
-                            <span class="block text-[10px] text-[#6E767D]">4,950 m · Equipo Técnico</span>
-                        </div>
-                    </div>
-
-                    <!-- Pin 4: Cumbre Piramidal -->
-                    <div 
-                        @click="openWaypoint('Cumbre Nevado Huaguruncho', '5,742 m s.n.m.', 'Pilar culminante del macizo. Paredes de hielo de hasta 65° de inclinación con vista panorámica de toda la selva central de Pasco y Junín.', '10°31\'48\"S 75°55\'48\"W', 'Cumbre Máxima')"
-                        class="absolute top-[22%] left-[56%] -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-                        <div class="w-10 h-10 rounded-full bg-ochre text-white border-2 border-white flex items-center justify-center shadow-2xl group-hover:scale-125 transition-transform animate-bounce">
-                            <span class="material-symbols-outlined text-[20px]">flag</span>
-                        </div>
-                        <div class="absolute left-11 top-1/2 -translate-y-1/2 bg-white border-2 border-ochre px-3 py-1 text-xs font-mono whitespace-nowrap shadow-xl rounded">
-                            <span class="text-ochre font-extrabold text-sm block">Cumbre Huaguruncho</span>
-                            <span class="text-[10px] font-bold text-[#191C1F]">5,742 m s.n.m. // Apu Mayor</span>
-                        </div>
-                    </div>
-
-                    <!-- Controles Inferiores del HUD -->
+                    <!-- Call To Action en el Viewport -->
                     <div class="absolute bottom-4 inset-x-4 flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex items-center gap-1 bg-white/90 backdrop-blur-md border border-[#DCE0DC] p-1 rounded text-xs font-mono">
-                            <button 
-                                @click="activeLayer = 'topo'"
-                                :class="activeLayer === 'topo' ? 'bg-[#191C1F] text-white' : 'text-[#575D5F] hover:bg-[#F2F3F8]'"
-                                class="px-3 py-1 font-bold rounded transition-colors">
-                                Capa Topográfica
-                            </button>
-                            <button 
-                                @click="activeLayer = 'sat'"
-                                :class="activeLayer === 'sat' ? 'bg-[#191C1F] text-white' : 'text-[#575D5F] hover:bg-[#F2F3F8]'"
-                                class="px-3 py-1 font-bold rounded transition-colors">
-                                Satélite Glaciar
-                            </button>
-                            <button 
-                                @click="activeLayer = 'gpx'"
-                                :class="activeLayer === 'gpx' ? 'bg-[#191C1F] text-white' : 'text-[#575D5F] hover:bg-[#F2F3F8]'"
-                                class="px-3 py-1 font-bold rounded transition-colors">
-                                Track GPX
-                            </button>
+                        <div class="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded border border-[#DCE0DC] text-xs font-mono text-[#191C1F]">
+                            <strong>Vista Previa Web:</strong> En la App Móvil el visor responde al movimiento de tu celular con giroscopio.
                         </div>
-
-                        <div class="bg-black/80 backdrop-blur-md border border-white/20 text-white px-3 py-1 rounded text-xs font-mono">
-                            Toca los puntos en el visor para abrir la ficha de campo
-                        </div>
+                        <button 
+                            @click="downloadModalOpen = true"
+                            class="px-4 py-2 bg-ochre hover:bg-ochre-hover text-white text-xs font-heading font-bold uppercase rounded shadow transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[16px]">download</span>
+                            <span>DESCARGAR APP PARA VER EN VR</span>
+                        </button>
                     </div>
-                </div>
 
-                <!-- Barra Inferior de Metadatos -->
-                <div class="bg-white px-4 py-2 border-t border-[#DCE0DC] flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[#6E767D]">
-                    <div>TOPÓNIMO QUECHUA: <em>"HUAQ-RUNCHU"</em> (EL QUE LLORA O TIEMBLA EN LA NIEVE)</div>
-                    <div class="flex items-center gap-4">
-                        <span>RESOLUCIÓN: GIGAPÍXEL ULTRA-HD</span>
-                        <span class="text-yareta font-bold">LEVANTAMIENTO CARTOGRÁFICO VALIDADO</span>
-                    </div>
                 </div>
             </div>
 
@@ -392,242 +568,174 @@
     </section>
 
     <!-- ======================================================== -->
-    <!-- 5. TOPO MATRIX: CATÁLOGO DE RUTAS Y SENDEROS TÉCNICOS    -->
+    <!-- 6. RUTAS TOPOGRÁFICAS INCLUIDAS EN LA APP                -->
     <!-- ======================================================== -->
     <section id="rutas-topo" class="py-14 bg-[#F8F9FD] border-b border-[#DCE0DC]">
         <div class="max-w-[1380px] mx-auto px-4 md:px-8">
             
-            <!-- Encabezado de Sección -->
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-[#DCE0DC] gap-4">
                 <div>
                     <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-yareta uppercase mb-1">
                         <span class="material-symbols-outlined text-[16px]">alt_route</span>
-                        <span>CATÁLOGO CARTOGRÁFICO DE MONTAÑA</span>
+                        <span>SENDEROS DISPONIBLES EN LA APP</span>
                     </div>
                     <h2 class="text-3xl sm:text-4xl font-heading font-black text-[#191C1F] tracking-tight">
-                        Rutas Técnicas & Cuaderno de Ascenso
+                        Rutas Técnicas & Tracks GPX Offline
                     </h2>
                     <p class="text-[#575D5F] text-sm sm:text-base max-w-2xl mt-1">
-                        Senderos verificados por los guías comunales de Huachón y la Asociación de Guías de Montaña del Perú (AGMP).
+                        Cada ruta en la aplicación incluye perfil altimétrico, puntos de agua, zonas de campamento seguro y coordenadas GPS descargadas.
                     </p>
                 </div>
 
-                <!-- Filtros Rápidos -->
                 <div class="flex items-center gap-1.5 text-xs font-mono font-bold">
                     <button 
                         @click="selectedRouteFilter = 'all'"
-                        :class="selectedRouteFilter === 'all' ? 'bg-ochre text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC] hover:bg-[#F2F3F8]'"
+                        :class="selectedRouteFilter === 'all' ? 'bg-ochre text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC]'"
                         class="px-3 py-1.5 rounded transition-colors">
-                        Todas las Rutas
+                        Todas
                     </button>
                     <button 
                         @click="selectedRouteFilter = 'climb'"
-                        :class="selectedRouteFilter === 'climb' ? 'bg-ochre text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC] hover:bg-[#F2F3F8]'"
+                        :class="selectedRouteFilter === 'climb' ? 'bg-ochre text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC]'"
                         class="px-3 py-1.5 rounded transition-colors">
                         Alta Montaña
                     </button>
                     <button 
                         @click="selectedRouteFilter = 'trek'"
-                        :class="selectedRouteFilter === 'trek' ? 'bg-ochre text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC] hover:bg-[#F2F3F8]'"
+                        :class="selectedRouteFilter === 'trek' ? 'bg-ochre text-white' : 'bg-white text-[#575D5F] border border-[#DCE0DC]'"
                         class="px-3 py-1.5 rounded transition-colors">
-                        Trekking Familiar
+                        Trekking
                     </button>
                 </div>
             </div>
 
-            <!-- Grilla de Tarjetas Técnicas -->
+            <!-- Grilla de Tarjetas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                <!-- Tarjeta 1: Ruta Arista Suroeste (Vía Normal) -->
+                <!-- Ruta 1 -->
                 <div 
                     x-show="selectedRouteFilter === 'all' || selectedRouteFilter === 'climb'"
-                    class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between relative group">
-                    <div class="absolute -top-3 left-4 bg-ochre text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase">
-                        VÍA NORMAL A CUMBRE
-                    </div>
+                    class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between text-xs font-mono text-[#6E767D] mb-3 pt-1">
+                        <div class="flex items-center justify-between text-xs font-mono text-[#6E767D] mb-2">
                             <span>COD: RUTA-01-SW</span>
-                            <span class="text-yareta font-bold">OFFLINE ACTIVO</span>
+                            <span class="text-yareta font-bold">MAPA EN LA APP</span>
                         </div>
-                        <h3 class="text-xl font-heading font-black text-[#191C1F] mb-2 group-hover:text-ochre transition-colors">
-                            Ruta Arista Suroeste (Vía Normal)
+                        <h3 class="text-xl font-heading font-black text-[#191C1F] mb-2">
+                            Arista Suroeste (Vía Normal)
                         </h3>
                         <p class="text-xs text-[#575D5F] leading-relaxed mb-4">
-                            Línea técnica que remonta la cuenca de Añilcocha, campo de grietas y la arista de nieve compacta hasta la cumbre a 5,742 m.
+                            Ascenso a la cumbre máxima de 5,742 m atravesando el campo de grietas y la pared de nieve compacta.
                         </p>
-
-                        <!-- Grilla de Parámetros -->
                         <div class="grid grid-cols-2 gap-2 p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-xs font-mono mb-4">
                             <div>
-                                <span class="block text-[10px] text-[#6E767D]">COTA MÁXIMA</span>
+                                <span class="block text-[10px] text-[#6E767D]">ALTURA MÁXIMA</span>
                                 <span class="font-bold text-[#191C1F]">5,742 m s.n.m.</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] text-[#6E767D]">DESNIVEL POSITIVO</span>
+                                <span class="block text-[10px] text-[#6E767D]">DESNIVEL</span>
                                 <span class="font-bold text-ochre">+1,280 m</span>
                             </div>
                             <div class="mt-1">
-                                <span class="block text-[10px] text-[#6E767D]">DISTANCIA TOTAL</span>
+                                <span class="block text-[10px] text-[#6E767D]">DISTANCIA</span>
                                 <span class="font-bold text-[#191C1F]">14.5 km</span>
                             </div>
                             <div class="mt-1">
-                                <span class="block text-[10px] text-[#6E767D]">GRADUACIÓN UIAA</span>
-                                <span class="font-bold text-ochre">AD+ (Algo Difícil Sup.)</span>
-                            </div>
-                        </div>
-
-                        <!-- Mini Perfil Altimétrico -->
-                        <div class="mb-4 p-2 bg-white border border-[#DCE0DC] rounded text-[10px] font-mono text-[#6E767D]">
-                            <div class="flex justify-between mb-1">
-                                <span>4,320m Base</span>
-                                <span>5,050m Morrena</span>
-                                <span class="text-ochre font-bold">5,742m Cumbre</span>
-                            </div>
-                            <div class="h-2 w-full bg-[#ECEEF2] rounded overflow-hidden">
-                                <div class="h-full bg-ochre w-[85%]"></div>
+                                <span class="block text-[10px] text-[#6E767D]">GRADUACIÓN</span>
+                                <span class="font-bold text-ochre">AD+ (Técnica)</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="pt-3 border-t border-[#DCE0DC] flex gap-2">
-                        <button 
-                            @click="openRoute({ name: 'Ruta Arista Suroeste (Vía Normal)', alt: '5,742 m', gain: '+1,280 m', dist: '14.5 km', grade: 'AD+', desc: 'Ascenso técnico de 2 días. Día 1: Huachón a Añilcocha (4,320m). Día 2: Ataque a cumbre partiendo a las 02:00 am. Grampones, dos piolets técnicos y cuerda de 60m indispensables.', gpx: 'el-nevado-huaguruncho.gpx' })"
-                            class="flex-1 py-2 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] text-[#191C1F] text-xs font-mono font-bold rounded text-center">
-                            VER FICHA & GPX
-                        </button>
-                        <a href="#panoramic-hud" class="px-3 py-2 bg-ochre hover:bg-ochre-hover text-white text-xs font-mono font-bold rounded text-center flex items-center justify-center">
-                            <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
-                        </a>
-                    </div>
+                    <button 
+                        @click="downloadModalOpen = true"
+                        class="w-full py-2 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] text-[#191C1F] text-xs font-mono font-bold rounded flex items-center justify-center gap-1.5 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">download</span>
+                        <span>Descargar Track en la App</span>
+                    </button>
                 </div>
 
-                <!-- Tarjeta 2: Circuito Lagunas Glaciares & Huachón -->
+                <!-- Ruta 2 -->
                 <div 
                     x-show="selectedRouteFilter === 'all' || selectedRouteFilter === 'trek'"
-                    class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between relative group">
-                    <div class="absolute -top-3 left-4 bg-yareta text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase">
-                        TREKKING COMUNITARIO
-                    </div>
+                    class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between text-xs font-mono text-[#6E767D] mb-3 pt-1">
+                        <div class="flex items-center justify-between text-xs font-mono text-[#6E767D] mb-2">
                             <span>COD: TRK-02-HUA</span>
-                            <span class="text-yareta font-bold">FAMILIAS & GUÍAS</span>
+                            <span class="text-yareta font-bold">MAPA EN LA APP</span>
                         </div>
-                        <h3 class="text-xl font-heading font-black text-[#191C1F] mb-2 group-hover:text-yareta transition-colors">
-                            Circuito Lagunas Glaciares & Huachón
+                        <h3 class="text-xl font-heading font-black text-[#191C1F] mb-2">
+                            Circuito Lagunas Glaciares
                         </h3>
                         <p class="text-xs text-[#575D5F] leading-relaxed mb-4">
-                            Travesía escénica que rodea espejos turquesas de origen glaciar, bosques nativos de queñual y pastizales de alpacas.
+                            Travesía escénica para montañistas y familias bordeando espejos turquesas de deshielo y bosques de queñual.
                         </p>
-
-                        <!-- Grilla de Parámetros -->
                         <div class="grid grid-cols-2 gap-2 p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-xs font-mono mb-4">
                             <div>
-                                <span class="block text-[10px] text-[#6E767D]">COTA MÁXIMA</span>
+                                <span class="block text-[10px] text-[#6E767D]">ALTURA MÁXIMA</span>
                                 <span class="font-bold text-[#191C1F]">4,650 m s.n.m.</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] text-[#6E767D]">DESNIVEL POSITIVO</span>
+                                <span class="block text-[10px] text-[#6E767D]">DESNIVEL</span>
                                 <span class="font-bold text-yareta">+620 m</span>
                             </div>
                             <div class="mt-1">
-                                <span class="block text-[10px] text-[#6E767D]">DISTANCIA TOTAL</span>
+                                <span class="block text-[10px] text-[#6E767D]">DISTANCIA</span>
                                 <span class="font-bold text-[#191C1F]">18.2 km</span>
                             </div>
                             <div class="mt-1">
-                                <span class="block text-[10px] text-[#6E767D]">GRADUACIÓN UIAA</span>
-                                <span class="font-bold text-yareta">F (Fácil Senderismo)</span>
-                            </div>
-                        </div>
-
-                        <!-- Mini Perfil Altimétrico -->
-                        <div class="mb-4 p-2 bg-white border border-[#DCE0DC] rounded text-[10px] font-mono text-[#6E767D]">
-                            <div class="flex justify-between mb-1">
-                                <span>3,400m Huachón</span>
-                                <span>4,280m Laguna</span>
-                                <span class="text-yareta font-bold">4,650m Mirador</span>
-                            </div>
-                            <div class="h-2 w-full bg-[#ECEEF2] rounded overflow-hidden">
-                                <div class="h-full bg-yareta w-[60%]"></div>
+                                <span class="block text-[10px] text-[#6E767D]">GRADUACIÓN</span>
+                                <span class="font-bold text-yareta">F (Fácil Trek)</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="pt-3 border-t border-[#DCE0DC] flex gap-2">
-                        <button 
-                            @click="openRoute({ name: 'Circuito Lagunas Glaciares & Huachón', alt: '4,650 m', gain: '+620 m', dist: '18.2 km', grade: 'F', desc: 'Ruta accesible para montañistas y familias con acondicionamiento físico intermedio. Visita Laguna Huascacocha y Laguna Huaguruncho. Servicio de arrieros disponible en Huachón.', gpx: 'circuito-lagunas.gpx' })"
-                            class="flex-1 py-2 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] text-[#191C1F] text-xs font-mono font-bold rounded text-center">
-                            VER FICHA & GPX
-                        </button>
-                        <a href="#panoramic-hud" class="px-3 py-2 bg-yareta hover:bg-yareta-hover text-white text-xs font-mono font-bold rounded text-center flex items-center justify-center">
-                            <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
-                        </a>
-                    </div>
+                    <button 
+                        @click="downloadModalOpen = true"
+                        class="w-full py-2 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] text-[#191C1F] text-xs font-mono font-bold rounded flex items-center justify-center gap-1.5 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">download</span>
+                        <span>Descargar Track en la App</span>
+                    </button>
                 </div>
 
-                <!-- Tarjeta 3: Travesía Quebrada Añilcocha -->
+                <!-- Ruta 3 -->
                 <div 
                     x-show="selectedRouteFilter === 'all' || selectedRouteFilter === 'climb'"
-                    class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between relative group">
-                    <div class="absolute -top-3 left-4 bg-[#2E3134] text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase">
-                        EXPEDICIÓN INTERMEDIA
-                    </div>
+                    class="bg-white border border-[#DCE0DC] p-6 rounded shadow-sm hover:border-[#191C1F] transition-all flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between text-xs font-mono text-[#6E767D] mb-3 pt-1">
+                        <div class="flex items-center justify-between text-xs font-mono text-[#6E767D] mb-2">
                             <span>COD: EXP-03-AÑIL</span>
-                            <span class="text-ochre font-bold">BALIZAS GLACIARES</span>
+                            <span class="text-ochre font-bold">MAPA EN LA APP</span>
                         </div>
-                        <h3 class="text-xl font-heading font-black text-[#191C1F] mb-2 group-hover:text-ochre transition-colors">
+                        <h3 class="text-xl font-heading font-black text-[#191C1F] mb-2">
                             Travesía Quebrada Añilcocha
                         </h3>
                         <p class="text-xs text-[#575D5F] leading-relaxed mb-4">
-                            Aproximación por cañón encajonado hasta la lengua glacial terminal. Punto de inspección de balizas criosféricas SERNANP.
+                            Aproximación por cañón encajonado hasta la lengua glacial terminal. Punto de balizas criosféricas de la UNDAC.
                         </p>
-
-                        <!-- Grilla de Parámetros -->
                         <div class="grid grid-cols-2 gap-2 p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-xs font-mono mb-4">
                             <div>
-                                <span class="block text-[10px] text-[#6E767D]">COTA MÁXIMA</span>
+                                <span class="block text-[10px] text-[#6E767D]">ALTURA MÁXIMA</span>
                                 <span class="font-bold text-[#191C1F]">5,100 m s.n.m.</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] text-[#6E767D]">DESNIVEL POSITIVO</span>
+                                <span class="block text-[10px] text-[#6E767D]">DESNIVEL</span>
                                 <span class="font-bold text-ochre">+940 m</span>
                             </div>
                             <div class="mt-1">
-                                <span class="block text-[10px] text-[#6E767D]">DISTANCIA TOTAL</span>
+                                <span class="block text-[10px] text-[#6E767D]">DISTANCIA</span>
                                 <span class="font-bold text-[#191C1F]">11.8 km</span>
                             </div>
                             <div class="mt-1">
-                                <span class="block text-[10px] text-[#6E767D]">GRADUACIÓN UIAA</span>
+                                <span class="block text-[10px] text-[#6E767D]">GRADUACIÓN</span>
                                 <span class="font-bold text-[#191C1F]">PD (Poco Difícil)</span>
                             </div>
                         </div>
-
-                        <!-- Mini Perfil Altimétrico -->
-                        <div class="mb-4 p-2 bg-white border border-[#DCE0DC] rounded text-[10px] font-mono text-[#6E767D]">
-                            <div class="flex justify-between mb-1">
-                                <span>3,900m Ingreso</span>
-                                <span>4,600m Glaciar</span>
-                                <span class="font-bold text-[#191C1F]">5,100m Paso</span>
-                            </div>
-                            <div class="h-2 w-full bg-[#ECEEF2] rounded overflow-hidden">
-                                <div class="h-full bg-[#41484A] w-[75%]"></div>
-                            </div>
-                        </div>
                     </div>
-
-                    <div class="pt-3 border-t border-[#DCE0DC] flex gap-2">
-                        <button 
-                            @click="openRoute({ name: 'Travesía Quebrada Añilcocha', alt: '5,100 m', gain: '+940 m', dist: '11.8 km', grade: 'PD', desc: 'Ruta de aproximación glacial ideal para fotógrafos de naturaleza y montañistas experimentados. Se cruzan canchales y se alcanza el mirador frontal del gran serac de Huaguruncho.', gpx: 'quebrada-anilcocha.gpx' })"
-                            class="flex-1 py-2 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] text-[#191C1F] text-xs font-mono font-bold rounded text-center">
-                            VER FICHA & GPX
-                        </button>
-                        <a href="#panoramic-hud" class="px-3 py-2 bg-[#2E3134] hover:bg-[#191C1F] text-white text-xs font-mono font-bold rounded text-center flex items-center justify-center">
-                            <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
-                        </a>
-                    </div>
+                    <button 
+                        @click="downloadModalOpen = true"
+                        class="w-full py-2 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] text-[#191C1F] text-xs font-mono font-bold rounded flex items-center justify-center gap-1.5 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">download</span>
+                        <span>Descargar Track en la App</span>
+                    </button>
                 </div>
 
             </div>
@@ -635,120 +743,45 @@
     </section>
 
     <!-- ======================================================== -->
-    <!-- 6. HUELLA CERO SOLID WASTE & CONSERVATION CHECKPOINT     -->
+    <!-- 7. HUELLA CERO & CONSERVACIÓN AMBIENTAL                  -->
     <!-- ======================================================== -->
     <section id="huella-cero" class="py-14 bg-[#ECEEF2] border-b border-[#DCE0DC]">
         <div class="max-w-[1380px] mx-auto px-4 md:px-8">
-            <div class="bg-white border-2 border-yareta p-6 md:p-10 rounded shadow-sm relative overflow-hidden">
+            <div class="bg-white border-2 border-yareta p-6 md:p-10 rounded shadow-sm">
                 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     
-                    <!-- Lado Izquierdo: Certificado y Contador de Residuos -->
-                    <div class="lg:col-span-5 flex flex-col justify-between">
-                        <div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 bg-yareta/10 text-yareta text-xs font-mono font-bold rounded border border-yareta mb-4">
-                                <span class="material-symbols-outlined text-[16px]">shield</span>
-                                <span>SISTEMA DE CONTROL AMBIENTAL OBLIGATORIO</span>
-                            </div>
-                            <h2 class="text-2xl sm:text-3xl font-heading font-black text-[#191C1F] mb-3">
-                                Pacto Ecológico Huella Cero: Nevado Intacto
-                            </h2>
-                            <p class="text-xs sm:text-sm text-[#575D5F] leading-relaxed mb-6">
-                                Todo montañista, expedición científica y arriero debe cumplir el pesaje obligatorio de residuos en el Puesto de Control Añilcocha a la entrada y salida. La integridad del ecosistema de Puna y Yareta milenaria depende de este protocolo.
-                            </p>
-
-                            <!-- Sello Oficial Pasaporte de Montaña -->
-                            <div class="border-2 border-dashed border-yareta p-4 bg-[#F8F9FD] rounded flex items-center gap-4 mb-6">
-                                <div class="w-16 h-16 rounded-full border-2 border-yareta flex flex-col items-center justify-center text-yareta text-center shrink-0">
-                                    <span class="material-symbols-outlined text-[24px]">verified</span>
-                                    <span class="text-[8px] font-mono font-bold">SERNANP</span>
-                                </div>
-                                <div>
-                                    <div class="text-xs font-mono font-bold text-yareta">
-                                        CERTIFICACIÓN HUELLA CERO 100%
-                                    </div>
-                                    <div class="text-xs font-heading font-bold text-[#191C1F]">
-                                        SERNANP & COMUNIDAD CAMPESINA DE HUACHÓN
-                                    </div>
-                                    <div class="text-[11px] font-mono text-[#6E767D]">
-                                        ACTA REGIONAL PASCO · N° 048-2024
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="lg:col-span-7">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-yareta/10 text-yareta text-xs font-mono font-bold rounded border border-yareta mb-4">
+                            <span class="material-symbols-outlined text-[16px]">shield</span>
+                            <span>MÓDULO DE CONSERVACIÓN INTEGRADO EN LA APP</span>
                         </div>
+                        <h2 class="text-2xl sm:text-3xl font-heading font-black text-[#191C1F] mb-3">
+                            Pasaporte Ecológico Digital: Huella Cero
+                        </h2>
+                        <p class="text-xs sm:text-sm text-[#575D5F] leading-relaxed mb-6 font-body">
+                            La aplicación incluye un sistema de pesaje digital de residuos: declara tus botellas y empaques en el Puesto Añilcocha al subir, verifica la tara al bajar y recibe en tu celular tu certificado de retorno emitido por el SERNANP y la Comunidad de Huachón.
+                        </p>
 
-                        <!-- Contador de Residuos Pesados -->
-                        <div class="p-4 bg-[#F2F3F8] border border-[#DCE0DC] rounded">
-                            <span class="text-[10px] font-mono font-bold text-[#6E767D] block uppercase">RESIDUOS PESADOS Y RETIRADOS DE LA MONTAÑA</span>
-                            <div class="flex items-baseline gap-3 mt-1">
-                                <span class="text-3xl sm:text-4xl font-heading font-black text-yareta">1,420 kg</span>
-                                <span class="text-xs font-mono text-[#575D5F]">100% segregado y reciclado sin dejar rastro</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="p-3.5 bg-[#F8F9FD] border border-[#DCE0DC] rounded">
+                                <strong class="text-xs font-mono font-bold text-ochre block mb-1">1. Registro de Entrada</strong>
+                                <p class="text-xs text-[#575D5F]">Declaración de víveres y plástico de un solo uso en la app.</p>
+                            </div>
+                            <div class="p-3.5 bg-[#F8F9FD] border border-[#DCE0DC] rounded">
+                                <strong class="text-xs font-mono font-bold text-yareta block mb-1">2. Sello de Guardián</strong>
+                                <p class="text-xs text-[#575D5F]">Suma sellos a tu perfil y obtén insignias de montañista responsable.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Lado Derecho: 4 Reglas de Cordillera y Estado de Puestos -->
-                    <div class="lg:col-span-7 flex flex-col justify-between h-full">
-                        <div>
-                            <div class="flex items-center justify-between pb-2 mb-4 border-b border-[#DCE0DC] text-xs font-mono text-[#6E767D]">
-                                <span class="font-bold text-[#191C1F]">REGLAMENTO OFICIAL DE CORDILLERA</span>
-                                <span class="text-yareta font-bold">PUESTO AÑILCOCHA: OPERATIVO 24/7</span>
-                            </div>
-
-                            <!-- 4 Reglas Claras -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                                <div class="p-4 bg-[#F8F9FD] border border-[#DCE0DC] rounded">
-                                    <div class="flex items-center gap-2 text-xs font-mono font-bold text-ochre mb-1.5">
-                                        <span class="w-5 h-5 rounded-full bg-ochre text-white flex items-center justify-center text-[10px]">1</span>
-                                        <span>PESAJE OBLIGATORIO</span>
-                                    </div>
-                                    <p class="text-xs text-[#575D5F] leading-relaxed">
-                                        Pesaje exacto de víveres y equipo en el Puesto de Control al ingreso y verificación de retorno al descender.
-                                    </p>
-                                </div>
-
-                                <div class="p-4 bg-[#F8F9FD] border border-[#DCE0DC] rounded">
-                                    <div class="flex items-center gap-2 text-xs font-mono font-bold text-yareta mb-1.5">
-                                        <span class="w-5 h-5 rounded-full bg-yareta text-white flex items-center justify-center text-[10px]">2</span>
-                                        <span>CERO PLÁSTICOS 1-USO</span>
-                                    </div>
-                                    <p class="text-xs text-[#575D5F] leading-relaxed">
-                                        Prohibición estricta de bolsas plásticas desechables y envases no reutilizables sobre los 4,000 m s.n.m.
-                                    </p>
-                                </div>
-
-                                <div class="p-4 bg-[#F8F9FD] border border-[#DCE0DC] rounded">
-                                    <div class="flex items-center gap-2 text-xs font-mono font-bold text-yareta mb-1.5">
-                                        <span class="w-5 h-5 rounded-full bg-yareta text-white flex items-center justify-center text-[10px]">3</span>
-                                        <span>PROTECCIÓN DE YARETA</span>
-                                    </div>
-                                    <p class="text-xs text-[#575D5F] leading-relaxed">
-                                        Prohibido acampar o encender fuego sobre almohadillas de <em>Azorella compacta</em> (especie milenaria protegida).
-                                    </p>
-                                </div>
-
-                                <div class="p-4 bg-[#F8F9FD] border border-[#DCE0DC] rounded">
-                                    <div class="flex items-center gap-2 text-xs font-mono font-bold text-ochre mb-1.5">
-                                        <span class="w-5 h-5 rounded-full bg-ochre text-white flex items-center justify-center text-[10px]">4</span>
-                                        <span>REFORESTACIÓN QUEÑUAL</span>
-                                    </div>
-                                    <p class="text-xs text-[#575D5F] leading-relaxed">
-                                        Aporte directo de la tasa ambiental para el vivero comunal de queñuales (<em>Polylepis</em>) en Huachón.
-                                    </p>
-                                </div>
-                            </div>
+                    <div class="lg:col-span-5 flex flex-col items-center justify-center p-6 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-center">
+                        <div class="w-20 h-20 rounded-full border-4 border-yareta flex flex-col items-center justify-center text-yareta mb-3">
+                            <span class="material-symbols-outlined text-[36px]">verified</span>
                         </div>
-
-                        <!-- Barra de Estado Guardaparques -->
-                        <div class="p-3 bg-yareta text-white rounded flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-                            <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[18px]">nature_people</span>
-                                <span>GUARDAPARQUES COMUNALES DE HUACHÓN EN SERVICIO</span>
-                            </div>
-                            <span class="font-bold underline cursor-pointer" @click="downloadModalOpen = true">
-                                DESCARGAR REGLAMENTO EN PDF &rarr;
-                            </span>
-                        </div>
+                        <span class="text-xs font-mono font-bold text-yareta uppercase tracking-wider">RESIDUOS RETIRADOS Y RECICLADOS</span>
+                        <span class="text-4xl font-heading font-black text-[#191C1F] my-1">1,420 kg</span>
+                        <span class="text-[11px] font-mono text-[#6E767D]">Control oficial SERNANP / Huachón</span>
                     </div>
 
                 </div>
@@ -757,149 +790,81 @@
     </section>
 
     <!-- ======================================================== -->
-    <!-- 7. HUACHÓN: CULTURA, ALDEA ANDINA & GASTRONOMÍA           -->
+    <!-- 8. BANNER FINAL: DESCARGA LA APLICACIÓN                  -->
     <!-- ======================================================== -->
-    <section id="huachon" class="py-14 bg-[#F8F9FD] border-b border-[#DCE0DC]">
-        <div class="max-w-[1380px] mx-auto px-4 md:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                
-                <!-- Foto Real de Huachón Pueblo (5 Cols) -->
-                <div class="lg:col-span-5">
-                    <div class="bg-white border border-[#DCE0DC] p-3 rounded shadow-sm">
-                        <div class="overflow-hidden rounded bg-[#ECEEF2] h-[340px] sm:h-[400px]">
-                            <img 
-                                src="{% static 'images/huachon_village.jpg' %}" 
-                                alt="Villa colonial de Huachón, Pasco, Perú" 
-                                class="w-full h-full object-cover">
-                        </div>
-                        <div class="pt-3 px-1 flex justify-between items-center text-xs font-mono text-[#6E767D]">
-                            <span class="font-bold text-[#191C1F]">VILLA DE HUACHÓN · 3,400 M</span>
-                            <span>CAPITAL ANDINA DEL QUESO</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Textos e Información Comunal (7 Cols) -->
-                <div class="lg:col-span-7">
-                    <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-ochre uppercase mb-2">
-                        <span class="material-symbols-outlined text-[16px]">holiday_village</span>
-                        <span>PORTAL DE INGRESO A LA CORDILLERA</span>
-                    </div>
-                    <h2 class="text-3xl sm:text-4xl font-heading font-black text-[#191C1F] tracking-tight mb-4">
-                        Huachón: Tradición Pastoril, Quesos Artesanales y Guías Nativos
-                    </h2>
-                    <p class="text-sm sm:text-base text-[#575D5F] leading-relaxed mb-6 font-body">
-                        Antes de subir a los hielos del Huaguruncho, Huachón te recibe con su arquitectura de piedra andina, rebaños de alpacas y la calidez de su comunidad. Aquí se contratan los arrieros comunales, los guías de montaña certificados y se abastecen las expediciones.
-                    </p>
-
-                    <!-- Servicios Disponibles en el Pueblo -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                        <div class="p-3.5 bg-white border border-[#DCE0DC] rounded">
-                            <span class="material-symbols-outlined text-ochre text-[24px] mb-1">hiking</span>
-                            <h4 class="text-xs font-heading font-bold text-[#191C1F] mb-1">Guías & Arrieros</h4>
-                            <p class="text-[11px] text-[#6E767D]">Porteadores certificados y mulas de carga para campamento base.</p>
-                        </div>
-                        <div class="p-3.5 bg-white border border-[#DCE0DC] rounded">
-                            <span class="material-symbols-outlined text-yareta text-[24px] mb-1">restaurant</span>
-                            <h4 class="text-xs font-heading font-bold text-[#191C1F] mb-1">Gastronomía Típica</h4>
-                            <p class="text-[11px] text-[#6E767D]">Trucha fresca de piscigranja, queso mantecoso de puna y caldos reconstituyentes.</p>
-                        </div>
-                        <div class="p-3.5 bg-white border border-[#DCE0DC] rounded">
-                            <span class="material-symbols-outlined text-[#191C1F] text-[24px] mb-1">bed</span>
-                            <h4 class="text-xs font-heading font-bold text-[#191C1F] mb-1">Hospedajes Comunales</h4>
-                            <p class="text-[11px] text-[#6E767D]">Habitaciones térmicas de descanso para aclimatación previa.</p>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-[#ECEEF2] border border-[#DCE0DC] rounded text-xs font-mono text-[#575D5F]">
-                        <strong>¿Cómo llegar desde Cerro de Pasco?</strong> Colectivos y camionetas diarias parten desde el Terminal Terrestre de Pasco (tiempo aprox: 1h 45m por carretera afirmada).
-                    </div>
-                </div>
-
+    <section class="py-16 bg-[#14171A] text-white border-b border-[#2E3134]">
+        <div class="max-w-[1380px] mx-auto px-4 md:px-8 text-center">
+            
+            <div class="w-14 h-14 bg-ochre text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                <span class="material-symbols-outlined text-[32px]">smartphone</span>
             </div>
-        </div>
-    </section>
 
-    <!-- ======================================================== -->
-    <!-- 8. SEGURIDAD: PREVENCIÓN DE SOROCHE & SALUD ANDINA       -->
-    <!-- ======================================================== -->
-    <section id="seguridad" class="py-14 bg-[#ECEEF2] border-b border-[#DCE0DC]">
-        <div class="max-w-[1380px] mx-auto px-4 md:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-[#DCE0DC] gap-4">
-                <div>
-                    <div class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#ba1a1a] uppercase mb-1">
-                        <span class="material-symbols-outlined text-[16px]">medical_services</span>
-                        <span>PROTOCOLO MÉDICO DE ALTA MONTAÑA</span>
-                    </div>
-                    <h2 class="text-3xl sm:text-4xl font-heading font-black text-[#191C1F] tracking-tight">
-                        Prevención de Soroche (Mal de Altura) & Guía de Seguridad
-                    </h2>
-                </div>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-heading font-black tracking-tight mb-4">
+                Lleva el Nevado Huaguruncho en tu Bolsillo.
+            </h2>
+            <p class="text-[#A1A1A6] text-base sm:text-lg max-w-2xl mx-auto mb-8 font-body">
+                Disponible de forma gratuita para montañistas, investigadores, estudiantes y viajeros. Descárgala ahora y prepara tu expedición con cartografía sin conexión.
+            </p>
+
+            <!-- Botones Principales de Descarga en el Banner -->
+            <div class="flex flex-wrap items-center justify-center gap-4">
                 <button 
-                    @click="sosModalOpen = true"
-                    class="px-4 py-2 bg-[#ba1a1a] hover:bg-[#93000a] text-white text-xs font-mono font-bold rounded flex items-center gap-2 shrink-0">
-                    <span class="material-symbols-outlined text-[18px]">emergency</span>
-                    <span>ABRIR DIRECTORIO DE EMERGENCIAS</span>
+                    @click="downloadModalOpen = true"
+                    class="flex items-center gap-3 px-6 py-3 rounded bg-white hover:bg-[#F2F3F8] text-[#191C1F] transition-all shadow-xl font-heading font-bold text-sm">
+                    <span class="material-symbols-outlined text-[24px] text-yareta">play_arrow</span>
+                    <span>Descargar en Google Play</span>
+                </button>
+
+                <button 
+                    @click="downloadModalOpen = true"
+                    class="flex items-center gap-3 px-6 py-3 rounded bg-[#2E3134] hover:bg-[#41484A] text-white border border-white/20 transition-all shadow-xl font-heading font-bold text-sm">
+                    <span class="material-symbols-outlined text-[24px]">phone_iphone</span>
+                    <span>Descargar en App Store</span>
+                </button>
+
+                <button 
+                    @click="downloadModalOpen = true"
+                    class="flex items-center gap-2 px-5 py-3 rounded bg-ochre hover:bg-ochre-hover text-white transition-all shadow-xl font-mono text-xs font-bold">
+                    <span class="material-symbols-outlined text-[18px]">android</span>
+                    <span>Instalar APK (Android)</span>
                 </button>
             </div>
 
-            <!-- 3 Columnas Médicas -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Tarjeta 1: Aclimatación -->
-                <div class="bg-white border border-[#DCE0DC] p-5 rounded">
-                    <div class="flex items-center gap-2 text-xs font-mono font-bold text-[#191C1F] mb-3">
-                        <span class="w-6 h-6 rounded bg-[#F2F3F8] flex items-center justify-center">01</span>
-                        <span>REGLA DE ORO DE ACLIMATACIÓN</span>
-                    </div>
-                    <p class="text-xs text-[#575D5F] leading-relaxed mb-3">
-                        Pasa al menos 24 horas en Huachón (3,400m) o Cerro de Pasco (4,380m) antes de acometer caminatas sobre los 4,500m. Bebe abundante infusión de coca y evita comidas copiosas las primeras 48h.
-                    </p>
-                    <div class="p-2.5 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-[11px] font-mono text-[#6E767D]">
-                        <strong>Hidratación:</strong> Mínimo 3.5 a 4 litros de agua por día por montañista.
-                    </div>
-                </div>
-
-                <!-- Tarjeta 2: Síntomas de Alerta -->
-                <div class="bg-white border border-[#DCE0DC] p-5 rounded">
-                    <div class="flex items-center gap-2 text-xs font-mono font-bold text-ochre mb-3">
-                        <span class="w-6 h-6 rounded bg-ochre/10 text-ochre flex items-center justify-center">02</span>
-                        <span>SÍNTOMAS DE ALERTA CLÍNICA</span>
-                    </div>
-                    <p class="text-xs text-[#575D5F] leading-relaxed mb-3">
-                        Cefalea punzante que no cede a analgésicos, náuseas, mareo postural o respiración entrecortada en reposo indican progresión de Mal Agudo de Montaña (MAM).
-                    </p>
-                    <div class="p-2.5 bg-ochre/10 border border-ochre/30 rounded text-[11px] font-mono text-ochre">
-                        <strong>Acción Inmediata:</strong> Descender 500m de inmediato. Nunca ascender con síntomas.
-                    </div>
-                </div>
-
-                <!-- Tarjeta 3: Equipo Mínimo Exigido -->
-                <div class="bg-white border border-[#DCE0DC] p-5 rounded">
-                    <div class="flex items-center gap-2 text-xs font-mono font-bold text-yareta mb-3">
-                        <span class="w-6 h-6 rounded bg-yareta/10 text-yareta flex items-center justify-center">03</span>
-                        <span>EQUIPO OBLIGATORIO DE CORDILLERA</span>
-                    </div>
-                    <ul class="text-xs text-[#575D5F] space-y-1.5 mb-3 font-mono">
-                        <li>• Botiquín con oxímetro de pulso de campo</li>
-                        <li>• Silbato de rescate de 100 dB</li>
-                        <li>• Manta térmica aluminizada de supervivencia</li>
-                        <li>• Linterna frontal con baterías de repuesto térmicas</li>
-                    </ul>
-                    <div class="p-2.5 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-[11px] font-mono text-[#6E767D]">
-                        Controlado por guardaparques al ingreso de Añilcocha.
-                    </div>
-                </div>
-
-            </div>
         </div>
     </section>
 
     <!-- ======================================================== -->
-    <!-- 9. FOOTER INSTITUCIONAL DOCUMENTAL                       -->
+    <!-- 9. FOOTER INSTITUCIONAL CON ATRIBUCIÓN ESPECIAL UNDAC    -->
     <!-- ======================================================== -->
-    <footer class="bg-[#14171A] text-[#BCC2BD] py-12 border-t border-[#191C1F]">
+    <footer class="bg-[#0A0C0E] text-[#BCC2BD] py-14">
         <div class="max-w-[1380px] mx-auto px-4 md:px-8">
+            
+            <!-- ATRIBUCIÓN INSTITUCIONAL DESTACADA (OFICINA DE INVESTIGACIÓN UNDAC) -->
+            <div class="p-6 bg-[#14171A] border border-[#2E3134] rounded mb-10">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded bg-white/10 flex items-center justify-center text-ochre shrink-0">
+                            <span class="material-symbols-outlined text-[32px]">school</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-ochre uppercase tracking-wider block">
+                                INVESTIGACIÓN CIENTÍFICA & DESARROLLO TECNOLÓGICO
+                            </span>
+                            <h3 class="text-lg font-heading font-black text-white">
+                                Proyecto impulsado por la Oficina de Investigación de la Universidad Nacional Daniel Alcides Carrión (UNDAC)
+                            </h3>
+                            <p class="text-xs text-[#A1A1A6] font-body mt-1">
+                                Desarrollado para la salvaguarda de la criosfera andina, el turismo responsable y el empoderamiento de la Comunidad Campesina de Huachón, Pasco, Perú.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 text-right font-mono text-[11px] text-[#A1A1A6] border-t md:border-t-0 md:border-l border-[#2E3134] pt-3 md:pt-0 md:pl-6">
+                        <div class="font-bold text-white">UNDAC · PASCO</div>
+                        <div>Resolución de Investigación 2024-2026</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-[#2E3134]">
                 
                 <div class="md:col-span-2">
@@ -908,7 +873,7 @@
                         <span class="font-heading font-extrabold text-white text-base">HUAGURUNCHO 360</span>
                     </div>
                     <p class="text-xs leading-relaxed text-[#6E767D] max-w-md font-body mb-4">
-                        Iniciativa territorial de turismo sostenible, investigación criosférica y salvaguarda ecológica de la alta montaña andina. Huachón, Pasco, Perú.
+                        Plataforma oficial de alta montaña para la expedición al Nevado Huaguruncho (5,742 m s.n.m.), cartografía offline y certificación Huella Cero.
                     </p>
                     <div class="text-[11px] font-mono text-[#575D5F]">
                         CENTRO DE MONITOREO GLACIAR · 10°31'52"S 75°55'26"W · 5,742 M
@@ -918,29 +883,30 @@
                 <div>
                     <h4 class="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Entidades Custodias</h4>
                     <ul class="text-xs space-y-2 text-[#6E767D] font-mono">
+                        <li>• Universidad Nacional Daniel Alcides Carrión</li>
                         <li>• Municipalidad Distrital de Huachón</li>
                         <li>• Comunidad Campesina de Huachón</li>
                         <li>• DIRCETUR Gobierno Regional de Pasco</li>
-                        <li>• SERNANP Área de Conservación</li>
+                        <li>• SERNANP Pasco</li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Acceso Técnico</h4>
+                    <h4 class="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Descargas de la App</h4>
                     <ul class="text-xs space-y-2 text-[#6E767D] font-mono">
-                        <li><a href="#rutas-topo" class="hover:text-white transition-colors">• Tracks GPX de Alta Montaña</a></li>
-                        <li><a href="#panoramic-hud" class="hover:text-white transition-colors">• Fotogrametría 360°</a></li>
-                        <li><a href="#huella-cero" class="hover:text-white transition-colors">• Manifiesto Huella Cero</a></li>
-                        <li><button @click="downloadModalOpen = true" class="hover:text-ochre transition-colors text-left">• App Móvil Android (APK)</button></li>
+                        <li><button @click="downloadModalOpen = true" class="hover:text-white transition-colors text-left">• Google Play (Android)</button></li>
+                        <li><button @click="downloadModalOpen = true" class="hover:text-white transition-colors text-left">• App Store (iOS)</button></li>
+                        <li><button @click="downloadModalOpen = true" class="hover:text-ochre transition-colors text-left">• Descarga Directa APK</button></li>
+                        <li><a href="#rutas-topo" class="hover:text-white transition-colors">• Tracks Satelitales GPX</a></li>
                     </ul>
                 </div>
 
             </div>
 
             <div class="pt-6 flex flex-wrap items-center justify-between gap-4 text-[11px] font-mono text-[#575D5F]">
-                <div>&copy; 2026 HUAGURUNCHO 360 · Sistema Territorial Oficial de Pasco, Perú.</div>
+                <div>&copy; 2026 HUAGURUNCHO 360 · Impulsado por la Oficina de Investigación UNDAC · Huachón, Pasco, Perú.</div>
                 <div class="flex gap-4">
-                    <span>LICENCIA DE DATOS ABIERTOS</span>
+                    <span>TURISMO SOSTENIBLE</span>
                     <span>PROTOCOLO HUELLA CERO</span>
                 </div>
             </div>
@@ -948,190 +914,20 @@
     </footer>
 
     <!-- ======================================================== -->
-    <!-- MODAL 1: FICHA TÉCNICA DE RUTA                           -->
-    <!-- ======================================================== -->
-    <div 
-        x-show="routeModalOpen" 
-        x-transition
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        style="display: none;">
-        <div 
-            @click.away="routeModalOpen = false"
-            class="bg-white border border-[#191C1F] max-w-xl w-full p-6 rounded shadow-2xl relative">
-            <div class="flex justify-between items-start mb-4 pb-3 border-b border-[#DCE0DC]">
-                <div>
-                    <span class="text-[10px] font-mono font-bold text-ochre uppercase">FICHA TÉCNICA DE CAMPO</span>
-                    <h3 class="text-xl font-heading font-black text-[#191C1F]" x-text="selectedRoute?.name"></h3>
-                </div>
-                <button @click="routeModalOpen = false" class="text-[#6E767D] hover:text-[#191C1F]">
-                    <span class="material-symbols-outlined text-[20px]">close</span>
-                </button>
-            </div>
-
-            <div class="space-y-4 text-xs font-mono">
-                <div class="grid grid-cols-4 gap-2 p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded text-center">
-                    <div>
-                        <span class="block text-[9px] text-[#6E767D]">ALTURA</span>
-                        <strong class="text-[#191C1F]" x-text="selectedRoute?.alt"></strong>
-                    </div>
-                    <div>
-                        <span class="block text-[9px] text-[#6E767D]">DESNIVEL</span>
-                        <strong class="text-ochre" x-text="selectedRoute?.gain"></strong>
-                    </div>
-                    <div>
-                        <span class="block text-[9px] text-[#6E767D]">DISTANCIA</span>
-                        <strong class="text-[#191C1F]" x-text="selectedRoute?.dist"></strong>
-                    </div>
-                    <div>
-                        <span class="block text-[9px] text-[#6E767D]">GRADUACIÓN</span>
-                        <strong class="text-yareta" x-text="selectedRoute?.grade"></strong>
-                    </div>
-                </div>
-
-                <div>
-                    <span class="text-[#6E767D] block mb-1">INFORME TÉCNICO DE LA RUTA:</span>
-                    <p class="text-[#575D5F] font-body text-sm leading-relaxed" x-text="selectedRoute?.desc"></p>
-                </div>
-
-                <div class="p-3 bg-[#F2F3F8] border border-[#DCE0DC] rounded flex items-center justify-between">
-                    <div>
-                        <span class="font-bold text-[#191C1F] block">Archivo Satelital GPX:</span>
-                        <span class="text-[10px] text-[#6E767D]">Puntos de paso con altimetría precisa</span>
-                    </div>
-                    <button 
-                        @click="alert('Iniciando descarga del archivo GPX topográfico calibrado para GPS Garmin / Suunto / App móvil.'); routeModalOpen = false;"
-                        class="px-3 py-1.5 bg-[#191C1F] hover:bg-black text-white text-xs font-mono font-bold rounded">
-                        DESCARGAR GPX
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ======================================================== -->
-    <!-- MODAL 2: WAYPOINT PANORÁMICO 360                         -->
-    <!-- ======================================================== -->
-    <div 
-        x-show="waypointModalOpen" 
-        x-transition
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        style="display: none;">
-        <div 
-            @click.away="waypointModalOpen = false"
-            class="bg-white border border-[#191C1F] max-w-lg w-full p-6 rounded shadow-2xl relative">
-            <div class="flex justify-between items-start mb-4 pb-3 border-b border-[#DCE0DC]">
-                <div>
-                    <span class="text-[10px] font-mono font-bold text-ochre uppercase" x-text="selectedWaypoint.sector"></span>
-                    <h3 class="text-xl font-heading font-black text-[#191C1F]" x-text="selectedWaypoint.name"></h3>
-                </div>
-                <button @click="waypointModalOpen = false" class="text-[#6E767D] hover:text-[#191C1F]">
-                    <span class="material-symbols-outlined text-[20px]">close</span>
-                </button>
-            </div>
-
-            <div class="space-y-4 text-xs font-mono">
-                <div class="flex justify-between p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded">
-                    <div>
-                        <span class="block text-[9px] text-[#6E767D]">ALTITUD GPS</span>
-                        <strong class="text-ochre text-sm" x-text="selectedWaypoint.alt"></strong>
-                    </div>
-                    <div class="text-right">
-                        <span class="block text-[9px] text-[#6E767D]">COORDENADAS EXACTAS</span>
-                        <strong class="text-[#191C1F]" x-text="selectedWaypoint.coord"></strong>
-                    </div>
-                </div>
-
-                <div>
-                    <span class="text-[#6E767D] block mb-1">OBSERVACIÓN DE CAMPO:</span>
-                    <p class="text-[#575D5F] font-body text-sm leading-relaxed" x-text="selectedWaypoint.desc"></p>
-                </div>
-
-                <div class="pt-2 flex justify-end">
-                    <button 
-                        @click="waypointModalOpen = false"
-                        class="px-4 py-2 bg-[#191C1F] hover:bg-black text-white text-xs font-mono font-bold rounded">
-                        ENTENDIDO
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ======================================================== -->
-    <!-- MODAL 3: SOS EMERGENCIAS Y RESCATE EN MONTAÑA            -->
-    <!-- ======================================================== -->
-    <div 
-        x-show="sosModalOpen" 
-        x-transition
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        style="display: none;">
-        <div 
-            @click.away="sosModalOpen = false"
-            class="bg-white border-2 border-[#ba1a1a] max-w-md w-full p-6 rounded shadow-2xl relative">
-            <div class="flex justify-between items-start mb-4 pb-3 border-b border-[#ba1a1a]/30">
-                <div class="flex items-center gap-2 text-[#ba1a1a]">
-                    <span class="material-symbols-outlined text-[24px]">e911_emergency</span>
-                    <div>
-                        <span class="text-[10px] font-mono font-bold uppercase">CANAL DIRECTO DE AUXILIO</span>
-                        <h3 class="text-lg font-heading font-black text-[#191C1F]">Emergencia de Montaña Pasco</h3>
-                    </div>
-                </div>
-                <button @click="sosModalOpen = false" class="text-[#6E767D] hover:text-[#191C1F]">
-                    <span class="material-symbols-outlined text-[20px]">close</span>
-                </button>
-            </div>
-
-            <p class="text-xs text-[#575D5F] mb-4 font-body leading-relaxed">
-                Si te encuentras en la montaña y requieres auxilio médico por accidente, congelamiento o soroche severo, comunícate inmediatamente a las siguientes líneas directas:
-            </p>
-
-            <div class="space-y-2.5 text-xs font-mono mb-5">
-                <a href="tel:+51963258741" class="flex items-center justify-between p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded hover:border-[#ba1a1a] transition-colors">
-                    <div>
-                        <strong class="text-[#191C1F] block">Puesto de Salud Huachón (24h)</strong>
-                        <span class="text-[11px] text-[#6E767D]">Médico de turno & Oxigenoterapia</span>
-                    </div>
-                    <span class="px-2 py-1 bg-[#ba1a1a] text-white rounded text-xs font-bold">LLAMAR</span>
-                </a>
-
-                <a href="tel:105" class="flex items-center justify-between p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded hover:border-[#ba1a1a] transition-colors">
-                    <div>
-                        <strong class="text-[#191C1F] block">Policía de Alta Montaña Pasco</strong>
-                        <span class="text-[11px] text-[#6E767D]">Escuadrón de Rescate Andino</span>
-                    </div>
-                    <span class="px-2 py-1 bg-[#191C1F] text-white rounded text-xs font-bold">105</span>
-                </a>
-
-                <a href="tel:063421234" class="flex items-center justify-between p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded hover:border-[#ba1a1a] transition-colors">
-                    <div>
-                        <strong class="text-[#191C1F] block">Comunidad Campesina Huachón</strong>
-                        <span class="text-[11px] text-[#6E767D]">Comité de Arrieros & Brigadistas</span>
-                    </div>
-                    <span class="px-2 py-1 bg-[#191C1F] text-white rounded text-xs font-bold">LLAMAR</span>
-                </a>
-            </div>
-
-            <div class="p-2.5 bg-[#ba1a1a]/10 border border-[#ba1a1a]/30 rounded text-[11px] font-mono text-[#ba1a1a]">
-                <strong>Frecuencia Radial VHF de Montaña:</strong> 146.520 MHz (Canal Comunal Añilcocha)
-            </div>
-        </div>
-    </div>
-
-    <!-- ======================================================== -->
-    <!-- MODAL 4: DESCARGAR PACK OFFLINE                          -->
+    <!-- MODAL DE DESCARGA DE LA APLICACIÓN                       -->
     <!-- ======================================================== -->
     <div 
         x-show="downloadModalOpen" 
         x-transition
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
         style="display: none;">
         <div 
             @click.away="downloadModalOpen = false"
             class="bg-white border border-[#191C1F] max-w-md w-full p-6 rounded shadow-2xl relative">
             <div class="flex justify-between items-start mb-4 pb-3 border-b border-[#DCE0DC]">
                 <div>
-                    <span class="text-[10px] font-mono font-bold text-yareta uppercase">NAVEGACIÓN SIN INTERNET</span>
-                    <h3 class="text-xl font-heading font-black text-[#191C1F]">Pack Offline de Expedición</h3>
+                    <span class="text-[10px] font-mono font-bold text-ochre uppercase">INSTALACIÓN OFICIAL</span>
+                    <h3 class="text-xl font-heading font-black text-[#191C1F]">Descarga Huaguruncho 360</h3>
                 </div>
                 <button @click="downloadModalOpen = false" class="text-[#6E767D] hover:text-[#191C1F]">
                     <span class="material-symbols-outlined text-[20px]">close</span>
@@ -1139,45 +935,63 @@
             </div>
 
             <p class="text-xs text-[#575D5F] mb-4 font-body leading-relaxed">
-                En las quebradas y glaciares de Huaguruncho no existe cobertura móvil. Descarga los paquetes satelitales antes de salir de Huachón:
+                Selecciona la opción para tu dispositivo. Recuerda descargar los mapas satelitales en Huachón antes de iniciar el ascenso a la cordillera.
             </p>
 
             <div class="space-y-3 text-xs font-mono mb-5">
-                <div class="p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded flex items-center justify-between">
-                    <div>
-                        <strong class="text-[#191C1F] block">App Android Huaguruncho 360</strong>
-                        <span class="text-[11px] text-[#6E767D]">APK Oficial compilado con motor Rust</span>
+                <!-- Opción 1: Google Play -->
+                <a 
+                    href="https://play.google.com/store" 
+                    target="_blank"
+                    class="p-3 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] rounded flex items-center justify-between group transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[24px] text-yareta">play_arrow</span>
+                        <div>
+                            <strong class="text-[#191C1F] block font-heading">Google Play Store</strong>
+                            <span class="text-[10px] text-[#6E767D]">Para smartphones Android (8.0+)</span>
+                        </div>
                     </div>
-                    <span class="px-2.5 py-1 bg-yareta text-white rounded text-[10px] font-bold">COMPLETO</span>
-                </div>
+                    <span class="px-2.5 py-1 bg-[#191C1F] text-white rounded text-[10px] font-bold">INSTALAR</span>
+                </a>
 
-                <div class="p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded flex items-center justify-between">
-                    <div>
-                        <strong class="text-[#191C1F] block">Cartografía Satelital MBTiles</strong>
-                        <span class="text-[11px] text-[#6E767D]">Nivel de zoom 10 a 16 (Sector Nevado)</span>
+                <!-- Opción 2: App Store -->
+                <a 
+                    href="https://www.apple.com/app-store/" 
+                    target="_blank"
+                    class="p-3 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] rounded flex items-center justify-between group transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[24px] text-[#191C1F]">phone_iphone</span>
+                        <div>
+                            <strong class="text-[#191C1F] block font-heading">Apple App Store</strong>
+                            <span class="text-[10px] text-[#6E767D]">Para iPhone y iPad (iOS 15+)</span>
+                        </div>
                     </div>
-                    <span class="px-2.5 py-1 bg-[#ECEEF2] text-[#575D5F] rounded text-[10px] font-bold">38 MB</span>
-                </div>
+                    <span class="px-2.5 py-1 bg-[#191C1F] text-white rounded text-[10px] font-bold">OBTENER</span>
+                </a>
 
+                <!-- Opción 3: Descarga Directa APK -->
                 <div class="p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded flex items-center justify-between">
-                    <div>
-                        <strong class="text-[#191C1F] block">Tracks GPX & Waypoints Médicos</strong>
-                        <span class="text-[11px] text-[#6E767D]">Compatible con Garmin, Suunto y OsmAnd</span>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[24px] text-ochre">android</span>
+                        <div>
+                            <strong class="text-[#191C1F] block font-heading">APK Directo (Android)</strong>
+                            <span class="text-[10px] text-[#6E767D]">Instalador sin tienda · 48 MB</span>
+                        </div>
                     </div>
-                    <span class="px-2.5 py-1 bg-[#ECEEF2] text-[#575D5F] rounded text-[10px] font-bold">1.2 MB</span>
+                    <button 
+                        @click="alert('Iniciando descarga del instalador oficial Huaguruncho 360 APK.'); downloadModalOpen = false;"
+                        class="px-2.5 py-1 bg-ochre hover:bg-ochre-hover text-white rounded text-[10px] font-bold">
+                        DESCARGAR
+                    </button>
                 </div>
             </div>
 
-            <div class="pt-2 flex justify-end gap-2">
+            <div class="pt-2 flex justify-between items-center text-[10px] font-mono text-[#6E767D]">
+                <span>100% LIBRE DE VIRUS Y VERIFICADO</span>
                 <button 
                     @click="downloadModalOpen = false"
-                    class="px-3 py-2 bg-[#F2F3F8] text-[#575D5F] text-xs font-mono font-bold rounded">
+                    class="px-3 py-1 bg-[#F2F3F8] text-[#191C1F] font-bold rounded">
                     CERRAR
-                </button>
-                <button 
-                    @click="alert('El paquete APK y cartografía offline estará disponible en descarga directa y en el puesto de registro Huachón.'); downloadModalOpen = false;"
-                    class="px-4 py-2 bg-ochre hover:bg-ochre-hover text-white text-xs font-mono font-bold rounded">
-                    DESCARGAR TODO (ZIP)
                 </button>
             </div>
         </div>
