@@ -13,8 +13,6 @@ services:
     restart: unless-stopped
     expose:
       - "8000"
-    ports:
-      - "8000:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.production
       - DEBUG=False
