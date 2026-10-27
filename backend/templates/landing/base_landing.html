@@ -1,200 +1,120 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth bg-black text-white antialiased">
+<html lang="es" class="scroll-smooth bg-[#F8F9FD] text-[#191C1F] antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}HUAGURUNCHO 360 — La Cordillera de Pasco. En tu Celular.{% endblock %}</title>
+    <title>{% block title %}HUAGURUNCHO 360 // 5,742M — Estación Alpina & Expedición Huella Cero{% endblock %}</title>
     
-    <!-- Metadatos SEO Apple/Google Quality -->
-    <meta name="description" content="Experimenta el Nevado Huaguruncho (5,742 msnm) con cartografía 100% offline, navegación inmersiva en 360°, monitoreo glaciar en tiempo real y eco-reportes ciudadanos. Diseñado para alta montaña.">
-    <meta name="keywords" content="Huaguruncho, Apple Vision Pro, Huachón, Pasco, Nevado Huaguruncho, Trekking Perú, Tour 360, Eco Turismo, Glaciar, Turismo Sostenible, Offline-First">
+    <!-- Metadatos SEO y Autoridad Territorial -->
+    <meta name="description" content="Portal oficial de expedición, cartografía offline y conservación del Nevado Huaguruncho (5,742 m s.n.m.), Huachón, Pasco, Perú. Monitoreo criosférico, tours 360° de alta montaña y control de residuos Huella Cero.">
+    <meta name="keywords" content="Nevado Huaguruncho, Huachón, Pasco, Cordillera de Huaguruncho, Turismo Sostenible Perú, Trekking Alta Montaña, SERNANP Huella Cero, Tour Virtual 360, Cartografía Offline">
     <meta name="author" content="Municipalidad Distrital de Huachón & DIRCETUR Pasco">
     
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="HUAGURUNCHO 360 — La Cordillera de Pasco. En tu Celular.">
-    <meta property="og:description" content="Tours 360°, cartografía satelital 100% offline y pasaporte ecológico para la alta montaña andina.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80">
+    <meta property="og:title" content="HUAGURUNCHO 360 // 5,742M — Estación Alpina & Expedición Huella Cero">
+    <meta property="og:description" content="Monitoreo de alta montaña, tours 360°, cartografía satelital offline y certificación ecológica Huella Cero en el Coloso de Pasco.">
+    <meta property="og:image" content="{% static 'images/huaguruncho_hero.jpg' %}">
     
-    <!-- Google Fonts: Inter & JetBrains Mono (Optimizadas para Apple Typography) -->
+    <!-- Tipografía Editorial de Campo: Outfit, Plus Jakarta Sans, JetBrains Mono & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS (v3 CDN) con Paleta Apple / Google Flagship -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (v3 CDN) con Paleta Calibrada Cordillera Field Instrument -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        obsidian: {
-                            950: '#000000',
-                            900: '#060709',
-                            850: '#0A0C10',
-                            800: '#111318',
-                            750: '#181A22',
-                            700: '#222530',
-                            600: '#2E3240',
+                        basalt: {
+                            900: '#14171A',
+                            800: '#191C1F',
+                            700: '#2E3134',
+                            600: '#41484A',
+                            500: '#575D5F',
+                            400: '#6E767D',
+                            300: '#BCC2BD',
+                            200: '#DCE0DC',
+                            100: '#ECEEF2',
+                            50: '#F8F9FD',
                         },
-                        apple: {
-                            blue: '#2997FF',
-                            'blue-dark': '#0071E3',
-                            'blue-light': '#64D2FF',
-                            green: '#30D158',
-                            gold: '#FFD60A',
-                            orange: '#FF9F0A',
-                            red: '#FF453A',
-                            purple: '#BF5AF2',
-                            gray: '#86868B',
-                            'gray-light': '#A1A1A6',
-                            'gray-dark': '#1D1D1F',
-                            card: '#161617',
+                        ochre: {
+                            DEFAULT: '#A43716',
+                            hover: '#C54F2C',
+                            dark: '#862201',
+                            light: '#FFDBD1',
+                        },
+                        yareta: {
+                            DEFAULT: '#2A5C43',
+                            hover: '#36684E',
+                            container: '#B6ECCB',
+                            dark: '#1D5038',
                         },
                         glacial: {
-                            teal: '#38A3A5',
-                            cyan: '#57B9BA',
-                            ice: '#E0F7F7',
+                            DEFAULT: '#EDF3F5',
+                            border: '#D2DFE3',
+                            ice: '#E0F2F5',
                         }
                     },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'Inter', 'system-ui', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', '"SF Mono"', 'monospace'],
-                    },
-                    borderRadius: {
-                        '24px': '24px',
-                        '28px': '28px',
-                        '32px': '32px',
-                        '40px': '40px',
-                    },
-                    animation: {
-                        'pulse-glow': 'pulseGlow 4s ease-in-out infinite',
-                        'float-subtle': 'floatSubtle 6s ease-in-out infinite',
-                        'shimmer-fast': 'shimmer 2.5s infinite',
-                        'radar-ping': 'radarPing 3s cubic-bezier(0, 0, 0.2, 1) infinite',
-                    },
-                    keyframes: {
-                        pulseGlow: {
-                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
-                            '50%': { opacity: '0.8', transform: 'scale(1.05)' },
-                        },
-                        floatSubtle: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-8px)' },
-                        },
-                        radarPing: {
-                            '0%': { transform: 'scale(0.8)', opacity: '1' },
-                            '100%': { transform: 'scale(2.5)', opacity: '0' },
-                        }
+                        heading: ['Outfit', 'sans-serif'],
+                        body: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
                     }
                 }
             }
-        }
+        };
     </script>
     
-    <!-- HTMX 2.0 -->
-    <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+    <!-- HTMX 1.9.12 -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     
     <!-- Alpine.js 3.x -->
     <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* Estilos Apple Pro Hardware & Glass */
-        .apple-glass {
-            background: rgba(22, 22, 23, 0.72);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.09);
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 20px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+            vertical-align: middle;
         }
-        .apple-glass-card {
-            background: rgba(18, 18, 20, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+        /* Rejilla técnica milimétrica tipo carta geográfica */
+        .carto-grid {
+            background-image: 
+                linear-gradient(to right, rgba(20, 23, 26, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(20, 23, 26, 0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
         }
-        .apple-glass-card:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            background: rgba(26, 26, 30, 0.75);
-            transform: translateY(-2px);
-        }
-        .apple-glass-elevated {
-            background: rgba(28, 28, 30, 0.85);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
-        }
-        .apple-btn-primary {
-            background: #FFFFFF;
-            color: #000000;
-            font-weight: 600;
-            border-radius: 9999px;
-            transition: all 0.2s ease;
-        }
-        .apple-btn-primary:hover {
-            background: #E5E5EA;
-            transform: scale(1.02);
-        }
-        .apple-btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            color: #FFFFFF;
-            font-weight: 500;
-            border-radius: 9999px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.2s ease;
-        }
-        .apple-btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.16);
-            border-color: rgba(255, 255, 255, 0.28);
-            transform: scale(1.02);
-        }
-        .apple-headline-gradient {
-            background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 50%, #94A3B8 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .apple-blue-gradient {
-            background: linear-gradient(135deg, #64D2FF 0%, #2997FF 50%, #0071E3 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .apple-gold-gradient {
-            background: linear-gradient(135deg, #FFF1C5 0%, #FFD60A 50%, #FF9F0A 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .apple-green-gradient {
-            background: linear-gradient(135deg, #A7F3D0 0%, #30D158 50%, #059669 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        /* Barra de scroll refinada */
+
+        /* Barra de desplazamiento austera y técnica */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
         }
         ::-webkit-scrollbar-track {
-            background: #000000;
+            background: #F0F2EE;
         }
         ::-webkit-scrollbar-thumb {
-            background: #2E3240;
-            border-radius: 9999px;
-            border: 2px solid #000000;
+            background: #BCC2BD;
+            border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #484E60;
+            background: #8B948E;
         }
 
         /* HTMX Indicator */
@@ -207,31 +127,12 @@
         }
     </style>
 </head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="bg-black text-white font-sans antialiased selection:bg-apple-blue selection:text-white relative overflow-x-hidden min-h-screen">
-
-    <!-- Spotlight Superior Estilo Apple Keynote -->
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <!-- Spotlight Azul Glaciar Cenital -->
-        <div class="absolute -top-[200px] left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(circle_at_50%_40%,rgba(41,151,255,0.18)_0%,rgba(56,163,165,0.08)_40%,transparent_75%)] blur-2xl"></div>
-        <!-- Spotlight Verde Bosque a la izquierda -->
-        <div class="absolute top-[40%] -left-[300px] w-[800px] h-[800px] bg-[radial-gradient(circle,rgba(48,209,88,0.06)_0%,transparent_70%)] blur-3xl"></div>
-        <!-- Spotlight Dorado a la derecha -->
-        <div class="absolute top-[75%] -right-[300px] w-[800px] h-[800px] bg-[radial-gradient(circle,rgba(255,214,10,0.06)_0%,transparent_70%)] blur-3xl"></div>
-    </div>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="bg-[#F8F9FD] text-[#191C1F] font-body antialiased selection:bg-ochre selection:text-white relative min-h-screen flex flex-col">
 
     <!-- Contenido Principal -->
-    <div class="relative z-10 flex flex-col min-h-screen">
+    <div class="relative z-10 flex-grow">
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Inicialización de Lucide Icons -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            lucide.createIcons();
-        });
-        document.body.addEventListener('htmx:afterSwap', function () {
-            lucide.createIcons();
-        });
-    </script>
 </body>
 </html>
