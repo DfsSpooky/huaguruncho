@@ -173,3 +173,9 @@ LOGGING = {
         },
     },
 }
+
+# Proteger documentación OpenAPI / Swagger en producción (solo accesible para administradores)
+SPECTACULAR_SETTINGS = {
+    **SPECTACULAR_SETTINGS,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAdminUser'],
+}

@@ -32,6 +32,22 @@ from apps.landing.models import (
 class LandingPageView(TemplateView):
     template_name = 'landing/index.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        host = request.get_host().lower()
+        if host.startswith('apih.'):
+            accept = request.headers.get('Accept', '')
+            if 'application/json' in accept and 'text/html' not in accept:
+                from django.http import JsonResponse
+                return JsonResponse({
+                    'service': 'HUAGURUNCHO 360 - API Gateway',
+                    'version': '1.0.0',
+                    'status': 'operational',
+                    'portal': 'https://huaguruncho.aquienpasco.com'
+                })
+            from django.shortcuts import redirect
+            return redirect('https://huaguruncho.aquienpasco.com/', permanent=False)
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
