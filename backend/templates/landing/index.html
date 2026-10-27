@@ -71,27 +71,33 @@
                 <a href="#huachon" class="hover:text-ochre transition-colors py-1">Conoce Huachón</a>
             </nav>
 
-            <!-- Botones de Descarga en Navbar -->
+            <!-- Botones de Descarga en Navbar con Badges Oficiales -->
             <div class="flex items-center gap-2.5">
-                <button 
-                    @click="downloadModalOpen = true"
-                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F2F3F8] text-[#191C1F] text-xs font-mono font-bold rounded border border-[#DCE0DC] shadow-sm transition-all">
-                    <span class="material-symbols-outlined text-[16px] text-yareta">play_arrow</span>
-                    <span>Google Play</span>
-                </button>
+                <a 
+                    href="https://play.google.com/store" 
+                    target="_blank"
+                    class="hidden sm:inline-block transition-transform hover:scale-105 active:scale-95 shadow-sm rounded overflow-hidden">
+                    <img 
+                        src="{% static 'images/googleplay.webp' %}" 
+                        alt="Disponible en Google Play" 
+                        class="h-8 w-auto object-contain">
+                </a>
+
+                <a 
+                    href="https://www.apple.com/app-store/" 
+                    target="_blank"
+                    class="hidden sm:inline-block transition-transform hover:scale-105 active:scale-95 shadow-sm rounded overflow-hidden">
+                    <img 
+                        src="{% static 'images/appstore.png' %}" 
+                        alt="Consíguelo en el App Store" 
+                        class="h-8 w-auto object-contain">
+                </a>
 
                 <button 
                     @click="downloadModalOpen = true"
-                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F2F3F8] text-[#191C1F] text-xs font-mono font-bold rounded border border-[#DCE0DC] shadow-sm transition-all">
-                    <span class="material-symbols-outlined text-[16px] text-[#191C1F]">phone_iphone</span>
-                    <span>App Store</span>
-                </button>
-
-                <button 
-                    @click="downloadModalOpen = true"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-ochre hover:bg-ochre-hover text-white text-xs font-heading font-bold uppercase tracking-wider rounded border border-ochre shadow-sm transition-all active:translate-y-[1px]">
+                    class="inline-flex items-center gap-2 px-3.5 py-2 bg-ochre hover:bg-ochre-hover text-white text-xs font-heading font-bold uppercase tracking-wider rounded border border-ochre shadow-sm transition-all active:translate-y-[1px]">
                     <span class="material-symbols-outlined text-[16px]">download</span>
-                    <span>DESCARGAR APP</span>
+                    <span>OBTENER</span>
                 </button>
 
                 <!-- Menú móvil -->
@@ -114,9 +120,17 @@
             <a @click="mobileMenuOpen = false" href="#rutas-topo" class="block py-1.5 text-[#191C1F] hover:text-ochre">Rutas y Paseos</a>
             <a @click="mobileMenuOpen = false" href="#huella-cero" class="block py-1.5 text-[#191C1F] hover:text-ochre">Cuidado Huella Cero</a>
             <a @click="mobileMenuOpen = false" href="#huachon" class="block py-1.5 text-[#191C1F] hover:text-ochre">Conoce Huachón</a>
-            <div class="pt-3 border-t border-[#DCE0DC] flex flex-col gap-2">
+            <div class="pt-3 border-t border-[#DCE0DC] flex flex-col gap-2.5">
+                <div class="flex items-center justify-center gap-3 py-1">
+                    <a href="https://play.google.com/store" target="_blank">
+                        <img src="{% static 'images/googleplay.webp' %}" alt="Google Play" class="h-9 w-auto">
+                    </a>
+                    <a href="https://www.apple.com/app-store/" target="_blank">
+                        <img src="{% static 'images/appstore.png' %}" alt="App Store" class="h-9 w-auto">
+                    </a>
+                </div>
                 <button @click="mobileMenuOpen = false; downloadModalOpen = true" class="w-full py-2.5 bg-ochre text-white text-xs font-heading font-bold rounded text-center">
-                    DESCARGAR APP GRATIS
+                    MÁS OPCIONES DE DESCARGA
                 </button>
             </div>
         </div>
@@ -149,38 +163,38 @@
                         Descubre lagunas de color turquesa, camina por senderos hermosos y conoce el nevado más impresionante de Pasco con nuestra app móvil. <strong>Funciona 100% sin internet</strong>, te orienta paso a paso con GPS y te permite disfrutar de vistas en 360° desde cualquier lugar.
                     </p>
 
-                    <!-- Botones de Tiendas de Descarga -->
+                    <!-- Badges Oficiales de Tiendas de Descarga -->
                     <div class="flex flex-wrap items-center gap-4 mb-8">
-                        <!-- Google Play -->
-                        <button 
-                            @click="downloadModalOpen = true"
-                            class="flex items-center gap-3 px-5 py-2.5 rounded bg-[#14171A] hover:bg-black text-white transition-all shadow-md group">
-                            <span class="material-symbols-outlined text-[28px] text-yareta group-hover:scale-110 transition-transform">play_arrow</span>
-                            <div class="text-left leading-tight">
-                                <span class="text-[9px] text-[#A1A1A6] block uppercase font-mono tracking-wider">DISPONIBLE EN</span>
-                                <span class="text-sm font-heading font-bold text-white">Google Play</span>
-                            </div>
-                        </button>
+                        <!-- Google Play Badge -->
+                        <a 
+                            href="https://play.google.com/store" 
+                            target="_blank"
+                            class="inline-block transition-transform hover:scale-105 active:scale-95 shadow-md rounded-lg overflow-hidden focus:outline-none">
+                            <img 
+                                src="{% static 'images/googleplay.webp' %}" 
+                                alt="Disponible en Google Play" 
+                                class="h-[48px] sm:h-[52px] w-auto object-contain">
+                        </a>
 
-                        <!-- App Store -->
-                        <button 
-                            @click="downloadModalOpen = true"
-                            class="flex items-center gap-3 px-5 py-2.5 rounded bg-[#14171A] hover:bg-black text-white transition-all shadow-md group">
-                            <span class="material-symbols-outlined text-[28px] text-white group-hover:scale-110 transition-transform">phone_iphone</span>
-                            <div class="text-left leading-tight">
-                                <span class="text-[9px] text-[#A1A1A6] block uppercase font-mono tracking-wider">CONSIGUE EN EL</span>
-                                <span class="text-sm font-heading font-bold text-white">App Store</span>
-                            </div>
-                        </button>
+                        <!-- App Store Badge -->
+                        <a 
+                            href="https://www.apple.com/app-store/" 
+                            target="_blank"
+                            class="inline-block transition-transform hover:scale-105 active:scale-95 shadow-md rounded-lg overflow-hidden focus:outline-none">
+                            <img 
+                                src="{% static 'images/appstore.png' %}" 
+                                alt="Consíguelo en el App Store" 
+                                class="h-[48px] sm:h-[52px] w-auto object-contain">
+                        </a>
 
                         <!-- APK Directo -->
                         <button 
                             @click="downloadModalOpen = true"
-                            class="flex items-center gap-2 px-4 py-3 rounded bg-white hover:bg-[#F2F3F8] text-[#191C1F] border border-[#DCE0DC] transition-all shadow-sm">
-                            <span class="material-symbols-outlined text-[20px] text-ochre">android</span>
+                            class="flex items-center gap-2.5 px-4 h-[48px] sm:h-[52px] rounded-lg bg-white hover:bg-[#F2F3F8] text-[#191C1F] border border-[#DCE0DC] transition-transform hover:scale-105 active:scale-95 shadow-sm">
+                            <span class="material-symbols-outlined text-[24px] text-ochre">android</span>
                             <div class="text-left leading-none font-mono">
                                 <span class="text-[9px] text-[#6E767D] block">DESCARGA DIRECTA</span>
-                                <span class="text-xs font-bold text-[#191C1F]">Instalador APK (Android)</span>
+                                <span class="text-xs font-bold text-[#191C1F]">APK Android (48 MB)</span>
                             </div>
                         </button>
                     </div>
@@ -843,26 +857,32 @@
                 Disponible de forma gratuita para todos los que quieran viajar, caminar y enamorarse de los paisajes de Pasco.
             </p>
 
-            <!-- Botones Principales de Descarga -->
+            <!-- Badges Oficiales de Descarga en el Banner -->
             <div class="flex flex-wrap items-center justify-center gap-4">
-                <button 
-                    @click="downloadModalOpen = true"
-                    class="flex items-center gap-3 px-6 py-3 rounded bg-white hover:bg-[#F2F3F8] text-[#191C1F] transition-all shadow-xl font-heading font-bold text-sm">
-                    <span class="material-symbols-outlined text-[24px] text-yareta">play_arrow</span>
-                    <span>Descargar en Google Play</span>
-                </button>
+                <a 
+                    href="https://play.google.com/store" 
+                    target="_blank"
+                    class="inline-block transition-transform hover:scale-105 active:scale-95 shadow-xl rounded-lg overflow-hidden focus:outline-none">
+                    <img 
+                        src="{% static 'images/googleplay.webp' %}" 
+                        alt="Disponible en Google Play" 
+                        class="h-[52px] sm:h-[56px] w-auto object-contain">
+                </a>
+
+                <a 
+                    href="https://www.apple.com/app-store/" 
+                    target="_blank"
+                    class="inline-block transition-transform hover:scale-105 active:scale-95 shadow-xl rounded-lg overflow-hidden focus:outline-none">
+                    <img 
+                        src="{% static 'images/appstore.png' %}" 
+                        alt="Consíguelo en el App Store" 
+                        class="h-[52px] sm:h-[56px] w-auto object-contain">
+                </a>
 
                 <button 
                     @click="downloadModalOpen = true"
-                    class="flex items-center gap-3 px-6 py-3 rounded bg-[#2E3134] hover:bg-[#41484A] text-white border border-white/20 transition-all shadow-xl font-heading font-bold text-sm">
-                    <span class="material-symbols-outlined text-[24px]">phone_iphone</span>
-                    <span>Descargar en App Store</span>
-                </button>
-
-                <button 
-                    @click="downloadModalOpen = true"
-                    class="flex items-center gap-2 px-5 py-3 rounded bg-ochre hover:bg-ochre-hover text-white transition-all shadow-xl font-mono text-xs font-bold">
-                    <span class="material-symbols-outlined text-[18px]">android</span>
+                    class="flex items-center gap-2 px-5 h-[52px] sm:h-[56px] rounded-lg bg-ochre hover:bg-ochre-hover text-white transition-transform hover:scale-105 active:scale-95 shadow-xl font-mono text-xs font-bold">
+                    <span class="material-symbols-outlined text-[20px]">android</span>
                     <span>Instalar APK (Android)</span>
                 </button>
             </div>
@@ -978,34 +998,28 @@
                 <a 
                     href="https://play.google.com/store" 
                     target="_blank"
-                    class="p-3 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] rounded flex items-center justify-between group transition-colors">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[24px] text-yareta">play_arrow</span>
-                        <div>
-                            <strong class="text-[#191C1F] block font-heading">Google Play Store</strong>
-                            <span class="text-[10px] text-[#6E767D]">Para celulares Android (gratis)</span>
-                        </div>
-                    </div>
-                    <span class="px-2.5 py-1 bg-[#191C1F] text-white rounded text-[10px] font-bold">INSTALAR</span>
+                    class="p-2.5 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] rounded-lg flex items-center justify-between group transition-all hover:border-[#191C1F]">
+                    <img 
+                        src="{% static 'images/googleplay.webp' %}" 
+                        alt="Disponible en Google Play" 
+                        class="h-10 w-auto object-contain">
+                    <span class="px-3 py-1.5 bg-[#191C1F] text-white rounded text-[10px] font-bold">INSTALAR</span>
                 </a>
 
                 <!-- App Store -->
                 <a 
                     href="https://www.apple.com/app-store/" 
                     target="_blank"
-                    class="p-3 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] rounded flex items-center justify-between group transition-colors">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[24px] text-[#191C1F]">phone_iphone</span>
-                        <div>
-                            <strong class="text-[#191C1F] block font-heading">Apple App Store</strong>
-                            <span class="text-[10px] text-[#6E767D]">Para iPhone y iPad (gratis)</span>
-                        </div>
-                    </div>
-                    <span class="px-2.5 py-1 bg-[#191C1F] text-white rounded text-[10px] font-bold">OBTENER</span>
+                    class="p-2.5 bg-[#F8F9FD] hover:bg-[#ECEEF2] border border-[#DCE0DC] rounded-lg flex items-center justify-between group transition-all hover:border-[#191C1F]">
+                    <img 
+                        src="{% static 'images/appstore.png' %}" 
+                        alt="Consíguelo en el App Store" 
+                        class="h-10 w-auto object-contain">
+                    <span class="px-3 py-1.5 bg-[#191C1F] text-white rounded text-[10px] font-bold">OBTENER</span>
                 </a>
 
                 <!-- Descarga Directa APK -->
-                <div class="p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded flex items-center justify-between">
+                <div class="p-3 bg-[#F8F9FD] border border-[#DCE0DC] rounded-lg flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-[24px] text-ochre">android</span>
                         <div>
@@ -1015,7 +1029,7 @@
                     </div>
                     <button 
                         @click="alert('Iniciando descarga directa del instalador Huaguruncho 360 APK.'); downloadModalOpen = false;"
-                        class="px-2.5 py-1 bg-ochre hover:bg-ochre-hover text-white rounded text-[10px] font-bold">
+                        class="px-3 py-1.5 bg-ochre hover:bg-ochre-hover text-white rounded text-[10px] font-bold">
                         DESCARGAR
                     </button>
                 </div>
