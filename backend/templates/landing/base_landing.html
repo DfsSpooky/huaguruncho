@@ -101,6 +101,15 @@
             background-size: 32px 32px;
         }
 
+        /* Ocultar barra de scroll para listas horizontales en móviles */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         /* Barra de desplazamiento austera y técnica */
         ::-webkit-scrollbar {
             width: 7px;
