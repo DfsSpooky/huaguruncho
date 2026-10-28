@@ -451,7 +451,11 @@ class RouteAdmin(admin.ModelAdmin):
 
         route = get_object_or_404(Route, pk=object_id)
         source_scene = get_object_or_404(TourScene, uuid=source_uuid)
-        target_scene = TourScene.objects.filter(uuid=target_uuid).first() if target_uuid else None
+        target_scene = (
+            TourScene.objects.filter(uuid=target_uuid).first()
+            if (h_type == Hotspot.HotspotType.NAVIGATION and target_uuid)
+            else None
+        )
 
         icon_map = {
             Hotspot.HotspotType.NAVIGATION: 'arrow_forward',

@@ -46,88 +46,202 @@ body, html {
   position: absolute;
   pointer-events: auto;
   cursor: pointer;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -22px);
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: transform 0.15s ease-out;
-  z-index: 10;
+  z-index: 15;
 }
 
 .hotspot:active {
-  transform: translate(-50%, -50%) scale(0.9);
+  transform: translate(-50%, -22px) scale(0.94);
+}
+
+.hotspot-pin-anchor {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hotspot-icon-wrapper {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
   position: relative;
+  border: 2.5px solid #FFFFFF;
 }
 
 .hotspot-pulse {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   animation: pulse-animation 2s infinite ease-out;
   pointer-events: none;
 }
 
-.hotspot-label {
-  margin-top: 6px;
-  background-color: rgba(18, 59, 93, 0.85);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  color: #FFFFFF;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  max-width: 160px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+/* Studio-matched Hotspot Palettes */
+.hotspot-photo_poi .hotspot-icon-wrapper {
+  background: linear-gradient(135deg, #A43716 0%, #D85A30 100%);
+  border-color: #FFFFFF;
+}
+.hotspot-photo_poi .hotspot-pulse {
+  border: 2.5px solid #FF8A65;
+  background: rgba(216, 90, 48, 0.25);
 }
 
-/* Hotspot type variants */
 .hotspot-navigation .hotspot-icon-wrapper {
-  background-color: #2D6A4F;
-  border: 2px solid #A3E635;
+  background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+  border-color: #FFFFFF;
 }
 .hotspot-navigation .hotspot-pulse {
-  border: 2px solid #A3E635;
+  border: 2.5px solid #8AB4F8;
+  background: rgba(26, 115, 232, 0.22);
 }
 
 .hotspot-information .hotspot-icon-wrapper {
-  background-color: #123B5D;
-  border: 2px solid #4A90B5;
+  background: linear-gradient(135deg, #1e8e3e 0%, #34a853 100%);
+  border-color: #FFFFFF;
 }
 .hotspot-information .hotspot-pulse {
-  border: 2px solid #4A90B5;
+  border: 2.5px solid #81C995;
+  background: rgba(30, 142, 62, 0.22);
+}
+
+.hotspot-audio_guide .hotspot-icon-wrapper {
+  background: linear-gradient(135deg, #9334e6 0%, #a142f4 100%);
+  border-color: #FFFFFF;
+}
+.hotspot-audio_guide .hotspot-pulse {
+  border: 2.5px solid #D7AEFB;
+  background: rgba(147, 52, 230, 0.22);
 }
 
 .hotspot-warning .hotspot-icon-wrapper {
-  background-color: #C2410C;
-  border: 2px solid #FDBA74;
+  background: linear-gradient(135deg, #ea8600 0%, #f9ab00 100%);
+  border-color: #FFFFFF;
 }
 .hotspot-warning .hotspot-pulse {
-  border: 2px solid #FDBA74;
+  border: 2.5px solid #FDE293;
+  background: rgba(234, 134, 0, 0.25);
+}
+
+/* Rich Glassmorphic Card attached to 360 Hotspot */
+.hotspot-rich-card {
+  margin-top: 6px;
+  background: rgba(20, 23, 26, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  padding: 6px 11px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+  max-width: 195px;
+  min-width: 110px;
+  border: 1.2px solid rgba(255, 255, 255, 0.26);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hotspot-rich-card-photo {
+  padding: 5px 10px 5px 5px;
+  max-width: 220px;
+  border-color: rgba(217, 93, 57, 0.75);
+  background: rgba(20, 23, 26, 0.95);
+}
+
+.hotspot-photo-thumb-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  background: #1f2429;
+}
+
+.hotspot-photo-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hotspot-photo-pill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(217, 93, 57, 0.92);
+  color: #FFFFFF;
+  font-size: 7.5px;
+  font-weight: 800;
+  text-align: center;
+  padding: 1px 2px;
+  letter-spacing: 0.3px;
+}
+
+.hotspot-card-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.hotspot-card-cat {
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #FDBA74;
+  text-transform: uppercase;
+  margin-bottom: 1px;
+}
+
+.hotspot-navigation .hotspot-card-cat {
+  color: #8AB4F8;
+}
+
+.hotspot-information .hotspot-card-cat {
+  color: #81C995;
+}
+
+.hotspot-card-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+
+.hotspot-card-sub {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #CBD5E1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
 }
 
 @keyframes pulse-animation {
   0% {
     transform: scale(1);
-    opacity: 0.8;
+    opacity: 0.85;
   }
   100% {
-    transform: scale(1.6);
+    transform: scale(1.75);
     opacity: 0;
   }
 }
@@ -152,7 +266,7 @@ body, html {
   width: 48px;
   height: 48px;
   border: 4px solid rgba(255, 255, 255, 0.2);
-  border-top-color: #4A90B5;
+  border-top-color: #D95D39;
   border-radius: 50%;
   animation: spin 1s infinite linear;
   margin-bottom: 12px;

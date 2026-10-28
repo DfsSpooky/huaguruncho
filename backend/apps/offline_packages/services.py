@@ -17,13 +17,21 @@ def generate_package_manifest(route, request=None):
     for scene in route.scenes.filter(is_active=True).prefetch_related('hotspots').order_by('sequence'):
         hotspots_data = []
         for h in scene.hotspots.all():
+            media_image_url = None
+            if h.media_image and hasattr(h.media_image, 'url'):
+                media_image_url = request.build_absolute_uri(h.media_image.url) if request else h.media_image.url
             hotspots_data.append({
                 'uuid': str(h.uuid),
+                'source_scene_uuid': str(scene.uuid),
                 'type': h.type,
                 'yaw': float(h.yaw),
                 'pitch': float(h.pitch),
+                'target_yaw': float(h.target_yaw) if h.target_yaw else 0.0,
+                'target_pitch': float(h.target_pitch) if h.target_pitch else 0.0,
                 'title': h.title,
                 'content': h.content,
+                'media_image_url': media_image_url,
+                'audio_url': h.audio_url or '',
                 'icon': h.icon,
                 'target_scene_uuid': str(h.target_scene.uuid) if h.target_scene else None,
             })
@@ -36,6 +44,10 @@ def generate_package_manifest(route, request=None):
             except Exception:
                 total_size += 1024 * 1024  # Fallback estimate 1MB
 
+        thumbnail_url = None
+        if scene.thumbnail and hasattr(scene.thumbnail, 'url'):
+            thumbnail_url = request.build_absolute_uri(scene.thumbnail.url) if request else scene.thumbnail.url
+
         scenes_data.append({
             'uuid': str(scene.uuid),
             'title': scene.title,
@@ -45,7 +57,10 @@ def generate_package_manifest(route, request=None):
             'longitude': float(scene.longitude) if scene.longitude else None,
             'altitude_masl': scene.altitude_masl,
             'heading': float(scene.heading) if scene.heading else 0.0,
+            'initial_yaw': float(scene.initial_yaw) if scene.initial_yaw else 0.0,
+            'initial_pitch': float(scene.initial_pitch) if scene.initial_pitch else 0.0,
             'panorama_image_url': panorama_url,
+            'thumbnail_url': thumbnail_url,
             'hotspots': hotspots_data
         })
 

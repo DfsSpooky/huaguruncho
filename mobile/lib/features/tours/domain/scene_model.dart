@@ -2,6 +2,7 @@ import 'hotspot_model.dart';
 
 class SceneModel {
   final String uuid;
+  final String? routeUuid;
   final String title;
   final String description;
   final String? panoramaImageUrl;
@@ -19,6 +20,7 @@ class SceneModel {
 
   const SceneModel({
     required this.uuid,
+    this.routeUuid,
     required this.title,
     required this.description,
     this.panoramaImageUrl,
@@ -35,6 +37,30 @@ class SceneModel {
     this.hotspots = const [],
   });
 
+  SceneModel copyWith({
+    String? panoramaLocalPath,
+    List<HotspotModel>? hotspots,
+  }) {
+    return SceneModel(
+      uuid: uuid,
+      routeUuid: routeUuid,
+      title: title,
+      description: description,
+      panoramaImageUrl: panoramaImageUrl,
+      thumbnailUrl: thumbnailUrl,
+      panoramaAsset: panoramaAsset,
+      panoramaLocalPath: panoramaLocalPath ?? this.panoramaLocalPath,
+      latitude: latitude,
+      longitude: longitude,
+      altitudeMasl: altitudeMasl,
+      heading: heading,
+      initialYaw: initialYaw,
+      initialPitch: initialPitch,
+      sequence: sequence,
+      hotspots: hotspots ?? this.hotspots,
+    );
+  }
+
   factory SceneModel.fromJson(Map<String, dynamic> json) {
     var rawHotspots = json['hotspots'] as List<dynamic>? ?? [];
     List<HotspotModel> parsedHotspots =
@@ -42,6 +68,7 @@ class SceneModel {
 
     return SceneModel(
       uuid: json['uuid']?.toString() ?? '',
+      routeUuid: json['route_uuid']?.toString(),
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       panoramaImageUrl: json['panorama_image_url']?.toString(),

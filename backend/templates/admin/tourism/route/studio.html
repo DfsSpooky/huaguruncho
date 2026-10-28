@@ -2445,8 +2445,12 @@
     var mediaGroup = document.getElementById('media-image-group');
     var audioGroup = document.getElementById('audio-url-group');
 
-    if (targetGroup) targetGroup.style.display = type === 'navigation' ? 'block' : 'none';
-    if (mediaGroup) mediaGroup.style.display = type === 'photo_poi' ? 'block' : 'none';
+    if (targetGroup) {
+      targetGroup.style.display = type === 'navigation' ? 'block' : 'none';
+      var targetSelect = targetGroup.querySelector('select[name="target_scene_uuid"]');
+      if (targetSelect) targetSelect.disabled = (type !== 'navigation');
+    }
+    if (mediaGroup) mediaGroup.style.display = (type === 'photo_poi' || type === 'information') ? 'block' : 'none';
     if (audioGroup) audioGroup.style.display = type === 'audio_guide' ? 'block' : 'none';
   };
 

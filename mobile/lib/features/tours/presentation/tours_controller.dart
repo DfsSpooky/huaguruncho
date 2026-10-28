@@ -12,6 +12,11 @@ final toursRepositoryProvider = Provider<ToursRepository>((ref) {
 final currentTourRouteUuidProvider = StateProvider<String?>((ref) => null);
 final currentTourSceneIndexProvider = StateProvider<int>((ref) => 0);
 
+final availableTourRoutesProvider = FutureProvider<List<TourRouteSummary>>((ref) async {
+  final repository = ref.watch(toursRepositoryProvider);
+  return repository.getAvailableTourRoutes();
+});
+
 final tourScenesProvider = FutureProvider.family<List<SceneModel>, String?>((ref, routeUuid) async {
   final repository = ref.watch(toursRepositoryProvider);
   return repository.getScenesForRoute(routeUuid);
