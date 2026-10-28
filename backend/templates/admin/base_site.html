@@ -8,10 +8,9 @@
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/huaguruncho_admin.css' %}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // If in Tour 360 Studio view, activate full-bleed mode
   if (window.location.pathname.includes('/studio/')) {
     document.body.classList.add('in-tour-studio');
     const navSidebar = document.getElementById('nav-sidebar');
@@ -21,32 +20,148 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentStart = document.getElementById('content-start');
     if (contentStart) contentStart.style.display = 'block';
   }
+
+  // Enriquecer la barra de navegación de rutas (breadcrumbs / subheader)
+  const breadcrumbContainers = document.querySelectorAll('.breadcrumbs, div.breadcrumbs');
+  breadcrumbContainers.forEach(function(bc) {
+    const nodes = Array.from(bc.childNodes);
+    nodes.forEach(function(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const raw = node.textContent;
+        const trimmed = raw.trim();
+        if (!trimmed) return;
+        
+        // Manejar separadores tipo ›, >, &rsaquo;, etc.
+        if (trimmed === '›' || trimmed === '>' || trimmed === '»' || trimmed === '/') {
+          const sep = document.createElement('span');
+          sep.className = 'hp-crumb-sep';
+          sep.textContent = '›';
+          bc.replaceChild(sep, node);
+        } else {
+          // Si el texto incluye separador seguido de texto (ej. " › Rutas")
+          if (trimmed.startsWith('›') || trimmed.startsWith('>')) {
+            const cleanText = trimmed.replace(/^[›>]\s*/, '');
+            const frag = document.createDocumentFragment();
+            const sep = document.createElement('span');
+            sep.className = 'hp-crumb-sep';
+            sep.textContent = '›';
+            frag.appendChild(sep);
+            if (cleanText) {
+              const cur = document.createElement('span');
+              cur.className = 'hp-crumb-current';
+              cur.textContent = cleanText;
+              frag.appendChild(cur);
+            }
+            bc.replaceChild(frag, node);
+          } else {
+            const cur = document.createElement('span');
+            cur.className = 'hp-crumb-current';
+            cur.textContent = trimmed;
+            bc.replaceChild(cur, node);
+          }
+        }
+      }
+    });
+  });
 });
 </script>
 {% endblock %}
 
 {% block branding %}
 <div id="site-name">
-  <a href="{% url 'admin:index' %}" style="display: inline-flex; align-items: center; gap: 10px;">
-    <span style="font-size: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🏔️</span>
-    <div>
-      <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 0.5px; color: #FFFFFF; line-height: 1.1;">
-        HUAGURUNCHO <span style="color: #4DD0E1;">360</span>
-      </div>
-      <div style="font-size: 11px; font-weight: 500; color: #B2DFDB; letter-spacing: 0.2px;">
-        Gestión Glaciar, Rutas & Conservación
-      </div>
+  <a href="{% url 'admin:index' %}" class="hp-brand-link">
+    <div class="hp-brand-badge">H360</div>
+    <div class="hp-brand-info">
+      <span class="hp-brand-title">
+        HUAGURUNCHO<span class="hp-brand-accent"> 360</span>
+      </span>
+      <span class="hp-brand-subtitle">
+        PANEL DE ADMINISTRACIÓN
+      </span>
     </div>
   </a>
 </div>
 {% endblock %}
 
-{% block userlinks %}
-  <a href="/" target="_blank" rel="noopener" style="background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px;">
-    🌐 Ver Portal
+{% block usertools %}
+{% if has_permission %}
+<div id="user-tools" class="hp-user-tools">
+  <a href="/" target="_blank" rel="noopener" class="hp-tool-btn hp-btn-site" title="Abrir sitio web oficial">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="2" y1="12" x2="22" y2="12"></line>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    </svg>
+    <span>Ver sitio</span>
+    <svg class="hp-btn-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+      <polyline points="15 3 21 3 21 9"></polyline>
+      <line x1="10" y1="14" x2="21" y2="3"></line>
+    </svg>
   </a>
-  <a href="/api/docs/" target="_blank" rel="noopener" style="background: rgba(0, 131, 143, 0.35); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; color: #80DEEA !important;">
-    📄 Swagger API
+
+  <div class="hp-user-badge">
+    <div class="hp-user-avatar">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+    <div class="hp-user-details">
+      <span class="hp-user-name" title="{{ user.email|default:user.get_username }}">{{ user.email|default:user.get_username }}</span>
+      <span class="hp-role-pill">{% if user.is_superuser %}SUPERADMIN{% elif user.is_staff %}STAFF{% else %}USER{% endif %}</span>
+    </div>
+  </div>
+
+  {% if user.has_usable_password %}
+  <a href="{% url 'admin:password_change' %}" class="hp-tool-btn hp-btn-subtle" title="Cambiar contraseña de acceso">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+    <span>Contraseña</span>
   </a>
-  {{ block.super }}
+  {% endif %}
+
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}" class="hp-logout-form">
+    {% csrf_token %}
+    <button type="submit" class="hp-tool-btn hp-btn-logout" title="Cerrar sesión de forma segura">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Cerrar sesión</span>
+    </button>
+  </form>
+
+  {% include "admin/color_theme_toggle.html" %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block nav-breadcrumbs %}
+<nav aria-label="{% translate 'Breadcrumbs' %}" class="hp-subbar">
+  <div class="hp-subbar-container">
+    <div class="hp-subbar-crumbs">
+      {% block breadcrumbs %}
+      <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">Inicio</a>
+        {% if title %}
+          &rsaquo; {{ title }}
+        {% endif %}
+      </div>
+      {% endblock %}
+    </div>
+
+    <div class="hp-subbar-telemetry">
+      <div class="hp-telemetry-badge">
+        <span class="hp-telemetry-dot"></span>
+        <span class="hp-telemetry-label">Nevado Huaguruncho · 5,742 m</span>
+        <span class="hp-telemetry-divider">·</span>
+        <span class="hp-telemetry-loc">Pasco, Perú</span>
+      </div>
+    </div>
+  </div>
+</nav>
 {% endblock %}

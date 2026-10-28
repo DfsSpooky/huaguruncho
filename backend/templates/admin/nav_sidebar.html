@@ -1,0 +1,303 @@
+{% load i18n static %}
+<button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" aria-label="{% translate 'Toggle navigation' %}" title="Colapsar / Expandir Navegación">
+  <svg class="toggle-icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <polyline points="15 18 9 12 15 6"></polyline>
+  </svg>
+</button>
+
+<nav class="sticky huaguruncho-sidebar" id="nav-sidebar" aria-label="{% translate 'Sidebar' %}">
+  
+  <!-- Sidebar Search Filter -->
+  <div class="sidebar-search-box">
+    <div class="sidebar-search-icon">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+    <input 
+      type="search" 
+      id="nav-filter" 
+      class="sidebar-search-input"
+      placeholder="Filtrar módulos (/)..." 
+      aria-label="Filtrar módulos de administración"
+      autocomplete="off"
+    >
+    <kbd class="sidebar-search-kbd">/</kbd>
+  </div>
+
+  <!-- Sidebar Navigation Menu -->
+  <div class="sidebar-nav-sections" id="sidebarNavSections">
+    
+    <!-- Home / Dashboard -->
+    <div class="sidebar-nav-group">
+      <a href="{% url 'admin:index' %}" class="sidebar-nav-item {% if request.path == '/admin/' %}active{% endif %}">
+        <span class="sidebar-item-icon">⚡</span>
+        <span class="sidebar-item-label">Panel Principal</span>
+      </a>
+      <a href="/admin/tourism/route/1/studio/" class="sidebar-nav-item studio-badge-item {% if '/studio/' in request.path %}active{% endif %}">
+        <span class="sidebar-item-icon">🏔️</span>
+        <span class="sidebar-item-label">Tour 360° Studio</span>
+        <span class="sidebar-mini-pill">3D</span>
+      </a>
+    </div>
+
+    <!-- 1. Rutas y Experiencias 360 -->
+    <div class="sidebar-section-block">
+      <div class="sidebar-section-header">
+        <span>🗺️ Rutas &amp; 360°</span>
+      </div>
+      <div class="sidebar-section-items">
+        <div class="sidebar-nav-row {% if '/tourism/route/' in request.path and '/studio/' not in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_route_changelist' %}" class="sidebar-link">
+            <span>Rutas Turísticas</span>
+          </a>
+          <a href="{% url 'admin:tourism_route_add' %}" class="sidebar-add-action" title="Añadir Ruta">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/tourscene/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_tourscene_changelist' %}" class="sidebar-link">
+            <span>Escenas Panorámicas</span>
+          </a>
+          <a href="{% url 'admin:tourism_tourscene_add' %}" class="sidebar-add-action" title="Añadir Escena">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/hotspot/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_hotspot_changelist' %}" class="sidebar-link">
+            <span>Hotspots &amp; Conexiones</span>
+          </a>
+          <a href="{% url 'admin:tourism_hotspot_add' %}" class="sidebar-add-action" title="Añadir Hotspot">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/pointofinterest/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_pointofinterest_changelist' %}" class="sidebar-link">
+            <span>Puntos de Interés (POIs)</span>
+          </a>
+          <a href="{% url 'admin:tourism_pointofinterest_add' %}" class="sidebar-add-action" title="Añadir POI">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/audioguide/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_audioguide_changelist' %}" class="sidebar-link">
+            <span>Audioguías Andinas</span>
+          </a>
+          <a href="{% url 'admin:tourism_audioguide_add' %}" class="sidebar-add-action" title="Añadir Audioguía">+</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Conservación y Eco-Reportes -->
+    <div class="sidebar-section-block">
+      <div class="sidebar-section-header">
+        <span>🛡️ Conservación &amp; Alertas</span>
+      </div>
+      <div class="sidebar-section-items">
+        <div class="sidebar-nav-row {% if '/environmental_reports/environmentalreport/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:environmental_reports_environmentalreport_changelist' %}" class="sidebar-link">
+            <span>Eco-Reportes</span>
+          </a>
+          <a href="{% url 'admin:environmental_reports_environmentalreport_add' %}" class="sidebar-add-action" title="Añadir Reporte">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/environmental_reports/reportevidence/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:environmental_reports_reportevidence_changelist' %}" class="sidebar-link">
+            <span>Evidencias Fotográficas</span>
+          </a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/safetyrecommendation/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_safetyrecommendation_changelist' %}" class="sidebar-link">
+            <span>Seguridad &amp; LNT</span>
+          </a>
+          <a href="{% url 'admin:tourism_safetyrecommendation_add' %}" class="sidebar-add-action" title="Añadir Pauta">+</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Clima y Biodiversidad -->
+    <div class="sidebar-section-block">
+      <div class="sidebar-section-header">
+        <span>🏔️ Clima &amp; Biodiversidad</span>
+      </div>
+      <div class="sidebar-section-items">
+        <div class="sidebar-nav-row {% if '/tourism/mountainweatherstation/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_mountainweatherstation_changelist' %}" class="sidebar-link">
+            <span>Estaciones Clima</span>
+          </a>
+          <a href="{% url 'admin:tourism_mountainweatherstation_add' %}" class="sidebar-add-action" title="Añadir Estación">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/weatheralert/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_weatheralert_changelist' %}" class="sidebar-link">
+            <span>Alertas Climáticas</span>
+          </a>
+          <a href="{% url 'admin:tourism_weatheralert_add' %}" class="sidebar-add-action" title="Añadir Alerta">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/biodiversityspecies/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_biodiversityspecies_changelist' %}" class="sidebar-link">
+            <span>Flora &amp; Fauna Andina</span>
+          </a>
+          <a href="{% url 'admin:tourism_biodiversityspecies_add' %}" class="sidebar-add-action" title="Añadir Especie">+</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Comunidad y Guardaparques -->
+    <div class="sidebar-section-block">
+      <div class="sidebar-section-header">
+        <span>🤝 Comunidad &amp; Guardaparques</span>
+      </div>
+      <div class="sidebar-section-items">
+        <div class="sidebar-nav-row {% if '/tourism/communityservice/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_communityservice_changelist' %}" class="sidebar-link">
+            <span>Directorio Comunal</span>
+          </a>
+          <a href="{% url 'admin:tourism_communityservice_add' %}" class="sidebar-add-action" title="Añadir Servicio">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/emergencycontact/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_emergencycontact_changelist' %}" class="sidebar-link">
+            <span>Rescate SOS</span>
+          </a>
+          <a href="{% url 'admin:tourism_emergencycontact_add' %}" class="sidebar-add-action" title="Añadir Contacto">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/communitypost/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_communitypost_changelist' %}" class="sidebar-link">
+            <span>Muro Guardaparques</span>
+          </a>
+          <a href="{% url 'admin:tourism_communitypost_add' %}" class="sidebar-add-action" title="Añadir Publicación">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/guardianbadge/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_guardianbadge_changelist' %}" class="sidebar-link">
+            <span>Medallas &amp; Retos</span>
+          </a>
+          <a href="{% url 'admin:tourism_guardianbadge_add' %}" class="sidebar-add-action" title="Añadir Medalla">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/tourism/trailpassportstamp/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:tourism_trailpassportstamp_changelist' %}" class="sidebar-link">
+            <span>Sellos de Pasaporte</span>
+          </a>
+          <a href="{% url 'admin:tourism_trailpassportstamp_add' %}" class="sidebar-add-action" title="Añadir Sello">+</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Portal & Paquetes Offline -->
+    <div class="sidebar-section-block">
+      <div class="sidebar-section-header">
+        <span>🌐 Portal &amp; Offline</span>
+      </div>
+      <div class="sidebar-section-items">
+        <div class="sidebar-nav-row {% if '/offline_packages/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:offline_packages_offlinepackage_changelist' %}" class="sidebar-link">
+            <span>Paquetes Offline</span>
+          </a>
+        </div>
+        <div class="sidebar-nav-row {% if '/landing/landingheroconfig/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:landing_landingheroconfig_changelist' %}" class="sidebar-link">
+            <span>Landing Page</span>
+          </a>
+        </div>
+        <div class="sidebar-nav-row {% if '/landing/landingfaq/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:landing_landingfaq_changelist' %}" class="sidebar-link">
+            <span>Preguntas Frecuentes</span>
+          </a>
+          <a href="{% url 'admin:landing_landingfaq_add' %}" class="sidebar-add-action" title="Añadir FAQ">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/landing/landingfeature/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:landing_landingfeature_changelist' %}" class="sidebar-link">
+            <span>Tarjetas Bento Grid</span>
+          </a>
+          <a href="{% url 'admin:landing_landingfeature_add' %}" class="sidebar-add-action" title="Añadir Feature">+</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Cuentas y Accesos -->
+    <div class="sidebar-section-block">
+      <div class="sidebar-section-header">
+        <span>⚙️ Seguridad &amp; Accesos</span>
+      </div>
+      <div class="sidebar-section-items">
+        <div class="sidebar-nav-row {% if '/accounts/user/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:accounts_user_changelist' %}" class="sidebar-link">
+            <span>Usuarios &amp; Guardaparques</span>
+          </a>
+          <a href="{% url 'admin:accounts_user_add' %}" class="sidebar-add-action" title="Añadir Usuario">+</a>
+        </div>
+        <div class="sidebar-nav-row {% if '/auth/group/' in request.path %}active{% endif %}">
+          <a href="{% url 'admin:auth_group_changelist' %}" class="sidebar-link">
+            <span>Grupos y Permisos</span>
+          </a>
+          <a href="{% url 'admin:auth_group_add' %}" class="sidebar-add-action" title="Añadir Grupo">+</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sidebar Footer Info -->
+  <div class="sidebar-footer-info">
+    <div class="sidebar-footer-links">
+      <a href="/" target="_blank" rel="noopener" class="sidebar-footer-link" title="Abrir sitio web público">
+        <span>🌐 Ver Portal</span>
+      </a>
+      <a href="/api/docs/" target="_blank" rel="noopener" class="sidebar-footer-link" title="Abrir documentación Swagger API">
+        <span>📄 Swagger</span>
+      </a>
+    </div>
+    <div class="sidebar-status-pill">
+      <span class="status-pulse-dot"></span>
+      <span>Huaguruncho 360 v2.6</span>
+    </div>
+  </div>
+
+</nav>
+
+<script>
+  // Modern Client-Side Live Filter for Sidebar Items
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterInput = document.getElementById('nav-filter');
+    const navSections = document.getElementById('sidebarNavSections');
+    const toggleBtn = document.getElementById('toggle-nav-sidebar');
+    const body = document.body;
+
+    // Quick focus shortcut '/'
+    document.addEventListener('keydown', function(e) {
+      if (e.key === '/' && document.activeElement !== filterInput && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        if (filterInput) {
+          filterInput.focus();
+          filterInput.select();
+        }
+      }
+    });
+
+    if (filterInput && navSections) {
+      filterInput.addEventListener('input', function() {
+        const query = filterInput.value.toLowerCase().trim();
+        const rows = navSections.querySelectorAll('.sidebar-nav-row, .sidebar-nav-item');
+        const sectionBlocks = navSections.querySelectorAll('.sidebar-section-block');
+
+        rows.forEach(function(row) {
+          const text = row.textContent.toLowerCase();
+          if (!query || text.includes(query)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        // Hide empty section blocks
+        sectionBlocks.forEach(function(block) {
+          const visibleRows = block.querySelectorAll('.sidebar-nav-row:not([style*="display: none"])');
+          block.style.display = (visibleRows.length === 0 && query) ? 'none' : '';
+        });
+      });
+    }
+
+    // Toggle Sidebar State
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function() {
+        const isClosed = body.classList.toggle('nav-sidebar-closed');
+        localStorage.setItem('hp_admin_sidebar_closed', isClosed ? 'true' : 'false');
+      });
+
+      // Restore saved preference
+      if (localStorage.getItem('hp_admin_sidebar_closed') === 'true') {
+        body.classList.add('nav-sidebar-closed');
+      }
+    }
+  });
+</script>

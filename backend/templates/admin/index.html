@@ -1,24 +1,28 @@
-{% extends "admin/index.html" %}
-{% load i18n static %}
+{% extends "admin/base_site.html" %}
+{% load i18n static log %}
+
+{% block content_title %}{% endblock %}
+
+{% block nav-sidebar %}
+  {% include "admin/nav_sidebar.html" %}
+{% endblock %}
 
 {% block content %}
-{% if dashboard_stats %}
 <div class="huaguruncho-dashboard">
-  <!-- Banner de Bienvenida y Atajos Rápidos -->
+  <!-- Banner Simple y Operativo -->
   <div class="huaguruncho-banner">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
       <div>
-        <h2 style="margin: 0; color: #FFFFFF; font-size: 22px; font-weight: 800; letter-spacing: -0.02em;">
-          🏔️ HUAGURUNCHO 360 • Centro de Control y Operaciones
+        <h2 style="margin: 0; color: #FFFFFF; font-size: 18px; font-weight: 700;">
+          🏔️ Panel de Control &bull; Huaguruncho 360
         </h2>
-        <p style="margin: 6px 0 0 0; color: #E0F2F1; font-size: 13.5px; line-height: 1.4;">
-          Municipalidad Distrital de Huachón & DIRCETUR Pasco • Monitoreo Glaciar, Rutas 360° y Conservación Andina
+        <p style="margin: 4px 0 0 0; color: #cbd5e1; font-size: 13px;">
+          Municipalidad Distrital de Huachón &amp; DIRCETUR Pasco &bull; Gestión de senderos 360°, biodiversidad y eco-reportes
         </p>
       </div>
       <div>
-        <span style="background: rgba(255,255,255,0.18); padding: 7px 16px; border-radius: 9999px; font-size: 12px; font-weight: 800; border: 1px solid rgba(255,255,255,0.3); color: #FFFFFF; display: inline-flex; align-items: center; gap: 7px; backdrop-filter: blur(8px);">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; box-shadow: 0 0 8px #4ADE80;"></span>
-          Sistema en Línea • Temporada 2026
+        <span style="background: #334155; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: #f8fafc; border: 1px solid #475569;">
+          Temporada 2026 &bull; Huachón
         </span>
       </div>
     </div>
@@ -26,132 +30,77 @@
     <!-- Quick Actions Bar -->
     <div class="hp-quick-actions">
       <a href="{% url 'admin:tourism_route_add' %}" class="hp-quick-btn">
-        🗺️ + Nueva Ruta 360°
+        + Nueva Ruta 360°
       </a>
-      <a href="{% url 'admin:environmental_reports_environmentalreport_changelist' %}?status__exact=recibido" class="hp-quick-btn {% if dashboard_stats.pending_reports > 0 %}hp-quick-btn-alert{% endif %}">
-        ⚠️ Atender Reportes ({{ dashboard_stats.pending_reports }} pendientes)
+      <a href="{% url 'admin:environmental_reports_environmentalreport_changelist' %}?status__exact=recibido" class="hp-quick-btn" style="{% if dashboard_stats.pending_reports > 0 %}background: #991b1b; border-color: #b91c1c;{% endif %}">
+        ⚠️ Eco-Reportes ({{ dashboard_stats.pending_reports|default:0 }} pendientes)
       </a>
       <a href="{% url 'admin:tourism_mountainweatherstation_changelist' %}" class="hp-quick-btn">
-        📡 Monitoreo Meteorológico
+        Estaciones de Clima
       </a>
       <a href="{% url 'admin:tourism_biodiversityspecies_add' %}" class="hp-quick-btn">
-        🌿 + Añadir Especie
+        + Añadir Especie
       </a>
       <a href="{% url 'admin:offline_packages_offlinepackage_changelist' %}" class="hp-quick-btn">
-        📱 Paquetes Offline
+        Paquetes Offline
       </a>
     </div>
   </div>
 
-  <!-- Tarjetas de Métricas KPI en Grid 4x1 Equilibrado -->
+  <!-- Tarjetas KPI -->
   <div class="hp-metrics-grid">
-    <!-- 1. Eco-Reportes -->
-    <div class="hp-kpi-card kpi-reports {% if dashboard_stats.pending_reports > 0 %}has-pending{% endif %}">
+    <div class="hp-kpi-card">
       <div class="hp-kpi-title">
-        <span>⚠️ Eco-Reportes</span>
-        {% if dashboard_stats.pending_reports > 0 %}
-        <span class="hp-badge" style="background: #FEE2E2; color: #DC2626;">Atención req.</span>
-        {% else %}
-        <span class="hp-badge" style="background: #DCFCE7; color: #15803D;">Al día</span>
-        {% endif %}
+        <span>Eco-Reportes</span>
+        <span class="hp-badge" style="background: #fef2f2; color: #991b1b;">{{ dashboard_stats.pending_reports|default:0 }} pendientes</span>
       </div>
-      <div class="hp-kpi-value">
-        {{ dashboard_stats.pending_reports }}
-      </div>
-      <div class="hp-kpi-sub">
-        {{ dashboard_stats.resolved_reports }} resueltos de {{ dashboard_stats.total_reports }} registrados
-      </div>
-      <a href="{% url 'admin:environmental_reports_environmentalreport_changelist' %}?status__exact=recibido" class="hp-kpi-link" style="color: #DC2626;">
-        Gestionar incidencias &rarr;
-      </a>
+      <div class="hp-kpi-value">{{ dashboard_stats.pending_reports|default:0 }}</div>
+      <div class="hp-kpi-sub">{{ dashboard_stats.resolved_reports|default:0 }} resueltos de {{ dashboard_stats.total_reports|default:0 }}</div>
+      <a href="{% url 'admin:environmental_reports_environmentalreport_changelist' %}?status__exact=recibido" class="hp-kpi-link">Ver incidencias &rarr;</a>
     </div>
 
-    <!-- 2. Rutas & Escenas 360 -->
-    <div class="hp-kpi-card kpi-routes">
+    <div class="hp-kpi-card">
       <div class="hp-kpi-title">
-        <span>🗺️ Red de Rutas 360°</span>
-        <span class="hp-badge" style="background: #E0F7FA; color: #00838F;">{{ dashboard_stats.total_scenes }} escenas</span>
+        <span>Rutas 360°</span>
+        <span class="hp-badge" style="background: #f0fdfa; color: #0f766e;">{{ dashboard_stats.total_scenes|default:0 }} escenas</span>
       </div>
-      <div class="hp-kpi-value" style="color: #00838F;">
-        {{ dashboard_stats.total_routes }}
-      </div>
-      <div class="hp-kpi-sub">
-        Panorámicas georreferenciadas con Wikiloc GPX
-      </div>
-      <a href="{% url 'admin:tourism_route_changelist' %}" class="hp-kpi-link" style="color: #00838F;">
-        Explorar catálogo de rutas &rarr;
-      </a>
+      <div class="hp-kpi-value" style="color: #0f766e;">{{ dashboard_stats.total_routes|default:0 }}</div>
+      <div class="hp-kpi-sub">Rutas georreferenciadas activas</div>
+      <a href="{% url 'admin:tourism_route_changelist' %}" class="hp-kpi-link">Ver catálogo &rarr;</a>
     </div>
 
-    <!-- 3. Biodiversidad -->
-    <div class="hp-kpi-card kpi-bio">
+    <div class="hp-kpi-card">
       <div class="hp-kpi-title">
-        <span>🌿 Biodiversidad</span>
-        <span class="hp-badge" style="background: #DCFCE7; color: #166534;">Flora & Fauna</span>
+        <span>Biodiversidad</span>
+        <span class="hp-badge" style="background: #f0fdf4; color: #166534;">Flora & Fauna</span>
       </div>
-      <div class="hp-kpi-value" style="color: #166534;">
-        {{ dashboard_stats.total_species }}
-      </div>
-      <div class="hp-kpi-sub">
-        Nombres en Quechua y pautas No Deje Rastro (LNT)
-      </div>
-      <a href="{% url 'admin:tourism_biodiversityspecies_changelist' %}" class="hp-kpi-link" style="color: #166534;">
-        Ver especies registradas &rarr;
-      </a>
+      <div class="hp-kpi-value" style="color: #166534;">{{ dashboard_stats.total_species|default:0 }}</div>
+      <div class="hp-kpi-sub">Especies nativas registradas</div>
+      <a href="{% url 'admin:tourism_biodiversityspecies_changelist' %}" class="hp-kpi-link">Ver especies &rarr;</a>
     </div>
 
-    <!-- 4. Estaciones Meteorológicas -->
-    <div class="hp-kpi-card kpi-weather">
+    <div class="hp-kpi-card">
       <div class="hp-kpi-title">
-        <span>🏔️ Clima de Montaña</span>
-        <span class="hp-badge" style="background: #FEF3C7; color: #B45309;">Hasta 5,742m</span>
+        <span>Clima</span>
+        <span class="hp-badge" style="background: #fffbeb; color: #b45309;">Estaciones</span>
       </div>
-      <div class="hp-kpi-value" style="color: #D97706;">
-        {{ dashboard_stats.total_stations }}
-      </div>
-      <div class="hp-kpi-sub">
-        Pueblo Huachón, Huascacocha y Cumbre Huaguruncho
-      </div>
-      <a href="{% url 'admin:tourism_mountainweatherstation_changelist' %}" class="hp-kpi-link" style="color: #D97706;">
-        Actualizar condiciones &rarr;
-      </a>
+      <div class="hp-kpi-value" style="color: #d97706;">{{ dashboard_stats.total_stations|default:0 }}</div>
+      <div class="hp-kpi-sub">Red de monitoreo meteorológico</div>
+      <a href="{% url 'admin:tourism_mountainweatherstation_changelist' %}" class="hp-kpi-link">Ver estaciones &rarr;</a>
     </div>
   </div>
 
-  <!-- Analítica Visual con Chart.js -->
-  <div class="hp-charts-grid">
-    <!-- Gráfico de Afluencia de Visitantes -->
-    <div class="hp-chart-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-        <h3>📈 Estimación de Excursionistas por Mes (Huachón – Glaciar Huaguruncho)</h3>
-        <span class="hp-badge" style="background: #E0F7FA; color: #006064;">Temporada Seca Óptima: Mayo – Octubre</span>
-      </div>
-      <div style="height: 190px; position: relative;">
-        <canvas id="admin-tourists-chart"></canvas>
-      </div>
-    </div>
-
-    <!-- Gráfico de Donut: Eco-Reportes -->
-    <div class="hp-chart-card">
-      <h3>🌿 Estado de Resolución de Reportes</h3>
-      <div id="reports-chart-holder" data-resolved="{{ dashboard_stats.resolved_reports|default:'4' }}" data-pending="{{ dashboard_stats.pending_reports|default:'1' }}" style="height: 190px; position: relative;">
-        <canvas id="admin-reports-donut"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Centro de Módulos Operativos (Organizados por Dominio) -->
+  <!-- Módulos de Administración -->
   <div class="hp-modules-hub">
     <div class="hp-modules-hub-title">
-      <span>🗂️ Módulos de Gestión Huaguruncho 360</span>
-      <span style="font-size: 12px; font-weight: 500; color: var(--hp-text-muted);">Acceso directo clasificado por área de trabajo</span>
+      <span>Módulos de Gestión</span>
     </div>
 
     <div class="hp-domains-grid">
-      <!-- 1. Rutas y Experiencias 360 -->
+      <!-- 1 -->
       <div class="hp-domain-card">
         <div class="hp-domain-header">
-          <span>🗺️ Rutas & Experiencias 360°</span>
+          <span>🗺️ Rutas &amp; 360°</span>
         </div>
         <ul class="hp-domain-items">
           <li class="hp-domain-item">
@@ -165,33 +114,37 @@
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_tourscene_changelist' %}">Escenas Panorámicas 360°</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_tourscene_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_tourscene_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
-            <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_hotspot_changelist' %}">Hotspots & Conexiones</a></span>
+            <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_hotspot_changelist' %}">Hotspots &amp; Conexiones</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_hotspot_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_hotspot_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_pointofinterest_changelist' %}">Puntos de Interés (POIs)</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_pointofinterest_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_pointofinterest_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_audioguide_changelist' %}">Audioguías Andinas</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_audioguide_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_audioguide_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
         </ul>
       </div>
 
-      <!-- 2. Conservación y Eco-Reportes -->
+      <!-- 2 -->
       <div class="hp-domain-card">
         <div class="hp-domain-header">
-          <span>🛡️ Conservación & Vigilancia</span>
+          <span>🛡️ Conservación &amp; Reportes</span>
         </div>
         <ul class="hp-domain-items">
           <li class="hp-domain-item">
@@ -211,15 +164,16 @@
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_safetyrecommendation_changelist' %}">Pautas de Seguridad y LNT</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_safetyrecommendation_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_safetyrecommendation_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
         </ul>
       </div>
 
-      <!-- 3. Clima y Biodiversidad -->
+      <!-- 3 -->
       <div class="hp-domain-card">
         <div class="hp-domain-header">
-          <span>🏔️ Clima & Biodiversidad</span>
+          <span>🏔️ Clima &amp; Biodiversidad</span>
         </div>
         <ul class="hp-domain-items">
           <li class="hp-domain-item">
@@ -233,6 +187,7 @@
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_weatheralert_changelist' %}">Alertas Meteorológicas</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_weatheralert_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_weatheralert_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
@@ -245,14 +200,14 @@
         </ul>
       </div>
 
-      <!-- 4. Comunidad y Guardaparques -->
+      <!-- 4 -->
       <div class="hp-domain-card">
         <div class="hp-domain-header">
-          <span>🤝 Comunidad & Guardaparques</span>
+          <span>🤝 Comunidad &amp; Guardaparques</span>
         </div>
         <ul class="hp-domain-items">
           <li class="hp-domain-item">
-            <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_communityservice_changelist' %}">Directorio Comunal (Guías/Arrieros)</a></span>
+            <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_communityservice_changelist' %}">Directorio Comunal</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_communityservice_add' %}" class="hp-btn-add">+ Añadir</a>
               <a href="{% url 'admin:tourism_communityservice_changelist' %}" class="hp-btn-view">Ver</a>
@@ -262,33 +217,37 @@
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_emergencycontact_changelist' %}">Contactos de Rescate SOS</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_emergencycontact_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_emergencycontact_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_communitypost_changelist' %}">Muro de Guardaparques</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_communitypost_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_communitypost_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
-            <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_guardianbadge_changelist' %}">Gamificación: Medallas y Retos</a></span>
+            <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_guardianbadge_changelist' %}">Medallas y Retos</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_guardianbadge_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_guardianbadge_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
             <span class="hp-domain-item-name"><a href="{% url 'admin:tourism_trailpassportstamp_changelist' %}">Sellos de Pasaporte</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:tourism_trailpassportstamp_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:tourism_trailpassportstamp_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
         </ul>
       </div>
 
-      <!-- 5. Portal Web y Paquetes Offline -->
+      <!-- 5 -->
       <div class="hp-domain-card">
         <div class="hp-domain-header">
-          <span>🌐 Portal Web & Paquetes Offline</span>
+          <span>🌐 Portal Web &amp; Offline</span>
         </div>
         <ul class="hp-domain-items">
           <li class="hp-domain-item">
@@ -307,21 +266,23 @@
             <span class="hp-domain-item-name"><a href="{% url 'admin:landing_landingfaq_changelist' %}">Preguntas Frecuentes (FAQ)</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:landing_landingfaq_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:landing_landingfaq_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
           <li class="hp-domain-item">
             <span class="hp-domain-item-name"><a href="{% url 'admin:landing_landingfeature_changelist' %}">Tarjetas Bento Grid</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:landing_landingfeature_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:landing_landingfeature_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
         </ul>
       </div>
 
-      <!-- 6. Cuentas y Accesos -->
+      <!-- 6 -->
       <div class="hp-domain-card">
         <div class="hp-domain-header">
-          <span>⚙️ Cuentas & Permisos</span>
+          <span>⚙️ Cuentas &amp; Permisos</span>
         </div>
         <ul class="hp-domain-items">
           <li class="hp-domain-item">
@@ -335,88 +296,42 @@
             <span class="hp-domain-item-name"><a href="{% url 'admin:auth_group_changelist' %}">Grupos y Roles</a></span>
             <div class="hp-domain-item-actions">
               <a href="{% url 'admin:auth_group_add' %}" class="hp-btn-add">+ Añadir</a>
+              <a href="{% url 'admin:auth_group_changelist' %}" class="hp-btn-view">Ver</a>
             </div>
           </li>
         </ul>
       </div>
     </div>
   </div>
+
+  <!-- Actividad Reciente -->
+  <div class="hp-recent-card">
+    <div class="hp-recent-header">
+      <span>Actividad Reciente</span>
+    </div>
+    {% get_admin_log 8 as admin_log for_user user %}
+    {% if not admin_log %}
+      <p style="color: #64748b; font-size: 13px; margin: 0;">Sin acciones recientes registradas.</p>
+    {% else %}
+      <ul class="hp-recent-list">
+        {% for entry in admin_log %}
+        <li class="hp-recent-item">
+          <span class="hp-recent-badge {% if entry.is_addition %}is-add{% elif entry.is_change %}is-change{% else %}is-del{% endif %}">
+            {% if entry.is_addition %}+ Añadido{% elif entry.is_change %}✎ Editado{% else %}&times; Eliminado{% endif %}
+          </span>
+          {% if entry.is_deletion or not entry.get_admin_url %}
+            <span class="hp-recent-title">{{ entry.object_repr }}</span>
+          {% else %}
+            <a href="{{ entry.get_admin_url }}" class="hp-recent-link">{{ entry.object_repr }}</a>
+          {% endif %}
+          {% if entry.content_type %}
+            <span class="hp-recent-model">({{ entry.content_type.name|capfirst }})</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const isDark = document.documentElement.dataset.theme === 'dark' || document.body.classList.contains('theme-dark');
-    const textColor = isDark ? '#94A3B8' : '#64748B';
-    const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
-
-    const ctx1 = document.getElementById('admin-tourists-chart');
-    if (ctx1) {
-        new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'],
-                datasets: [{
-                    label: 'Visitantes / Mes (Estimado)',
-                    data: [120, 95, 140, 280, 650, 920, 1450, 1380, 850, 480, 220, 160],
-                    backgroundColor: '#00838F',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: textColor, font: { family: 'Inter', size: 11 } }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: gridColor },
-                        ticks: { color: textColor, font: { family: 'Inter', size: 11 } }
-                    }
-                }
-            }
-        });
-    }
-
-    const holder = document.getElementById('reports-chart-holder');
-    const ctx2 = document.getElementById('admin-reports-donut');
-    if (ctx2 && holder) {
-        const resolved = parseInt(holder.getAttribute('data-resolved') || '4', 10);
-        const pending = parseInt(holder.getAttribute('data-pending') || '1', 10);
-        new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: ['Solucionados', 'Pendientes'],
-                datasets: [{
-                    data: [resolved, pending],
-                    backgroundColor: ['#2D6A4F', '#DC2626'],
-                    borderWidth: isDark ? 0 : 2,
-                    borderColor: '#FFFFFF'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: textColor,
-                            boxWidth: 12,
-                            font: { family: 'Inter', size: 11, weight: 'bold' }
-                        }
-                    }
-                }
-            }
-        });
-    }
-});
-</script>
-{% endif %}
-
-{{ block.super }}
 {% endblock %}
