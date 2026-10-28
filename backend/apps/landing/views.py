@@ -281,3 +281,44 @@ class HTMXGuardianStampView(View):
             'total_points': 340,
             'new_rank': 'Guardián del Hielo (Nivel 3)',
         })
+
+
+class RobotsTxtView(View):
+    """
+    Directivas de rastreo para robots y motores de búsqueda (Google, Bing, Yandex).
+    """
+    def get(self, request, *args, **kwargs):
+        content = (
+            "User-agent: *\n"
+            "Allow: /\n"
+            "Disallow: /admin/\n"
+            "Disallow: /api/\n"
+            "\n"
+            "Sitemap: https://huaguruncho.aquienpasco.com/sitemap.xml\n"
+        )
+        return HttpResponse(content, content_type="text/plain; charset=utf-8")
+
+
+class SitemapXmlView(View):
+    """
+    Sitemap XML oficial con metadata geográfica e imágenes para Google Search Console.
+    """
+    def get(self, request, *args, **kwargs):
+        content = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
+            '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
+            '  <url>\n'
+            '    <loc>https://huaguruncho.aquienpasco.com/</loc>\n'
+            '    <lastmod>2026-10-27</lastmod>\n'
+            '    <changefreq>weekly</changefreq>\n'
+            '    <priority>1.0</priority>\n'
+            '    <image:image>\n'
+            '      <image:loc>https://huaguruncho.aquienpasco.com/static/images/huaguruncho_hero.jpg</image:loc>\n'
+            '      <image:title>Nevado Huaguruncho (5,742 m) - Cordillera de Pasco</image:title>\n'
+            '      <image:caption>La aplicación móvil oficial para explorar el Nevado Huaguruncho con cartografía sin conexión a internet y tours 360</image:caption>\n'
+            '    </image:image>\n'
+            '  </url>\n'
+            '</urlset>'
+        )
+        return HttpResponse(content, content_type="application/xml; charset=utf-8")

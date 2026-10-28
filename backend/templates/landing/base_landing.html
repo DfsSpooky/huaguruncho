@@ -4,18 +4,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Huaguruncho 360 — La App Oficial para Descubrir el Nevado Huaguruncho{% endblock %}</title>
+    <title>{% block title %}Huaguruncho 360 — La App Oficial para Explorar el Nevado Huaguruncho (Pasco, Perú){% endblock %}</title>
     
-    <!-- Metadatos SEO y Presentación de la App -->
-    <meta name="description" content="Descarga la aplicación oficial Huaguruncho 360: mapas sin internet, fotos y tours 360°, rutas seguras de caminata y cuidado ambiental en el Nevado Huaguruncho (Pasco, Perú). Proyecto impulsado por la Oficina de Investigación de la Universidad Nacional Daniel Alcides Carrión (UNDAC).">
-    <meta name="keywords" content="Huaguruncho 360, App Nevado Huaguruncho, Huachón, Pasco, Turismo Pasco, Rutas Huaguruncho, Mapa sin internet, Tours 360, Huella Cero, UNDAC">
-    <meta name="author" content="Huaguruncho 360 & Oficina de Investigación UNDAC">
-    
-    <!-- Open Graph -->
+    <!-- Metadatos SEO Principales -->
+    <meta name="description" content="Descarga la aplicación oficial Huaguruncho 360: mapas 100% sin internet, fotos y tours en 360°, rutas seguras de caminata y cuidado ambiental en el Nevado Huaguruncho (5,742 m en Pasco, Perú). Proyecto impulsado por la Oficina de Investigación de la UNDAC.">
+    <meta name="keywords" content="Huaguruncho 360, App Nevado Huaguruncho, Nevado Huaguruncho, Turismo Pasco, Huachón, Cordillera de Huaguruncho, Mapa de montaña sin internet, Tours 360 Perú, Trekking Huaguruncho, Lagunas de Pasco, Huella Cero, UNDAC Pasco">
+    <meta name="author" content="Huaguruncho 360 & Oficina de Investigación de la Universidad Nacional Daniel Alcides Carrión (UNDAC)">
+    <link rel="canonical" href="https://huaguruncho.aquienpasco.com/">
+    <link rel="alternate" hreflang="es" href="https://huaguruncho.aquienpasco.com/">
+    <link rel="alternate" hreflang="x-default" href="https://huaguruncho.aquienpasco.com/">
+
+    <!-- Directivas de Indexación para Buscadores (Google, Bing, Yahoo) -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+    <!-- SEO Local y Georreferenciación (Pasco, Perú) -->
+    <meta name="geo.region" content="PE-PAS">
+    <meta name="geo.placename" content="Huachón, Pasco, Perú">
+    <meta name="geo.position" content="-10.5311;-75.9239">
+    <meta name="ICBM" content="-10.5311, -75.9239">
+
+    <!-- Configuración para Móviles y PWA -->
+    <meta name="theme-color" content="#14171A">
+    <meta name="msapplication-TileColor" content="#14171A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Huaguruncho 360">
+    <meta name="application-name" content="Huaguruncho 360">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Favicon e Icono de Aplicación SVG -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2314171A'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFFFFF' font-family='sans-serif' font-weight='900' font-size='38'>H</text><circle cx='76' cy='32' r='8' fill='%23A43716'/></svg>">
+    <link rel="apple-touch-icon" href="https://huaguruncho.aquienpasco.com{% static 'images/huaguruncho_hero.jpg' %}">
+
+    <!-- Open Graph (Facebook, WhatsApp, LinkedIn, Telegram, Discord, iMessage) -->
+    <meta property="og:locale" content="es_PE">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Huaguruncho 360 — La App Oficial para Descubrir el Nevado Huaguruncho">
-    <meta property="og:description" content="Explora el Nevado Huaguruncho desde tu celular: mapas sin internet, vistas 360°, rutas paso a paso y turismo responsable en Pasco.">
-    <meta property="og:image" content="{% static 'images/huaguruncho_hero.jpg' %}">
+    <meta property="og:site_name" content="Huaguruncho 360">
+    <meta property="og:title" content="Huaguruncho 360 — La App Oficial para Explorar el Nevado Huaguruncho">
+    <meta property="og:description" content="Descarga gratis la app móvil para descubrir el Nevado Huaguruncho (Pasco, Perú): mapas sin internet, fotos y vistas 360°, rutas paso a paso y turismo responsable. Proyecto impulsado por la Oficina de Investigación UNDAC.">
+    <meta property="og:url" content="https://huaguruncho.aquienpasco.com/">
+    <meta property="og:image" content="https://huaguruncho.aquienpasco.com{% static 'images/huaguruncho_hero.jpg' %}">
+    <meta property="og:image:secure_url" content="https://huaguruncho.aquienpasco.com{% static 'images/huaguruncho_hero.jpg' %}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Nevado Huaguruncho (5,742 m) en Huachón, Pasco, Perú">
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Huaguruncho 360 — La App Oficial para Explorar el Nevado Huaguruncho">
+    <meta name="twitter:description" content="Mapas sin internet, tours virtuales en 360° y rutas hacia lagunas turquesas en el Coloso de Pasco. Descarga gratis para Android e iOS.">
+    <meta name="twitter:image" content="https://huaguruncho.aquienpasco.com{% static 'images/huaguruncho_hero.jpg' %}">
+    <meta name="twitter:image:alt" content="Nevado Huaguruncho 5,742 m en Pasco Perú">
+
+    <!-- Schema.org Datos Estructurados JSON-LD (Google Rich Snippets) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://huaguruncho.aquienpasco.com/#website",
+          "url": "https://huaguruncho.aquienpasco.com/",
+          "name": "Huaguruncho 360",
+          "description": "Portal y aplicación oficial para la exploración del Nevado Huaguruncho en Pasco, Perú.",
+          "inLanguage": "es-PE"
+        },
+        {
+          "@type": "MobileApplication",
+          "@id": "https://huaguruncho.aquienpasco.com/#app",
+          "name": "Huaguruncho 360",
+          "operatingSystem": "Android, iOS",
+          "applicationCategory": "TravelApplication",
+          "applicationSubCategory": "NavigationApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "PEN"
+          },
+          "description": "Aplicación móvil oficial para explorar el Nevado Huaguruncho con cartografía sin internet, fotos y tours en 360°, rutas guiadas y pasaporte ecológico Huella Cero.",
+          "screenshot": "https://huaguruncho.aquienpasco.com{% static 'images/huaguruncho_hero.jpg' %}",
+          "author": {
+            "@type": "EducationalOrganization",
+            "name": "Oficina de Investigación de la Universidad Nacional Daniel Alcides Carrión (UNDAC)",
+            "url": "https://huaguruncho.aquienpasco.com/"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "ratingCount": "128",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "TouristAttraction",
+          "@id": "https://huaguruncho.aquienpasco.com/#attraction",
+          "name": "Nevado Huaguruncho",
+          "alternateName": ["Apu Huaguruncho", "Coloso de Pasco"],
+          "description": "Pico glacial de 5,742 m s.n.m. en la cordillera oriental de Pasco, Huachón, Perú. Famoso por sus lagunas de origen glaciar y rutas de senderismo.",
+          "url": "https://huaguruncho.aquienpasco.com/",
+          "image": "https://huaguruncho.aquienpasco.com{% static 'images/huaguruncho_hero.jpg' %}",
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": -10.5311,
+            "longitude": -75.9239,
+            "elevation": "5742 m"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Huachón",
+            "addressRegion": "Pasco",
+            "addressCountry": "PE"
+          },
+          "isAccessibleForFree": true,
+          "publicAccess": true
+        },
+        {
+          "@type": "EducationalOrganization",
+          "@id": "https://huaguruncho.aquienpasco.com/#undac",
+          "name": "Universidad Nacional Daniel Alcides Carrión (UNDAC) - Oficina de Investigación",
+          "url": "https://huaguruncho.aquienpasco.com/",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Cerro de Pasco",
+            "addressRegion": "Pasco",
+            "addressCountry": "PE"
+          }
+        }
+      ]
+    }
+    </script>
     
     <!-- Tipografía Editorial de Campo: Outfit, Plus Jakarta Sans, JetBrains Mono & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

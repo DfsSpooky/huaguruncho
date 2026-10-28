@@ -7,12 +7,16 @@ from .views import (
     HTMXTourSceneView,
     HTMXSubscribeView,
     HTMXGuardianStampView,
+    RobotsTxtView,
+    SitemapXmlView,
 )
 
 app_name = 'landing'
 
 urlpatterns = [
     path('', LandingPageView.as_view(), name='index'),
+    path('robots.txt', RobotsTxtView.as_view(), name='robots-txt'),
+    path('sitemap.xml', SitemapXmlView.as_view(), name='sitemap-xml'),
     path('htmx/routes/', HTMXRouteFilterView.as_view(), name='htmx-routes'),
     path('htmx/safety-check/', HTMXSafetyAdvisorView.as_view(), name='htmx-safety-check'),
     path('htmx/weather-telemetry/', HTMXWeatherTelemetryView.as_view(), name='htmx-weather-telemetry'),
