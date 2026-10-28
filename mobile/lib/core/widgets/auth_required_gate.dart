@@ -9,7 +9,7 @@ Future<void> showAuthRequiredModal(
   BuildContext context, {
   required String featureName,
   String description =
-      'Para utilizar las herramientas interactivas de expedición, telemetría GPS, recorridos 360°, pasaporte de cumbre y registro de seguridad COEL, inicia sesión o crea tu cuenta oficial de excursionista.',
+      'Para usar los mapas con GPS, recorridos en 360°, sellos de visita y avisos de seguridad, inicia sesión o crea tu cuenta gratuita.',
 }) {
   HapticFeedback.mediumImpact();
   return showModalBottomSheet<void>(
@@ -124,7 +124,7 @@ Future<void> showAuthRequiredModal(
                         SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            'Tu cuenta vincula tu telemetría, sellos GPS y contacto de rescate COEL Huachón.',
+                            'Tu cuenta guarda tus recorridos, sellos de visita y datos de contacto de emergencia.',
                             style: TextStyle(
                               fontSize: 11,
                               color: AppColors.yaretaPine,

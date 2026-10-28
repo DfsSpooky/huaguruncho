@@ -778,7 +778,7 @@ class RouteDetailScreen extends ConsumerWidget {
               if (!isAuthenticated) {
                 showAuthRequiredModal(
                   context,
-                  featureName: 'Reporte Ambiental Georreferenciado',
+                  featureName: 'Reportar un Problema Ambiental',
                 );
                 return;
               }

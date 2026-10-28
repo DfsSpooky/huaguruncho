@@ -313,7 +313,7 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
 
                 // 4. Telemetría GPS Satelital
                 const Text(
-                  '03 // TELEMETRÍA DE POSICIÓN SATELITAL GPS',
+                  '03 // UBICACIÓN GPS DEL LUGAR',
                   style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w900,

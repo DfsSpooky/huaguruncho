@@ -36,9 +36,9 @@ class MainShellScaffold extends ConsumerWidget {
           if (!authState.isAuthenticated) {
             showAuthRequiredModal(
               context,
-              featureName: 'Reporte Ambiental Georreferenciado',
+              featureName: 'Reportar un Problema Ambiental',
               description:
-                  'Inicia sesión o crea tu cuenta de excursionista para capturar incidencias ambientales con foto y coordenadas GPS.',
+                  'Inicia sesión o crea tu cuenta gratuita para avisar con foto si ves basura o caminos dañados.',
             );
             return;
           }

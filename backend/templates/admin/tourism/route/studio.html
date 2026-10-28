@@ -1605,9 +1605,9 @@
       setTimeout(loadPlaceholderPanorama, 150);
       return;
     }
-    var placeholderImg = 'https://pannellum.org/images/cerro-toco-0.jpg';
+    var placeholderImg = '/static/images/scene_huachon_plaza.jpg';
     var badge = document.getElementById('active-scene-badge');
-    if (badge) badge.innerText = '1. Vista Panorámica Inicial (Demo)';
+    if (badge) badge.innerText = '1. Vista Panorámica Inicial (Huachón)';
 
     if (panoViewer) {
       try { panoViewer.destroy(); } catch (_) {}
@@ -1631,7 +1631,7 @@
       return;
     }
 
-    var imgUrl = scene.panorama_image_url || 'https://pannellum.org/images/cerro-toco-0.jpg';
+    var imgUrl = scene.panorama_image_url || '/static/images/scene_huachon_plaza.jpg';
     var badge = document.getElementById('active-scene-badge');
     if (badge) badge.innerText = scene.sequence + '. ' + scene.title;
 
@@ -1686,6 +1686,35 @@
           var yaw = coords[1];
           openHotspotModal(pitch, yaw);
           toggleAddHotspotMode(false);
+        }
+      });
+
+      panoViewer.on('error', function(err) {
+        console.warn('Pannellum error loading panorama:', err);
+        var badge = document.getElementById('active-scene-badge');
+        if (badge) {
+          badge.innerHTML = '<span style="color:#d93025; font-weight:700;">⚠️ Imagen no disponible</span> • ' + (scene.title || '');
+        }
+        if (typeof showToast === 'function') {
+          showToast('⚠️ No se pudo procesar la imagen 360 original. Mostrando vista base.');
+        }
+        var fallbackUrl = '/static/images/scene_huachon_plaza.jpg';
+        if (imgUrl !== fallbackUrl) {
+          setTimeout(function() {
+            try {
+              if (panoViewer) panoViewer.destroy();
+              panoViewer = pannellum.viewer('panorama-viewer', {
+                type: 'equirectangular',
+                panorama: fallbackUrl,
+                autoLoad: true,
+                showControls: true,
+                compass: true,
+                yaw: startYaw,
+                pitch: startPitch,
+                hotSpots: hotspotsConfig
+              });
+            } catch (_) {}
+          }, 600);
         }
       });
     } catch (err) {
@@ -1821,7 +1850,7 @@
 
   function loadSimulatorScene(scene) {
     document.getElementById('sim-scene-title').innerText = scene.sequence + '. ' + scene.title + ' (' + (scene.altitude_masl || 0) + ' m s.n.m.)';
-    var imgUrl = scene.panorama_image_url || 'https://pannellum.org/images/cerro-toco-0.jpg';
+    var imgUrl = scene.panorama_image_url || '/static/images/scene_huachon_plaza.jpg';
 
     if (simViewer) {
       try { simViewer.destroy(); } catch (_) {}

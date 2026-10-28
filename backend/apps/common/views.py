@@ -10,6 +10,26 @@ from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers
 
 from .rust_bridge import is_rust_engine_available, rust_engine_version
+from django.views.static import serve
+from django.http import HttpResponse
+
+
+def media_serve(request, path, document_root=None, show_indexes=False):
+    """
+    Sirve archivos de media en producción con cabeceras CORS permisivas
+    y cacheado optimizado para texturas 360 WebGL, audio y paquetes offline.
+    """
+    if request.method == "OPTIONS":
+        response = HttpResponse(status=200)
+    else:
+        response = serve(request, path, document_root=document_root, show_indexes=show_indexes)
+
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+    response["Access-Control-Allow-Headers"] = "*"
+    if response.status_code == 200:
+        response["Cache-Control"] = "public, max-age=86400"
+    return response
 
 
 class HealthCheckView(APIView):

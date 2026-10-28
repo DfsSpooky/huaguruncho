@@ -33,6 +33,18 @@ while True:
 END
 fi
 
+# Preparar y asegurar volumen persistente de archivos media (/app/media)
+echo "Asegurando estructura y permisos en volumen persistente de media..."
+mkdir -p /app/media/panoramas /app/media/panoramas/thumbnails /app/media/routes/covers /app/media/reports/evidences /app/media/offline_packages
+chmod -R 755 /app/media 2>/dev/null || true
+
+# Copiar imágenes base al volumen si aún no existen (sin sobreescribir subidas de usuario)
+if [ -d "/app/static/images" ]; then
+    cp -n /app/static/images/scene_huachon_plaza.jpg /app/media/panoramas/ 2>/dev/null || true
+    cp -n /app/static/images/scene_laguna_huaguruncho.jpg /app/media/panoramas/scene_laguna_huascacocha.jpg 2>/dev/null || true
+    cp -n /app/static/images/scene_mirador_glaciar.jpg /app/media/panoramas/ 2>/dev/null || true
+fi
+
 # Aplicar migraciones
 echo "Aplicando migraciones de base de datos..."
 python manage.py migrate --noinput

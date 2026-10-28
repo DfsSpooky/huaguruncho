@@ -128,6 +128,16 @@ class Route(UUIDModel, TimeStampedModel):
             except Exception:
                 pass
 
+        # Optimizar imagen de portada si fue cargada
+        if self.cover_image and getattr(self.cover_image, '_committed', True) is False and not getattr(self, '_skip_image_optimization', False):
+            try:
+                from apps.common.image_optimizer import optimize_standard_image
+                opt_file, filename = optimize_standard_image(self.cover_image, max_dimension=1920, quality=85)
+                if opt_file:
+                    self.cover_image.save(filename, opt_file, save=False)
+            except Exception:
+                pass
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -214,7 +224,21 @@ class TourScene(UUIDModel, TimeStampedModel):
         return f"{self.route.name} - Escena {self.sequence}: {self.title}"
 
     def save(self, *args, **kwargs):
-        # Auto-extraer GPS y rumbo de la imagen si no fueron especificados manualmente
+        is_new_image = False
+        if self.panorama_image:
+            if not self.pk:
+                is_new_image = True
+            else:
+                try:
+                    orig = TourScene.objects.filter(pk=self.pk).values('panorama_image').first()
+                    if orig and orig.get('panorama_image') != self.panorama_image.name:
+                        is_new_image = True
+                    elif getattr(self.panorama_image, '_committed', True) is False:
+                        is_new_image = True
+                except Exception:
+                    is_new_image = True
+
+        # 1. Auto-extraer GPS y rumbo de la imagen original antes de transformar
         if self.panorama_image and (self.latitude is None or self.longitude is None or not self.heading):
             try:
                 from apps.tourism.utils.exif_reader import extract_panorama_metadata
@@ -229,6 +253,34 @@ class TourScene(UUIDModel, TimeStampedModel):
                     self.heading = meta['heading']
             except Exception:
                 pass
+
+        # 2. Optimización WebGL inteligente (máx 4096px, 2:1 ratio, JPEG progresivo Q86)
+        if is_new_image and self.panorama_image and not getattr(self, '_skip_image_optimization', False):
+            try:
+                from apps.common.image_optimizer import optimize_panorama_image, generate_panorama_thumbnail
+                opt_file, filename = optimize_panorama_image(self.panorama_image)
+                if opt_file:
+                    self.panorama_image.save(filename, opt_file, save=False)
+
+                # Generar miniatura panorámica para selector y vista móvil
+                if not self.thumbnail:
+                    thumb_file, thumb_name = generate_panorama_thumbnail(self.panorama_image)
+                    if thumb_file:
+                        self.thumbnail.save(thumb_name, thumb_file, save=False)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning("Error optimizando panorama de escena: %s", e)
+
+        # 3. Generar miniatura si falta en escenas existentes
+        elif self.panorama_image and not self.thumbnail and not getattr(self, '_skip_image_optimization', False):
+            try:
+                from apps.common.image_optimizer import generate_panorama_thumbnail
+                thumb_file, thumb_name = generate_panorama_thumbnail(self.panorama_image)
+                if thumb_file:
+                    self.thumbnail.save(thumb_name, thumb_file, save=False)
+            except Exception:
+                pass
+
         super().save(*args, **kwargs)
 
 

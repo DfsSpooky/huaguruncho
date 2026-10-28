@@ -218,7 +218,7 @@ class _MountainWeatherScreenState extends ConsumerState<MountainWeatherScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'TELEMETRÍA SATELITAL GLACIAR · EN VIVO',
+                                    'PRONÓSTICO DEL CLIMA EN VIVO',
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w900,
@@ -228,7 +228,7 @@ class _MountainWeatherScreenState extends ConsumerState<MountainWeatherScreen> {
                                   ),
                                   SizedBox(height: 2),
                                   Text(
-                                    'Gradiente adiabático de alta montaña: la temperatura desciende ~0.65 °C por cada 100 m de ascenso.',
+                                    'El frío aumenta a medida que subes hacia el nevado. Lleva ropa de abrigo y protección contra el viento.',
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: Colors.white,

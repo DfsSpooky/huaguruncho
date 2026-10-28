@@ -450,7 +450,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 Text(
-                  'INTERFAZ 2.0 · 5,742 M · PASCO',
+                  'PASCO, PERÚ · 5,742 M',
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -635,7 +635,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'CONSOLA OFICIAL GUARDABOSQUES',
+                    'PANEL DE GUARDAPARQUES',
                     style: TextStyle(
                       color: Color(0xFF6EE7B7),
                       fontSize: 9.5,
@@ -662,7 +662,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Sección 02: Garita Digital COEL (Registro de Expedición)
+  // Sección 02: Registro de Seguridad (Antes Garita Digital)
   Widget _buildExpeditionCheckinSection(
     BuildContext context,
     dynamic activeExpedition,
@@ -701,7 +701,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     const SizedBox(width: 6),
                     const Text(
-                      'EXPEDICIÓN ACTIVA EN RUTA · COEL',
+                      'VISITA REGISTRADA EN CURSO',
                       style: TextStyle(
                         color: Color(0xFF6EE7B7),
                         fontSize: 10,
@@ -718,7 +718,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    '${activeExpedition.groupSize} MONTAÑISTAS',
+                    '${activeExpedition.groupSize} PERSONAS',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 9,
@@ -739,7 +739,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Contacto SOS: ${activeExpedition.emergencyContactName} (${activeExpedition.emergencyContactPhone})',
+              'Contacto de ayuda: ${activeExpedition.emergencyContactName} (${activeExpedition.emergencyContactPhone})',
               style: const TextStyle(
                 color: Color(0xFFCBD5E1),
                 fontSize: 11.5,
@@ -758,7 +758,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Retorno seguro confirmado en Garita Digital Huachón.'),
+                            content: Text('Retorno seguro confirmado. ¡Gracias por tu visita!'),
                             backgroundColor: AppColors.yaretaPine,
                           ),
                         );
@@ -796,9 +796,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (!isAuthenticated) {
           showAuthRequiredModal(
             context,
-            featureName: 'Garita Digital de Ascenso COEL',
+            featureName: 'Registro de Seguridad y Visita',
             description:
-                'Inicia sesión o regístrate como excursionista para declarar tu ruta de ascenso, integrantes y contacto SOS ante Defensa Civil Huachón.',
+                'Inicia sesión o regístrate para anotar tu ruta, tus acompañantes y un contacto de emergencia para que los guardaparques sepan que estás seguro.',
           );
           return;
         }
@@ -839,7 +839,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '02 // GARITA DIGITAL DE ASCENSO (COEL)',
+                    '02 // REGISTRO DE SEGURIDAD',
                     style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
@@ -849,7 +849,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Registrar Salida de Montaña',
+                    'Registrar mi Salida al Nevado',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
@@ -858,7 +858,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Protocolo preventivo de Defensa Civil Huachón antes de ascender.',
+                    'Anota tu salida para que las autoridades y guías sepan que estás en la ruta.',
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.graniteMuted,
@@ -874,7 +874,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Text(
-                'CHECK-IN',
+                'REGISTRARME',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 9.5,
@@ -916,7 +916,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(width: 7),
                 const Text(
-                  'SENDEROS CARTOGRAFIADOS',
+                  'RUTAS Y SENDEROS OFICIALES',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
@@ -929,7 +929,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             InkWell(
               onTap: () => context.go('/routes'),
               child: const Text(
-                'CATÁLOGO COMPLETO →',
+                'VER TODAS LAS RUTAS →',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
@@ -951,7 +951,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             child: const Center(
               child: Text(
-                'Sincronizando cartas topográficas de rutas...',
+                'Cargando rutas y senderos...',
                 style: TextStyle(fontSize: 12, color: AppColors.graniteMuted, fontWeight: FontWeight.w600),
               ),
             ),
@@ -1116,7 +1116,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         _buildMiniPill('${r.estimatedDurationMinutes ~/ 60}h ${r.estimatedDurationMinutes % 60}m'),
                         const Spacer(),
                         const Text(
-                          'FICHA →',
+                          'VER RUTA →',
                           style: TextStyle(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w900,
@@ -1154,7 +1154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Sección 04: Despachos Oficiales de Campo (Municipalidad de Huachón)
+  // Sección 04: Avisos y Noticias de Huachón
   Widget _buildDispatchesSection(BuildContext context, List<Map<String, dynamic>> notices) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1179,7 +1179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(width: 7),
             const Expanded(
               child: Text(
-                'DESPACHOS OFICIALES · MUNICIPALIDAD DE HUACHÓN',
+                'NOTICIAS Y AVISOS · HUACHÓN, PASCO',
                 style: TextStyle(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w900,
@@ -1282,7 +1282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Sección 05: Logística & Comunidad Altoandina
+  // Sección 05: Servicios y Comunidad
   Widget _buildCommunityLogisticsSection(BuildContext context, bool isAuthenticated) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1306,7 +1306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const SizedBox(width: 7),
             const Text(
-              'LOGÍSTICA & COMUNIDAD HUACHÓN',
+              'SERVICIOS Y COMUNIDAD DE HUACHÓN',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w900,
@@ -1322,9 +1322,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Expanded(
               child: _buildLogisticsCard(
                 icon: Icons.handshake_outlined,
-                tag: 'ARRIEROS & GUÍAS',
+                tag: 'GUÍAS Y ALOJAMIENTO',
                 title: 'Servicios Locales',
-                subtitle: 'Hospedaje rural, acémilas y gastronomía en Huachón.',
+                subtitle: 'Hospedaje, guías locales, caballos y comida típica.',
                 onTap: () => context.push('/community-services'),
               ),
             ),
@@ -1332,14 +1332,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Expanded(
               child: _buildLogisticsCard(
                 icon: Icons.forum_outlined,
-                tag: 'BITÁCORA SOCIAL',
-                title: 'Muro Centinelas',
-                subtitle: 'Crónicas y avisos de montañistas en ruta.',
+                tag: 'EXPERIENCIAS',
+                title: 'Muro de Viajeros',
+                subtitle: 'Fotos, consejos y comentarios de otros visitantes.',
                 onTap: () {
                   if (!isAuthenticated) {
                     showAuthRequiredModal(
                       context,
-                      featureName: 'Muro Social de Centinelas',
+                      featureName: 'Muro de Viajeros',
                     );
                     return;
                   }
@@ -1355,7 +1355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (!isAuthenticated) {
               showAuthRequiredModal(
                 context,
-                featureName: 'Gestor de Paquetes 100% Offline',
+                featureName: 'Descarga de Mapas sin Internet',
               );
               return;
             }
@@ -1385,7 +1385,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'MEMORIA CARTOGRÁFICA AUTÓNOMA',
+                        'USO SIN CONEXIÓN',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
@@ -1395,7 +1395,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Gestor de Paquetes 100% Offline',
+                        'Descargar Mapas para Usar sin Señal',
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w900,

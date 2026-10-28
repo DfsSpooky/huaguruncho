@@ -181,6 +181,9 @@ class RouteAdmin(admin.ModelAdmin):
             if init_pitch is not None and init_pitch != '':
                 scene.initial_pitch = float(init_pitch)
             scene.description = desc
+            pano_file = request.FILES.get('panorama_image')
+            if pano_file:
+                scene.panorama_image = pano_file
             scene.save()
 
         return render(request, 'admin/tourism/route/partials/scene_inspector.html', {

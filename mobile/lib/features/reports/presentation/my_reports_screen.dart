@@ -43,7 +43,7 @@ class MyReportsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'BITÁCORA ECO-REPORTES',
+                  'MIS REPORTES AMBIENTALES',
                   style: TextStyle(
                     color: AppColors.basaltInk,
                     fontSize: 15,
@@ -52,7 +52,7 @@ class MyReportsScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  'AUDITORÍA AMBIENTAL · OFFLINE / SERNANP',
+                  'CUIDADO DEL NEVADO · FUNCIONA SIN INTERNET',
                   style: TextStyle(
                     color: AppColors.graniteMuted,
                     fontSize: 9,
@@ -102,13 +102,13 @@ class MyReportsScreen extends ConsumerWidget {
       ),
       body: !authState.isAuthenticated
           ? const AuthRequiredView(
-              featureName: 'Bitácora de Eco-Reportes',
+              featureName: 'Mis Reportes Ambientales',
               description:
-                  'Inicia sesión o crea tu cuenta de excursionista para registrar incidencias ambientales y sincronizar tu bitácora con SERNANP y la Municipalidad de Huachón.',
+                  'Inicia sesión o regístrate para reportar problemas ambientales y ayudar a mantener limpio el Nevado Huaguruncho.',
               icon: Icons.assignment_outlined,
             )
           : reportsStream.when(
-        loading: () => const LoadingIndicator(message: 'Cargando bitácora de eco-reportes...'),
+        loading: () => const LoadingIndicator(message: 'Cargando reportes...'),
         error: (err, stack) => ErrorView(
           message: err.toString(),
           onRetry: () => ref.refresh(myReportsStreamProvider),
@@ -117,10 +117,10 @@ class MyReportsScreen extends ConsumerWidget {
           if (reports.isEmpty) {
             return EmptyStateView(
               icon: Icons.assignment_turned_in_outlined,
-              title: 'Bitácora sin registros locales',
+              title: 'Aún no tienes reportes guardados',
               description:
-                  'Documenta residuos sólidos, señalética dañada o alertas ambientales en el Nevado Huaguruncho.',
-              actionLabel: 'REGISTRAR INCIDENCIA AMBIENTAL',
+                  'Si encuentras basura, letreros rotos o algún problema en el camino, tómale una foto y repórtalo aquí.',
+              actionLabel: 'REPORTAR UN PROBLEMA',
               onAction: () => context.push('/create-report'),
             );
           }
@@ -160,7 +160,7 @@ class MyReportsScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${reports.length} INCIDENCIAS EN BITÁCORA LOCAL',
+                                  '${reports.length} REPORTES EN TU CELULAR',
                                   style: const TextStyle(
                                     color: Color(0xFF6EE7B7),
                                     fontSize: 9.5,
@@ -170,7 +170,7 @@ class MyReportsScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 const Text(
-                                  'Almacenamiento SQLite Offline · Sincronización diferida con Huachón.',
+                                  'Guardados en tu celular · Se sincronizan al conectarte a internet.',
                                   style: TextStyle(color: Colors.white70, fontSize: 11),
                                 ),
                               ],

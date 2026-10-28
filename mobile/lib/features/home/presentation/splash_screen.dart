@@ -206,7 +206,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 const Text(
-                                  'TELEMETRÍA LISTA',
+                                  'SISTEMA LISTO',
                                   style: TextStyle(
                                     fontSize: 9.5,
                                     color: Color(0xFF6EE7B7),

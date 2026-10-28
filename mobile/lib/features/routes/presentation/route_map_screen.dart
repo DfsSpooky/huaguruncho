@@ -538,12 +538,12 @@ class _RouteMapScreenState extends ConsumerState<RouteMapScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'PERFIL TOPOGRÁFICO (ALTIMETRÍA GPX)',
+                                  'ALTURA Y SUBIDAS DEL CAMINO',
                                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12.5, letterSpacing: 0.5),
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  'Curva de ascenso generada desde la telemetría',
+                                  'Gráfico de elevación a lo largo de la ruta',
                                   style: TextStyle(color: Colors.white70, fontSize: 11),
                                 ),
                               ],

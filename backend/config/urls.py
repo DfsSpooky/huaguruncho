@@ -2,7 +2,7 @@
 URL Configuration for HUAGURUNCHO 360 backend.
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import (
@@ -10,7 +10,7 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from apps.common.views import HealthCheckView, RootHealthCheckView
+from apps.common.views import HealthCheckView, RootHealthCheckView, media_serve
 
 api_v1_patterns = [
     path('health/', HealthCheckView.as_view(), name='health'),
@@ -34,8 +34,10 @@ urlpatterns = [
     path('', include('apps.landing.urls')),
 ]
 
-if settings.DEBUG or getattr(settings, 'SERVE_MEDIA_FILES', False):
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if getattr(settings, 'SERVE_MEDIA_FILES', False) or settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', media_serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

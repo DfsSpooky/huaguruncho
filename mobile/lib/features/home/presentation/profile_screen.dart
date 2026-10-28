@@ -181,7 +181,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Inicia sesión o regístrate para respaldar tus eco-reportes, sellos de conservación y bitácoras de ascenso en la plataforma oficial de Huachón.',
+                          'Inicia sesión o regístrate para guardar tus reportes, sellos de visita y recorridos en Huaguruncho.',
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.graniteMuted,

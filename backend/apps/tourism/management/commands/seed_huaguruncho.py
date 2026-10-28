@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.conf import settings
 from apps.tourism.models import (
     Route,
     TourScene,
@@ -176,6 +177,13 @@ class Command(BaseCommand):
         )
         self.stdout.write(self.style.SUCCESS('✔ Ruta piloto Huachón – Mirador Huaguruncho lista'))
 
+        # Asignar portada oficial de la ruta si no existe
+        if not route.cover_image:
+            cover_path = settings.BASE_DIR / 'static' / 'images' / 'huaguruncho_cover.jpg'
+            if cover_path.exists():
+                with open(cover_path, 'rb') as f:
+                    route.cover_image.save('huaguruncho_cover.jpg', ContentFile(f.read()), save=True)
+
         # 4. Puntos de Interés (POIs)
         pois_data = [
             ('Plaza Mayor de Huachón', PointOfInterest.POICategory.QUEBRADA, 3400, -10.605120, -75.952130, 'Villa andina tradicional, punto de inicio para la expedición al glaciar.', 1),
@@ -200,8 +208,31 @@ class Command(BaseCommand):
             )
         self.stdout.write(self.style.SUCCESS(f'✔ {len(pois_data)} puntos de interés (POIs) cargados'))
 
-        # 5. Escenas 360° y Hotspots
-        dummy_pixel = b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b'
+        # 5. Escenas 360° y Hotspots con Panoramas Reales
+        def get_bundled_panorama(static_filename, target_filename):
+            static_path = settings.BASE_DIR / 'static' / 'images' / static_filename
+            if static_path.exists():
+                with open(static_path, 'rb') as f:
+                    return ContentFile(f.read(), name=target_filename)
+            return None
+
+        def ensure_scene_panorama(scene, static_filename, target_filename):
+            needs_file = False
+            if not scene.panorama_image:
+                needs_file = True
+            else:
+                try:
+                    if not scene.panorama_image.storage.exists(scene.panorama_image.name):
+                        needs_file = True
+                    elif scene.panorama_image.size < 1000:  # Archivo dummy de 43 bytes
+                        needs_file = True
+                except Exception:
+                    needs_file = True
+
+            if needs_file:
+                cf = get_bundled_panorama(static_filename, target_filename)
+                if cf:
+                    scene.panorama_image.save(target_filename, cf, save=True)
 
         scene1, _ = TourScene.objects.get_or_create(
             route=route,
@@ -214,8 +245,7 @@ class Command(BaseCommand):
                 'is_active': True,
             }
         )
-        if not scene1.panorama_image:
-            scene1.panorama_image.save('scene_huachon_plaza.jpg', ContentFile(dummy_pixel), save=True)
+        ensure_scene_panorama(scene1, 'scene_huachon_plaza.jpg', 'scene_huachon_plaza.jpg')
 
         scene2, _ = TourScene.objects.get_or_create(
             route=route,
@@ -228,8 +258,7 @@ class Command(BaseCommand):
                 'is_active': True,
             }
         )
-        if not scene2.panorama_image:
-            scene2.panorama_image.save('scene_laguna_huascacocha.jpg', ContentFile(dummy_pixel), save=True)
+        ensure_scene_panorama(scene2, 'scene_laguna_huaguruncho.jpg', 'scene_laguna_huascacocha.jpg')
 
         scene3, _ = TourScene.objects.get_or_create(
             route=route,
@@ -242,8 +271,11 @@ class Command(BaseCommand):
                 'is_active': True,
             }
         )
-        if not scene3.panorama_image:
-            scene3.panorama_image.save('scene_mirador_glaciar.jpg', ContentFile(dummy_pixel), save=True)
+        ensure_scene_panorama(scene3, 'scene_mirador_glaciar.jpg', 'scene_mirador_glaciar.jpg')
+
+        for sc in [scene1, scene2, scene3]:
+            if sc.panorama_image and not sc.thumbnail:
+                sc.save()
 
         # Hotspots
         Hotspot.objects.update_or_create(

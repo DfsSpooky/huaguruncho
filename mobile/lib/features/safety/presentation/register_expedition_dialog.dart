@@ -83,7 +83,7 @@ class _RegisterExpeditionDialogState extends ConsumerState<RegisterExpeditionDia
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: AppColors.yaretaPine,
-            content: Text('Expedición registrada en Bitácora COEL. Buen ascenso a Huaguruncho.'),
+            content: Text('Salida registrada con éxito. ¡Que disfrutes tu visita a Huaguruncho!'),
           ),
         );
       } else {
@@ -170,7 +170,7 @@ class _RegisterExpeditionDialogState extends ConsumerState<RegisterExpeditionDia
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Defensa Civil y guardaparques monitorean esta bitácora para activar protocolo de rescate en caso de retraso.',
+                        'Los guardaparques y guías de Huachón están atentos a tu registro para ayudarte si ocurre cualquier retraso o emergencia.',
                         style: TextStyle(fontSize: 11.5, color: AppColors.basaltInk, height: 1.35),
                       ),
                     ),
@@ -349,7 +349,7 @@ class _RegisterExpeditionDialogState extends ConsumerState<RegisterExpeditionDia
                 child: _isSubmitting
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                     : const Text(
-                        'ACTIVAR BITÁCORA DE ASCENSO',
+                        'CONFIRMAR Y REGISTRAR SALIDA',
                         style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, letterSpacing: 0.5),
                       ),
               ),

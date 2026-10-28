@@ -44,7 +44,7 @@ class GuardianRepositoryImpl implements GuardianRepository {
       slug: 'centinela-ambiental',
       title: 'Centinela Ambiental de Huachón',
       quechuaTitle: 'Huachón Pachamama Waqaychaq',
-      description: 'Emitir un reporte ambiental georreferenciado verificado por la comunidad.',
+      description: 'Enviar un reporte ambiental con foto verificado por la comunidad.',
       tier: 'plata',
       tierDisplay: 'Plata',
       icon: 'verified_user',

@@ -18,36 +18,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, dynamic>> _pages = [
     {
       'index': '01 / 03',
-      'tag': 'CARTOGRAFÍA INMERSIVA 360°',
+      'tag': 'VISTAS PANORÁMICAS 360°',
       'coords': '10°31\'48"S · 5,742 M S.N.M.',
       'image': 'assets/images/huaguruncho_hero.jpg',
-      'title': 'Exploración Fotogramétrica 360°',
+      'title': 'Descubre Huaguruncho en 360°',
       'description':
-          'Inspecciona el macizo glaciar oriental del Nevado Huaguruncho mediante visores esféricos de alta resolución, hitos topográficos y audioguías en Quechua y Español.',
-      'specLabel': 'COBERTURA VISUAL',
-      'specValue': '12 Miradores Esféricos + Telemetría Solar',
+          'Conoce el hermoso nevado y sus lagunas con fotos panorámicas en 360°, datos de la ruta y relatos en Quechua y Español.',
+      'specLabel': 'QUÉ INCLUYE',
+      'specValue': '12 Miradores 360° + Pronóstico del Clima',
     },
     {
       'index': '02 / 03',
-      'tag': 'INSTRUMENTACIÓN AUTÓNOMA OFFLINE',
+      'tag': 'FUNCIONA SIN INTERNET',
       'coords': 'QUEBRADA HUACHÓN · 4,250 M',
       'image': 'assets/images/huaguruncho_trekking.jpg',
-      'title': 'Navegación GPS 100% Sin Red',
+      'title': 'Mapas y GPS sin Conexión',
       'description':
-          'Descarga cartas topográficas, perfiles de elevación y paquetes de ruta en memoria local para navegar con precisión satelital donde no existe cobertura celular.',
-      'specLabel': 'AUTONOMÍA DE CAMPO',
-      'specValue': 'Mapas Offline + Alerta de Desvío + SOS',
+          'Descarga los mapas y rutas en tu celular antes de salir para que puedas ver el camino y tu ubicación aunque no tengas señal.',
+      'specLabel': 'HERRAMIENTAS',
+      'specValue': 'Mapas sin Internet + Botón de Ayuda SOS',
     },
     {
       'index': '03 / 03',
-      'tag': 'PROTOCOLO HUELLA CERO & SERNANP',
+      'tag': 'CUIDADO DE LA NATURALEZA',
       'coords': 'COMUNIDAD DE HUACHÓN · PASCO',
       'image': 'assets/images/huachon_village.jpg',
-      'title': 'Bitácora & Auditoría Ambiental',
+      'title': 'Viaje Seguro y Responsable',
       'description':
-          'Registra tu ingreso en la Garita Digital COEL, audita tus bolsas de residuos al retornar y reporta incidencias ecológicas georreferenciadas en tiempo real.',
-      'specLabel': 'SINCRONIZACIÓN DIFERIDA',
-      'specValue': 'SQLite Local → Servidor Municipal Huachón',
+          'Anota tu salida para caminar seguro, regresa con toda tu basura para cuidar el nevado y reporta si ves algún daño en el camino.',
+      'specLabel': 'RESPALDO',
+      'specValue': 'Funciona sin señal y se sincroniza con internet',
     },
   ];
 

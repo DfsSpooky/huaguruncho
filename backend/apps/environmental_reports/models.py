@@ -130,3 +130,23 @@ class ReportEvidence(models.Model):
 
     def __str__(self):
         return f"Evidencia para Reporte #{self.report_id}"
+
+    def save(self, *args, **kwargs):
+        is_new_image = False
+        if self.image:
+            if not self.pk:
+                is_new_image = True
+            elif getattr(self.image, '_committed', True) is False:
+                is_new_image = True
+
+        if is_new_image and self.image and not getattr(self, '_skip_image_optimization', False):
+            try:
+                from apps.common.image_optimizer import optimize_standard_image
+                opt_file, filename = optimize_standard_image(self.image, max_dimension=1920, quality=84)
+                if opt_file:
+                    self.image.save(filename, opt_file, save=False)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning("No se pudo optimizar evidencia de reporte: %s", e)
+
+        super().save(*args, **kwargs)

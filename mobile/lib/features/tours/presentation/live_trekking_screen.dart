@@ -861,7 +861,7 @@ class _LiveTrekkingScreenState extends ConsumerState<LiveTrekkingScreen> {
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                'TRACK GPX: ${_distanceCoveredKm.toStringAsFixed(1)} / ${totalDistance.toStringAsFixed(1)} KM (${(progressPercent * 100).toStringAsFixed(0)}%)',
+                                'AVANCE: ${_distanceCoveredKm.toStringAsFixed(1)} / ${totalDistance.toStringAsFixed(1)} KM (${(progressPercent * 100).toStringAsFixed(0)}%)',
                                 style: const TextStyle(
                                   color: AppColors.basaltInk,
                                   fontSize: 10,
@@ -967,7 +967,7 @@ class _LiveTrekkingScreenState extends ConsumerState<LiveTrekkingScreen> {
                         child: _buildMetricTile(
                           label: 'Desvío Sendero',
                           value: '${_distanceToTrailM.toStringAsFixed(0)} m',
-                          subtext: _isOffTrailAlert ? 'Fuera de trazo' : 'Vector nominal',
+                          subtext: _isOffTrailAlert ? 'Fuera del camino' : 'En el sendero correcto',
                           icon: Icons.alt_route_rounded,
                           accentColor: _isOffTrailAlert ? AppColors.error : AppColors.yaretaPine,
                         ),
@@ -975,9 +975,9 @@ class _LiveTrekkingScreenState extends ConsumerState<LiveTrekkingScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _buildMetricTile(
-                          label: 'Desnivel +D',
+                          label: 'Subida acumulada',
                           value: '+${route?.elevationGainM.toInt() ?? 639} m',
-                          subtext: 'Capa: ${_currentLayer.toUpperCase()}',
+                          subtext: 'Mapa: ${_currentLayer.toUpperCase()}',
                           icon: Icons.trending_up_rounded,
                           accentColor: AppColors.yaretaPine,
                         ),
@@ -1008,7 +1008,7 @@ class _LiveTrekkingScreenState extends ConsumerState<LiveTrekkingScreen> {
                                 SizedBox(width: 6),
                                 Flexible(
                                   child: Text(
-                                    'REPORTAR INCIDENCIA',
+                                    'REPORTAR PROBLEMA',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(

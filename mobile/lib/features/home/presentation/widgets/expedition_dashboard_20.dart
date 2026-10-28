@@ -167,14 +167,14 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
         const SizedBox(height: 18),
 
         // ==========================================
-        // 4. ENCABEZADO SECCIÓN 01 // INSTRUMENTACIÓN BENTO
+        // 4. ENCABEZADO SECCIÓN 01 // GUÍAS Y HERRAMIENTAS
         // ==========================================
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: _buildSectionHeader(
             index: '01',
-            title: 'INSTRUMENTACIÓN DE CAMPO',
-            subtitle: 'Módulos tácticos de alta montaña & conservación',
+            title: 'GUÍAS Y HERRAMIENTAS',
+            subtitle: 'Todo lo que necesitas para tu visita y el cuidado del nevado',
           ),
         ),
 
@@ -315,8 +315,8 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                           const SizedBox(width: 4),
                           Text(
                             widget.isOnline
-                                ? 'TELEMETRÍA EN LÍNEA'
-                                : 'MODO CORDILLERA',
+                                ? 'CONEXIÓN EN LÍNEA'
+                                : 'MODO SIN INTERNET',
                             style: TextStyle(
                               fontSize: 9.5,
                               fontWeight: FontWeight.w900,
@@ -508,7 +508,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
-                          'REGISTRO N° 24-ALP',
+                          'NEVADO HUAGURUNCHO',
                           style: TextStyle(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w900,
@@ -646,7 +646,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
             ),
           ),
 
-          // Franja Inferior de Telemetría Solar & Satelital
+          // Franja Inferior de Luz Solar y Estado
           Container(
             color: AppColors.pureWhite,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -657,7 +657,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'VENTANA SOLAR',
+                        'HORAS DE LUZ',
                         style: TextStyle(
                           fontSize: 8.5,
                           color: AppColors.graniteMuted,
@@ -681,7 +681,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ESTADO GLACIAR',
+                        'ESTADO DEL TIEMPO',
                         style: TextStyle(
                           fontSize: 8.5,
                           color: AppColors.graniteMuted,
@@ -690,7 +690,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'ESTABLE · NIEVE FIRME',
+                        'DESPEJADO · APTO',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -705,7 +705,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        'SEÑAL GPS / IRIDIUM',
+                        'SEÑAL GPS',
                         style: TextStyle(
                           fontSize: 8.5,
                           color: AppColors.graniteMuted,
@@ -714,7 +714,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        '100% FIJADA',
+                        'CONECTADO',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
@@ -778,7 +778,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.isRangerOrAdmin ? 'GARITA GUARDAPARQUES' : 'PROTOCOLO ALPINO',
+                          widget.isRangerOrAdmin ? 'CONTROL GUARDAPARQUES' : 'GUÍA DE SEGURIDAD',
                           style: const TextStyle(
                             fontSize: 8.5,
                             fontWeight: FontWeight.w900,
@@ -787,7 +787,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          widget.isRangerOrAdmin ? 'CONTROL HUACHÓN' : 'SEGURIDAD > 4,000M',
+                          widget.isRangerOrAdmin ? 'PUESTO HUACHÓN' : 'CONSEJOS PARA LA ALTURA',
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w900,
@@ -806,7 +806,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
 
         const SizedBox(width: 10),
 
-        // Botón SOS Satelital Táctico
+        // Botón SOS de Ayuda
         Expanded(
           flex: 5,
           child: InkWell(
@@ -832,12 +832,12 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                   Icon(Icons.emergency_share_outlined, color: Colors.white, size: 17),
                   SizedBox(width: 6),
                   Text(
-                    'ALERTA SOS',
+                    'PEDIR AYUDA SOS',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 11.5,
+                      fontSize: 11,
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 0.6,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
@@ -884,7 +884,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                         Icon(Icons.north_east_rounded, size: 14, color: AppColors.cordilleraOchre),
                         SizedBox(width: 4),
                         Text(
-                          'PERFIL ALTIMÉTRICO OFICIAL',
+                          'MAPA Y ALTURA DE LA RUTA',
                           style: TextStyle(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w900,
@@ -901,7 +901,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
-                        'NIVEL: EXIGENTE',
+                        'NIVEL: MODERADO',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
@@ -923,7 +923,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Ascenso por quebrada morrénica, cruce de pedreras fósiles y paso por humedales altoandinos.',
+                  'Caminata por el valle, cruce de senderos rocosos y paso por hermosas lagunas y bofedales andinos.',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -932,7 +932,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Rejilla de telemetría de 4 columnas
+                // Rejilla de datos de 4 columnas
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.alpineChalk,
@@ -943,16 +943,16 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     children: [
                       _TelemetryColumn(label: 'DISTANCIA', value: '8.4 km'),
                       _TelemetryDivider(),
-                      _TelemetryColumn(label: 'DESNIVEL', value: '+720 m', valueColor: AppColors.cordilleraOchre),
+                      _TelemetryColumn(label: 'SUBIDA', value: '+720 m', valueColor: AppColors.cordilleraOchre),
                       _TelemetryDivider(),
-                      _TelemetryColumn(label: 'TIEMPO EST.', value: '4h 30m'),
+                      _TelemetryColumn(label: 'TIEMPO APROX.', value: '4h 30m'),
                       _TelemetryDivider(),
-                      _TelemetryColumn(label: 'ALT. MAX', value: '4,680 m'),
+                      _TelemetryColumn(label: 'ALTURA MÁX.', value: '4,680 m'),
                     ],
                   ),
                 ),
                 const SizedBox(height: 14),
-                // Gráfico vectorial de elevación topográfica
+                // Gráfico vectorial de elevación
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.pureWhite,
@@ -970,7 +970,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                               Icon(Icons.show_chart_rounded, size: 14, color: AppColors.basaltInk),
                               SizedBox(width: 4),
                               Text(
-                                'CURVA DE ELEVACIÓN TOPOGRÁFICA',
+                                'SUBIDAS Y BAJADAS DEL CAMINO',
                                 style: TextStyle(
                                   fontSize: 8.5,
                                   fontWeight: FontWeight.w900,
@@ -980,7 +980,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                             ],
                           ),
                           Text(
-                            'GRADIENTE: 14.2%',
+                            'PENDIENTE: 14%',
                             style: TextStyle(
                               fontSize: 8.5,
                               fontWeight: FontWeight.w700,
@@ -1036,7 +1036,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                         Icon(Icons.gps_fixed_rounded, size: 15, color: AppColors.cordilleraOchre),
                         SizedBox(width: 8),
                         Text(
-                          'INICIAR NAVEGACIÓN GPS EN VIVO',
+                          'ABRIR MAPA Y SEGUIMIENTO EN VIVO',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11.5,
@@ -1062,7 +1062,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
   Widget _buildBentoModularGrid(BuildContext context) {
     return Column(
       children: [
-        // FILA 1: Tours 360° + Auditoría Huella Cero
+        // FILA 1: Tours 360° + Control de Basura
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1070,10 +1070,10 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
               child: _buildBentoCard(
                 context: context,
                 tag: 'VISTA 360°',
-                badgeText: 'ESFÉRICO',
+                badgeText: 'FOTOS 360°',
                 tagColor: AppColors.cordilleraOchre,
                 title: 'Miradores 360°',
-                subtitle: 'Inspección esférica de glaciares y lagunas.',
+                subtitle: 'Mira fotos panorámicas de lagunas y glaciares.',
                 contentWidget: Container(
                   height: 44,
                   decoration: BoxDecoration(
@@ -1093,12 +1093,12 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: const Text(
-                      'PANORAMA GIGAPIXEL',
+                      'FOTO PANORÁMICA',
                       style: TextStyle(color: Colors.white, fontSize: 7.5, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
-                actionLabel: 'ABRIR VISOR 360°',
+                actionLabel: 'VER EN 360°',
                 onTap: () => _requireAuth(
                   context,
                   'Miradores Esféricos 360°',
@@ -1110,11 +1110,11 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
             Expanded(
               child: _buildBentoCard(
                 context: context,
-                tag: 'HUELLA CERO',
-                badgeText: 'SERNANP',
+                tag: 'CUIDADO AMBIENTAL',
+                badgeText: 'SIN BASURA',
                 tagColor: AppColors.yaretaPine,
-                title: 'Control Residuos',
-                subtitle: 'Conteo de bolsas selladas al descender.',
+                title: 'Control de Basura',
+                subtitle: 'Anota cuántas bolsas de residuos bajas.',
                 contentWidget: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
@@ -1126,7 +1126,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'BOLSAS\nSELLADAS',
+                        'BOLSAS\nRETORNADAS',
                         style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: AppColors.graniteMuted),
                       ),
                       Row(
@@ -1167,7 +1167,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     ],
                   ),
                 ),
-                actionLabel: widget.isRangerOrAdmin ? 'GARITA CHECKPOINT' : 'CÓDIGO HUELLA CERO',
+                actionLabel: widget.isRangerOrAdmin ? 'CONTROL GUARDAPARQUES' : 'CÓDIGO DE CUIDADO',
                 onTap: () => context.push(widget.isRangerOrAdmin ? '/ranger-checkpoint' : '/responsible-use'),
               ),
             ),
@@ -1175,18 +1175,18 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
         ),
         const SizedBox(height: 10),
 
-        // FILA 2: Clima Glaciar + Biodiversidad Altoandina
+        // FILA 2: Clima + Flora y Fauna
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: _buildBentoCard(
                 context: context,
-                tag: 'METEOROLOGÍA',
-                badgeText: 'SENAMHI',
+                tag: 'CLIMA',
+                badgeText: 'TIEMPO',
                 tagColor: AppColors.basaltInk,
-                title: 'Clima y Glaciares',
-                subtitle: 'Estaciones de altura, radiación UV e isoterma.',
+                title: 'Clima y Nevado',
+                subtitle: 'Temperatura, viento, lluvia y sol.',
                 contentWidget: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -1208,7 +1208,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     ],
                   ),
                 ),
-                actionLabel: 'MONITOR CLIMÁTICO',
+                actionLabel: 'VER EL CLIMA',
                 onTap: () => context.push('/mountain-weather'),
               ),
             ),
@@ -1216,11 +1216,11 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
             Expanded(
               child: _buildBentoCard(
                 context: context,
-                tag: 'BIODIVERSIDAD',
-                badgeText: 'ENDÉMICA',
+                tag: 'NATURALEZA',
+                badgeText: 'LOCAL',
                 tagColor: AppColors.yaretaPine,
                 title: 'Flora y Fauna',
-                subtitle: 'Puya Raimondi, Taruca, Cóndor y Polylepis.',
+                subtitle: 'Puya Raimondi, cóndor, taruca y más.',
                 contentWidget: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -1234,14 +1234,14 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                       SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'HERBARIO & AVIFAUNA GEORREFERENCIADA',
+                          'FOTOS DE PLANTAS Y ANIMALES',
                           style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w800, color: AppColors.basaltInk),
                         ),
                       ),
                     ],
                   ),
                 ),
-                actionLabel: 'CATÁLOGO ESPECIES',
+                actionLabel: 'VER ESPECIES',
                 onTap: () => context.push('/biodiversity'),
               ),
             ),
@@ -1249,18 +1249,18 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
         ),
         const SizedBox(height: 10),
 
-        // FILA 3: Mochila Técnica + Pasaporte Guardián
+        // FILA 3: Mochila y Ropa + Sellos de Visita
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: _buildBentoCard(
                 context: context,
-                tag: 'EQUIPAMIENTO',
-                badgeText: '3 CAPAS',
+                tag: 'EQUIPAJE',
+                badgeText: 'ROPA',
                 tagColor: AppColors.cordilleraOchre,
-                title: 'Mochila Técnica',
-                subtitle: 'Calculadora de peso y equipo de alta montaña.',
+                title: '¿Qué llevar?',
+                subtitle: 'Lista de ropa abrigadora y cosas útiles.',
                 contentWidget: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -1271,15 +1271,15 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('PROTOCOLO:', style: TextStyle(fontSize: 8, color: AppColors.graniteMuted, fontWeight: FontWeight.w700)),
-                      Text('CUMBRE > 4,500M', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.basaltInk)),
+                      Text('CONSEJO:', style: TextStyle(fontSize: 8, color: AppColors.graniteMuted, fontWeight: FontWeight.w700)),
+                      Text('LLEVA ROPA DE FRÍO', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.basaltInk)),
                     ],
                   ),
                 ),
-                actionLabel: 'CHECKLIST EQUIPO',
+                actionLabel: 'VER LISTA DE EQUIPO',
                 onTap: () => _requireAuth(
                   context,
-                  'Mochila Técnica y Checklist de Ascenso',
+                  'Mochila y Cosas que Llevar',
                   () => context.push('/trekking-checklist'),
                 ),
               ),
@@ -1288,11 +1288,11 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
             Expanded(
               child: _buildBentoCard(
                 context: context,
-                tag: 'CREDENCIAL',
-                badgeText: 'LNT',
+                tag: 'RECUERDOS',
+                badgeText: 'LOGROS',
                 tagColor: AppColors.basaltInk,
-                title: 'Pasaporte Eco',
-                subtitle: 'Sellos de cumbre y juramento No Deje Rastro.',
+                title: 'Sellos de Visita',
+                subtitle: 'Sellos digitales y compromiso ambiental.',
                 contentWidget: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -1303,15 +1303,15 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('RANGO:', style: TextStyle(fontSize: 8, color: AppColors.graniteMuted, fontWeight: FontWeight.w700)),
-                      Text('CENTINELA ANDINO', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.yaretaPine)),
+                      Text('NIVEL:', style: TextStyle(fontSize: 8, color: AppColors.graniteMuted, fontWeight: FontWeight.w700)),
+                      Text('AMIGO DEL NEVADO', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.yaretaPine)),
                     ],
                   ),
                 ),
-                actionLabel: 'VER SELLOS',
+                actionLabel: 'VER MIS SELLOS',
                 onTap: () => _requireAuth(
                   context,
-                  'Pasaporte Guardián de Cumbre',
+                  'Pasaporte de Sellos',
                   () => context.push('/guardian-passport'),
                 ),
               ),
@@ -1320,18 +1320,18 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
         ),
         const SizedBox(height: 10),
 
-        // FILA 4: Navegación GPS en Vivo + Nuevo Eco-Reporte
+        // FILA 4: Mapa en Vivo + Reporte Ambiental
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: _buildBentoCard(
                 context: context,
-                tag: 'NAVEGACIÓN',
-                badgeText: 'GPS 14 SAT',
+                tag: 'MAPA EN VIVO',
+                badgeText: 'GPS',
                 tagColor: AppColors.basaltInk,
-                title: 'Tracker en Vivo',
-                subtitle: 'Hito rocoso con alerta de desvío de sendero.',
+                title: 'Seguir el Camino',
+                subtitle: 'Mira tu posición en el mapa para no perderte.',
                 contentWidget: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -1349,10 +1349,10 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                     ),
                   ),
                 ),
-                actionLabel: 'ABRIR TRACKER GPS',
+                actionLabel: 'ABRIR MAPA EN VIVO',
                 onTap: () => _requireAuth(
                   context,
-                  'Tracker Satelital GPS en Vivo',
+                  'Mapa GPS en Vivo',
                   () => context.push('/live-trekking'),
                 ),
               ),
@@ -1361,11 +1361,11 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
             Expanded(
               child: _buildBentoCard(
                 context: context,
-                tag: 'ALERTA ECO',
-                badgeText: 'PRIORIDAD',
+                tag: 'CUIDAR EL LUGAR',
+                badgeText: 'AVISO',
                 tagColor: AppColors.cordilleraOchre,
-                title: 'Reporte Ambiental',
-                subtitle: 'Incidencias con foto y coordenadas offline.',
+                title: 'Reportar Problema',
+                subtitle: 'Avisa con foto si ves basura o caminos dañados.',
                 contentWidget: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -1379,7 +1379,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                       SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          'FOTO + GPS FIX',
+                          'FOTO + LUGAR EXACTO',
                           style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.basaltInk),
                         ),
                       ),
@@ -1389,7 +1389,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                 actionLabel: 'CREAR REPORTE',
                 onTap: () => _requireAuth(
                   context,
-                  'Reporte Ambiental Georreferenciado',
+                  'Reportar Problema Ambiental',
                   () => context.push('/create-report'),
                 ),
               ),
@@ -1512,7 +1512,7 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
     );
   }
 
-  // 6. Cuaderno de Campo & Bitácora Técnica
+  // 6. Consejos y Recomendaciones Útiles para la Visita
   Widget _buildFieldNotesCard() {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1529,10 +1529,10 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.menu_book_rounded, size: 14, color: AppColors.basaltInk),
+                  Icon(Icons.info_outline_rounded, size: 14, color: AppColors.basaltInk),
                   SizedBox(width: 6),
                   Text(
-                    'BITÁCORA TÉCNICA DE CAMPO',
+                    'CONSEJOS ÚTILES PARA EL CAMINO',
                     style: TextStyle(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w900,
@@ -1543,23 +1543,23 @@ class _ExpeditionDashboard20State extends State<ExpeditionDashboard20> {
                 ],
               ),
               Text(
-                'SERNANP · SECTOR PASCO',
+                'MUNICIPALIDAD DE HUACHÓN',
                 style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w700, color: AppColors.graniteMuted),
               ),
             ],
           ),
           const SizedBox(height: 10),
           _buildFieldNoteRow(
-            code: '01 / GEOLOGÍA',
-            text: 'Formación granítica y morrenas laterales activas sobre los 4,500 m. Uso obligatorio de casco en canaletas.',
+            code: '01 / TERRENO',
+            text: 'Hay zonas con piedras sueltas sobre los 4,500 m. Camina con buen calzado y a paso firme.',
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 6),
             child: Divider(color: AppColors.glacialBorder, height: 1),
           ),
           _buildFieldNoteRow(
-            code: '02 / HIDROGRAFÍA',
-            text: 'Cuenca glaciar tributaria de las lagunas Tauricocha y Huascacocha. Prohibido usar detergentes.',
+            code: '02 / CUIDA EL AGUA',
+            text: 'Las lagunas de Tauricocha y Huascacocha son fuentes de vida. Por favor no arrojes basura ni uses jabón en el agua.',
           ),
         ],
       ),

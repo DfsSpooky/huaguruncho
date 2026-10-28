@@ -137,9 +137,9 @@ class _Tour360ScreenState extends ConsumerState<Tour360Screen> {
                     ),
                   ),
                   content: const Text(
-                    '▪ Desliza en cualquier eje para inspeccionar la cuenca glaciar en 360°.\n'
-                    '▪ Pellizca con dos dedos para acercar cumbres, morrenas y grietas.\n'
-                    '▪ Toca los marcadores topográficos (hotspots) para abrir telemetría o saltar de mirador.',
+                    '▪ Desliza en cualquier dirección para mirar el paisaje en 360°.\n'
+                    '▪ Pellizca con dos dedos para acercar cumbres y lagunas.\n'
+                    '▪ Toca los puntos interactivos para ver información o cambiar de mirador.',
                     style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 12.5, height: 1.45),
                   ),
                   actions: [

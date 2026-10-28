@@ -352,7 +352,7 @@ class _EmergencySosScreenState extends ConsumerState<EmergencySosScreen> {
                       const SizedBox(width: 6),
                       const Expanded(
                         child: Text(
-                          'TELEMETRÍA DE POSICIÓN PARA EXTRACCIÓN',
+                          'TU UBICACIÓN EXACTA PARA AYUDA',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

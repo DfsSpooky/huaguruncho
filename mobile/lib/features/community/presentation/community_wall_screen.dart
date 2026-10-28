@@ -35,7 +35,7 @@ class _CommunityWallScreenState extends ConsumerState<CommunityWallScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.basaltInk,
-          content: const Text('Inicia sesión como excursionista para publicar en la bitácora.'),
+          content: const Text('Inicia sesión para compartir fotos y consejos en el muro.'),
           action: SnackBarAction(
             label: 'INGRESAR',
             textColor: AppColors.cordilleraOchre,
@@ -81,7 +81,7 @@ class _CommunityWallScreenState extends ConsumerState<CommunityWallScreen> {
                     children: [
                       const Expanded(
                         child: Text(
-                          'PUBLICAR EN BITÁCORA COMUNITARIA',
+                          'COMPARTIR EN EL MURO DE VIAJEROS',
                           style: TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w900,
@@ -258,8 +258,8 @@ class _CommunityWallScreenState extends ConsumerState<CommunityWallScreen> {
                                 : AppColors.cordilleraOchre,
                             content: Text(
                               success
-                                  ? '✓ Publicación enviada a la bitácora.'
-                                  : '✓ Publicación guardada en bitácora local.',
+                                  ? '✓ Publicación compartida en el muro.'
+                                  : '✓ Guardada en tu celular. Se publicará cuando tengas señal.',
                             ),
                           ),
                         );

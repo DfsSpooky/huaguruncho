@@ -226,7 +226,7 @@ class ReportDetailScreen extends ConsumerWidget {
                 // Coordenadas GPS con botón copiar
                 if (report.latitude != null && report.longitude != null) ...[
                   const Text(
-                    'TELEMETRÍA SATELITAL (WGS84)',
+                    'UBICACIÓN GPS DEL LUGAR',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
