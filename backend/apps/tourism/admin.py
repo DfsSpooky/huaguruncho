@@ -62,6 +62,7 @@ class RouteAdmin(admin.ModelAdmin):
         'is_active',
         'created_at'
     )
+    list_display_links = ('cover_preview', 'name')
     list_filter = ('difficulty', 'is_active', 'created_at')
     search_fields = ('name', 'description', 'safety_recommendations')
     prepopulated_fields = {'slug': ('name',)}
@@ -338,8 +339,8 @@ class RouteAdmin(admin.ModelAdmin):
                     route.distance_km = res.get('total_distance_km')
                 if res.get('estimated_duration_minutes'):
                     route.estimated_duration_minutes = res.get('estimated_duration_minutes')
-                if res.get('difficulty'):
-                    route.difficulty = res.get('difficulty')
+                if not route.difficulty and res.get('difficulty'):
+                    route.difficulty = str(res.get('difficulty')).lower()
                 route.save()
 
                 if import_waypoints and res.get('waypoints'):
@@ -481,8 +482,10 @@ class RouteAdmin(admin.ModelAdmin):
             Route.Difficulty.FACIL: ('#DCFCE7', '#15803D', '🟢'),
             Route.Difficulty.MODERADA: ('#FEF3C7', '#B45309', '🟡'),
             Route.Difficulty.DIFICIL: ('#FEE2E2', '#B91C1C', '🔴'),
+            Route.Difficulty.EXPERTO: ('#F3E8FF', '#7E22CE', '🟣'),
         }
-        bg, fg, icon = config.get(obj.difficulty, ('#F1F5F9', '#475569', '⚪'))
+        diff_key = (obj.difficulty or '').lower()
+        bg, fg, icon = config.get(diff_key, ('#F1F5F9', '#475569', '⚪'))
         return format_html(
             '<span class="hp-badge" style="background: {}; color: {};">{} {}</span>',
             bg, fg, icon, obj.get_difficulty_display()

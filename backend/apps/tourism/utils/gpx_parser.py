@@ -66,17 +66,18 @@ def calculate_difficulty_level(
     max_altitude_m: float = 0.0
 ) -> str:
     """
-    Determina automáticamente el nivel de dificultad montañera según la escala MIDE/FEDME:
-    FACIL | MODERADA | DIFICIL | EXPERTO
+    Determina automáticamente el nivel de dificultad montañera según la escala MIDE/FEDME
+    adaptada a la altitud andina de la Cordillera de Huaguruncho (Pasco, Perú):
+    facil | moderada | dificil | experto
     """
-    if distance_km < 7.0 and elevation_gain_m < 350.0 and max_altitude_m < 3800:
-        return "FACIL"
-    elif distance_km <= 14.0 and elevation_gain_m <= 750.0 and max_altitude_m < 4200:
-        return "MODERADA"
-    elif distance_km <= 22.0 and elevation_gain_m <= 1300.0 and max_altitude_m < 4600:
-        return "DIFICIL"
+    if distance_km < 8.0 and elevation_gain_m < 400.0 and max_altitude_m < 4200.0:
+        return "facil"
+    elif distance_km <= 16.0 and elevation_gain_m <= 850.0 and max_altitude_m < 4600.0:
+        return "moderada"
+    elif distance_km <= 24.0 and elevation_gain_m <= 1400.0 and max_altitude_m < 5000.0:
+        return "dificil"
     else:
-        return "EXPERTO"
+        return "experto"
 
 
 def simplify_points_rdp(points: List[List[float]], epsilon: float = 0.00008) -> List[List[float]]:
@@ -132,6 +133,8 @@ def parse_gpx_content(gpx_text: str) -> Dict[str, Any]:
     """
     rust_res = rust_parse_gpx_content(gpx_text)
     if rust_res is not None:
+        if isinstance(rust_res, dict) and 'difficulty' in rust_res and rust_res['difficulty']:
+            rust_res['difficulty'] = str(rust_res['difficulty']).lower()
         return rust_res
 
     try:

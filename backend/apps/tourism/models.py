@@ -10,6 +10,7 @@ class Route(UUIDModel, TimeStampedModel):
         FACIL = 'facil', 'Fácil'
         MODERADA = 'moderada', 'Moderada'
         DIFICIL = 'dificil', 'Difícil'
+        EXPERTO = 'experto', 'Experto'
 
     name = models.CharField(
         max_length=200,
@@ -104,7 +105,11 @@ class Route(UUIDModel, TimeStampedModel):
         if not self.slug:
             self.slug = slugify(self.name)
 
-        # Auto-procesar GPX: extraer distancias, desniveles, duraciones y dificultad sin requerir ingreso manual
+        # Normalizar nivel de dificultad a minúsculas canónicas
+        if self.difficulty:
+            self.difficulty = str(self.difficulty).lower()
+
+        # Auto-procesar GPX: extraer distancias, desniveles y perfil altimétrico
         if self.gpx_file:
             try:
                 from apps.tourism.utils.gpx_parser import parse_gpx_content
@@ -119,10 +124,12 @@ class Route(UUIDModel, TimeStampedModel):
                     self.max_altitude_m = int(res.get('max_altitude_m', 0))
                     self.min_altitude_m = int(res.get('min_altitude_m', 0))
                     self.distance_km = res.get('total_distance_km', 0.0)
-                    if res.get('estimated_duration_minutes'):
+                    if res.get('estimated_duration_minutes') and not self.estimated_duration_minutes:
                         self.estimated_duration_minutes = res.get('estimated_duration_minutes')
-                    if res.get('difficulty'):
-                        self.difficulty = res.get('difficulty')
+                    # Respetar siempre la dificultad elegida manualmente por el administrador.
+                    # Sólo auto-asignar si el campo de dificultad no fue definido previamente.
+                    if not self.difficulty and res.get('difficulty'):
+                        self.difficulty = str(res.get('difficulty')).lower()
                     if (not self.name or self.name.strip() in ['Nueva Ruta', 'Ruta GPX']) and res.get('track_name'):
                         self.name = res.get('track_name')
             except Exception:
