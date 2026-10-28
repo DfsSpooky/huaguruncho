@@ -5,6 +5,7 @@ class SceneModel {
   final String title;
   final String description;
   final String? panoramaImageUrl;
+  final String? thumbnailUrl;
   final String? panoramaAsset;
   final String? panoramaLocalPath;
   final double? latitude;
@@ -21,6 +22,7 @@ class SceneModel {
     required this.title,
     required this.description,
     this.panoramaImageUrl,
+    this.thumbnailUrl,
     this.panoramaAsset,
     this.panoramaLocalPath,
     this.latitude,
@@ -43,6 +45,7 @@ class SceneModel {
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       panoramaImageUrl: json['panorama_image_url']?.toString(),
+      thumbnailUrl: json['thumbnail_url']?.toString(),
       panoramaAsset: json['panorama_asset']?.toString(),
       panoramaLocalPath: json['panorama_local_path']?.toString(),
       latitude: _parseDoubleNullable(json['latitude']),
