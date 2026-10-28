@@ -803,6 +803,54 @@
     justify-content: flex-end;
     gap: 10px;
   }
+
+  /* Hotspots personalizadas de alta definición en Pannellum */
+  .pnlm-custom-hotspot {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.45) !important;
+    font-size: 17px !important;
+    user-select: none !important;
+  }
+  .pnlm-custom-hotspot:hover {
+    transform: scale(1.22) !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+  }
+  .pnlm-hotspot-photo {
+    background: linear-gradient(135deg, #A43716 0%, #D85A30 100%) !important;
+    border: 2.5px solid #FFFFFF !important;
+  }
+  .pnlm-hotspot-nav {
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%) !important;
+    border: 2.5px solid #FFFFFF !important;
+  }
+  .pnlm-hotspot-info {
+    background: linear-gradient(135deg, #1e8e3e 0%, #34a853 100%) !important;
+    border: 2.5px solid #FFFFFF !important;
+  }
+  .pnlm-hotspot-warning {
+    background: linear-gradient(135deg, #ea8600 0%, #f9ab00 100%) !important;
+    border: 2.5px solid #FFFFFF !important;
+  }
+  .pnlm-hotspot-audio {
+    background: linear-gradient(135deg, #9334e6 0%, #a142f4 100%) !important;
+    border: 2.5px solid #FFFFFF !important;
+  }
+  .pnlm-tooltip span {
+    font-family: 'Google Sans', Roboto, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+    background: rgba(25, 28, 31, 0.92) !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
+  }
 </style>
 {% endblock %}
 
@@ -832,6 +880,17 @@
     </div>
     
     <div class="top-bar-actions">
+      <!-- Guardar Recorrido y Sincronización Global -->
+      <div class="studio-sync-box" style="display: flex; align-items: center; gap: 8px; margin-right: 6px;">
+        <span id="studio-global-status" style="font-size: 11.5px; font-weight: 600; color: #1e8e3e; display: flex; align-items: center; gap: 5px;">
+          <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #1e8e3e; display: inline-block;"></span>
+          Guardado sincronizado
+        </span>
+        <button type="button" class="btn-google btn-google-primary" onclick="handleGlobalSaveAndSync()" style="font-weight: 600; background: #1a73e8; color: white;" title="Guardar todos los cambios del recorrido y sincronizar">
+          💾 Guardar Recorrido
+        </button>
+      </div>
+
       <!-- Segmented View Mode -->
       <div class="segmented-control">
         <button id="mode-split-btn" class="segmented-btn active" onclick="setViewMode('split')">🌓 Dividido</button>
@@ -846,6 +905,7 @@
         hx-target="#scenes-list-container"
         hx-swap="innerHTML"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-on::after-request="if (event.detail.successful) { window.syncStudioState({ showToastMsg: '⚡ Nodos 360° generados y sincronizados' }); }"
         onclick="showToast('⚡ Generando y enlazando nodos 360° a lo largo del sendero GPX...')">
         ⚡ Auto-Generar Nodos
       </button>
@@ -857,12 +917,13 @@
         hx-target="#scenes-list-container"
         hx-swap="innerHTML"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-on::after-request="if (event.detail.successful) { window.syncStudioState({ refreshHotspots: true, showToastMsg: '🔗 Enlaces Street View sincronizados' }); }"
         onclick="showToast('🔗 Conectando nodos en cadena Street View...')">
         🔗 Enlazar Nodos
       </button>
 
       <!-- Simulador de Recorrido Virtual -->
-      <button class="btn-google btn-google-primary" onclick="startVirtualTourSimulator()">
+      <button class="btn-google" onclick="startVirtualTourSimulator()">
         🚶 Simular Recorrido
       </button>
 
@@ -933,12 +994,22 @@
             1. Plaza Mayor de Huachón (Punto de Partida)
           </div>
 
+          <!-- Banner Flotante de Modo Colocación -->
+          <div id="placement-hud-banner" style="display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(25, 28, 31, 0.94); color: #ffffff; padding: 7px 16px; border-radius: 24px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.45); align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2);">
+            <span>🎯 <b>Modo Colocación Activo:</b> Gira la foto y haz un clic en el punto exacto</span>
+            <button type="button" class="btn-google" style="padding: 3px 10px; font-size: 11px; background: var(--google-blue); color: white; border: none; font-weight: 600;" onclick="addHotspotAtCenterView('photo_poi')">📍 Fijar en Centro</button>
+            <button type="button" class="btn-google" style="padding: 3px 8px; font-size: 11px; background: rgba(255,255,255,0.2); color: white; border: none;" onclick="toggleAddHotspotMode(false)">✕ Cancelar</button>
+          </div>
+
           <div class="pano-bottom-tools">
             <button class="btn-google" style="background: #ffffff;" onclick="setCurrentViewAsInitialHeading()" title="Fijar ángulo de vista inicial al entrar a esta foto">
               🎯 Fijar como Inicio
             </button>
-            <button id="add-hotspot-mode-btn" class="btn-google btn-google-primary" onclick="toggleAddHotspotMode()">
-              🎯 Añadir Hotspot / POI
+            <button class="btn-google" style="background: #ffffff; font-weight: 600; color: #A43716; border-color: #A43716;" onclick="addHotspotAtCenterView('photo_poi')" title="Gira la foto al elemento deseado y pulsa para agregar una foto aquí">
+              📷 Añadir Foto / POI Aquí
+            </button>
+            <button id="add-hotspot-mode-btn" class="btn-google btn-google-primary" onclick="toggleAddHotspotMode()" title="Hacer clic libremente en cualquier punto del 360">
+              🎯 Clic en Punto 360
             </button>
           </div>
 
@@ -1021,7 +1092,7 @@
       hx-swap="innerHTML"
       hx-encoding="multipart/form-data"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-      onsubmit="closeModal('scene-modal'); showToast('Creando hito 360...')">
+      hx-on::after-request="if (event.detail.successful) { closeModal('scene-modal'); window.syncStudioState({ showToastMsg: '✔ Nuevo hito 360° creado' }); }">
       <div class="google-modal-body">
         <div class="google-input-group">
           <label>Título del Hito:</label>
@@ -1062,41 +1133,62 @@
 
 <!-- Modal: Añadir Hotspot / Punto de Interés 360 -->
 <div id="hotspot-modal" class="google-modal-overlay">
-  <div class="google-modal-dialog">
+  <div class="google-modal-dialog" style="max-width: 550px;">
     <div class="google-modal-header">
-      <h3>🎯 Crear Hotspot / Punto de Interés</h3>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 20px;">🎯</span>
+        <h3 style="margin: 0;">Crear Fotografía / Hotspot 360°</h3>
+      </div>
       <button type="button" class="google-modal-close-btn" onclick="closeModal('hotspot-modal')">&times;</button>
     </div>
     <form 
+      id="hotspot-create-form"
       hx-post="{% url 'admin:tourism_route_create_hotspot' route.id %}" 
       hx-target="#scene-inspector-panel" 
       hx-swap="innerHTML"
       hx-encoding="multipart/form-data"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-      onsubmit="closeModal('hotspot-modal'); showToast('Hotspot guardado'); setTimeout(fetchStudioJson, 500);">
+      hx-on::after-request="if (event.detail.successful) { closeModal('hotspot-modal'); window.syncStudioState({ refreshHotspots: true, showToastMsg: '✔ ¡Fotografía / Hotspot guardado exitosamente!' }); }">
       <input type="hidden" id="hotspot-source-uuid" name="source_scene_uuid" />
       <input type="hidden" id="hotspot-pitch" name="pitch" />
       <input type="hidden" id="hotspot-yaw" name="yaw" />
 
       <div class="google-modal-body">
+        <!-- Indicador de Coordenadas 360 Detectadas -->
+        <div style="background: #f1f3f4; padding: 8px 12px; border-radius: 8px; font-size: 12px; color: var(--google-text-secondary); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span>📍 Coordenadas esféricas: <strong id="hotspot-coords-preview" style="color: var(--google-text);">Yaw: 0.0° | Pitch: 0.0°</strong></span>
+          <span style="font-size: 11px; color: #1e8e3e; font-weight: 600;">● Precisión 360°</span>
+        </div>
+
         <div class="google-input-group">
-          <label>Tipo de Hotspot / POI:</label>
+          <label>Tipo de Hotspot / Elemento Interactivo:</label>
           <select name="type" id="hotspot-type-select" onchange="handleHotspotTypeChange(this.value)">
-            <option value="navigation">🔗 Navegación Street View (Avanzar a otra foto)</option>
             <option value="photo_poi">📷 Fotografía / Mirador / Detalle en Alta Resolución</option>
-            <option value="audio_guide">🎧 Audioguía / Relato Cultural</option>
+            <option value="navigation">🔗 Navegación Street View (Avanzar a otra foto)</option>
             <option value="information">ℹ️ Información Turística / Flora & Fauna</option>
+            <option value="audio_guide">🎧 Audioguía / Relato Cultural</option>
             <option value="warning">⚠️ Advertencia de Seguridad / Peligro Glaciar</option>
           </select>
         </div>
 
         <div class="google-input-group">
           <label>Título del Punto:</label>
-          <input type="text" name="title" placeholder="Ej. Mirador de la Laguna o Avanzar al Hito 2" required />
+          <input type="text" name="title" id="hotspot-title-input" placeholder="Ej. Mirador Glaciar o Nevado Huaguruncho al Atardecer" required />
+        </div>
+
+        <!-- Grupo Fotografía Detallada -->
+        <div id="media-image-group" class="google-input-group" style="padding: 12px; background: #FFF5F2; border: 1.5px dashed #A43716; border-radius: 8px;">
+          <label style="color: #A43716; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            📷 Fotografía de Detalle / Alta Resolución para Mostrar:
+          </label>
+          <input type="file" name="media_image" accept="image/*" style="font-size: 12px; margin-top: 4px; width: 100%;" />
+          <span style="font-size: 11px; color: #666; margin-top: 4px; display: block;">
+            Esta foto se abrirá en un visor emergente de alta definición cuando el turista haga clic en el icono 📷 dentro del 360°.
+          </span>
         </div>
 
         <!-- Grupo Navegación: Hito Destino y Ángulo de Entrada -->
-        <div id="target-scene-group" class="google-input-group">
+        <div id="target-scene-group" class="google-input-group" style="display: none;">
           <label>Hito Destino al pulsar:</label>
           <select name="target_scene_uuid">
             {% for s in scenes %}
@@ -1119,15 +1211,6 @@
           </span>
         </div>
 
-        <!-- Grupo Fotografía Detallada -->
-        <div id="media-image-group" class="google-input-group" style="display: none;">
-          <label>Fotografía de Detalle / Alta Resolución:</label>
-          <input type="file" name="media_image" accept="image/*" />
-          <span style="font-size: 11.5px; color: var(--google-text-secondary); margin-top: 4px; display: block;">
-            Foto que se abrirá en un modal interactivo cuando el usuario toque el icono de cámara en el 360.
-          </span>
-        </div>
-
         <!-- Grupo Audioguía -->
         <div id="audio-url-group" class="google-input-group" style="display: none;">
           <label>URL de Audio Guía (MP3 / Streaming):</label>
@@ -1136,12 +1219,12 @@
 
         <div class="google-input-group" style="margin-bottom: 0;">
           <label>Descripción / Mensaje Explicativo:</label>
-          <textarea name="content" rows="3" placeholder="Detalles de la flora, fauna o historia del lugar..."></textarea>
+          <textarea name="content" rows="3" placeholder="Describe lo que se aprecia en esta zona, su altitud, geología, flora o historia..."></textarea>
         </div>
       </div>
       <div class="google-modal-footer">
         <button type="button" class="btn-google" onclick="closeModal('hotspot-modal')">Cancelar</button>
-        <button type="submit" class="btn-google btn-google-primary">Guardar Hotspot</button>
+        <button type="submit" class="btn-google btn-google-primary" style="font-weight: 600;">Guardar Hotspot</button>
       </div>
     </form>
   </div>
@@ -1226,6 +1309,18 @@
   var maxAltDefault = parseFloat(configEl ? configEl.getAttribute('data-max-altitude') || '4796' : '4796');
   var distanceKmDefault = parseFloat(configEl ? configEl.getAttribute('data-distance-km') || '22.0' : '22.0');
 
+  // Configuración global de CSRF para todas las peticiones HTMX
+  document.addEventListener('htmx:configRequest', function(evt) {
+    var token = csrfToken;
+    if (!token) {
+      var csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+      if (csrfInput) token = csrfInput.value;
+    }
+    if (token) {
+      evt.detail.headers['X-CSRFToken'] = token;
+    }
+  });
+
   var geojsonTrackEl = document.getElementById('geojson-track-json');
   var scenesDataEl = document.getElementById('scenes-data-json');
   var poisDataEl = document.getElementById('pois-data-json');
@@ -1264,7 +1359,7 @@
     }
   }
 
-  // 1. Inicialización del Mapa Multicapa Híbrido
+  // 1. Inicialización del Mapa Multicapa Híbrido con Soporte Robusto Leaflet & OSM
   function initMap() {
     if (typeof L === 'undefined') {
       setTimeout(initMap, 150);
@@ -1287,13 +1382,14 @@
         maxZoom: 20,
         attribution: '© Google Maps • Relieve Topográfico'
       }),
-      'osm': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      'osm': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
+        subdomains: ['a', 'b', 'c'],
         attribution: '© OpenStreetMap contributors'
       }),
-      'opentopo': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17,
-        attribution: '© OpenTopoMap'
+      'opentopo': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 18,
+        attribution: '© Esri • Curvas de Nivel y Topografía Andina'
       })
     };
 
@@ -1304,6 +1400,9 @@
     if (geojsonTrack && geojsonTrack.geometry && geojsonTrack.geometry.coordinates && geojsonTrack.geometry.coordinates.length > 0) {
       initLat = geojsonTrack.geometry.coordinates[0][1];
       initLng = geojsonTrack.geometry.coordinates[0][0];
+    } else if (scenesData.length > 0 && scenesData[0].latitude && scenesData[0].longitude) {
+      initLat = scenesData[0].latitude;
+      initLng = scenesData[0].longitude;
     }
 
     leafletMap = L.map('map-view', {
@@ -1313,11 +1412,13 @@
       zoomControl: false
     });
 
+    currentTileLayer.bringToBack();
+
     L.control.zoom({ position: 'bottomright' }).addTo(leafletMap);
     markersLayer = L.layerGroup().addTo(leafletMap);
     poisLayer = L.layerGroup().addTo(leafletMap);
 
-    if (geojsonTrack && geojsonTrack.geometry && geojsonTrack.geometry.coordinates.length > 0) {
+    if (geojsonTrack && geojsonTrack.geometry && geojsonTrack.geometry.coordinates && geojsonTrack.geometry.coordinates.length > 0) {
       drawGpxTrack(geojsonTrack);
     }
 
@@ -1338,21 +1439,30 @@
     setTimeout(function() { if (leafletMap) leafletMap.invalidateSize(); }, 250);
   }
 
-  // Cambio de Capa de Mapa
+  // Cambio de Capa de Mapa con Reordenamiento de Capas para evitar ocultar el trazo GPX
   window.switchMapLayer = function(layerKey) {
     if (!leafletMap || !mapTileLayers[layerKey]) return;
 
-    if (currentTileLayer) {
+    if (currentTileLayer && leafletMap.hasLayer(currentTileLayer)) {
       leafletMap.removeLayer(currentTileLayer);
     }
     currentTileLayer = mapTileLayers[layerKey];
-    leafletMap.addLayer(currentTileLayer);
+    currentTileLayer.addTo(leafletMap);
+    currentTileLayer.bringToBack();
 
     document.querySelectorAll('.map-layer-pill').forEach(function(btn) { btn.classList.remove('active'); });
-    if (layerKey === 'google-hybrid') document.getElementById('layer-hybrid-btn').classList.add('active');
-    if (layerKey === 'google-terrain') document.getElementById('layer-terrain-btn').classList.add('active');
-    if (layerKey === 'osm') document.getElementById('layer-osm-btn').classList.add('active');
-    if (layerKey === 'opentopo') document.getElementById('layer-topo-btn').classList.add('active');
+    var btnMap = {
+      'google-hybrid': 'layer-hybrid-btn',
+      'google-terrain': 'layer-terrain-btn',
+      'osm': 'layer-osm-btn',
+      'opentopo': 'layer-topo-btn'
+    };
+    var activeBtn = document.getElementById(btnMap[layerKey]);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    setTimeout(function() {
+      if (leafletMap) leafletMap.invalidateSize();
+    }, 80);
   };
 
   // Cambio de Modo de Visualización
@@ -1659,11 +1769,20 @@
 
     var hotspotsConfig = (scene.hotspots || []).map(function(h) {
       var isNav = h.type === 'navigation';
+      var isPhoto = h.type === 'photo_poi';
+      var cssClass = 'pnlm-custom-hotspot';
+      if (isNav) cssClass += ' pnlm-hotspot-nav';
+      else if (isPhoto) cssClass += ' pnlm-hotspot-photo';
+      else if (h.type === 'audio_guide') cssClass += ' pnlm-hotspot-audio';
+      else if (h.type === 'warning') cssClass += ' pnlm-hotspot-warning';
+      else cssClass += ' pnlm-hotspot-info';
+
       return {
         pitch: h.pitch,
         yaw: h.yaw,
-        type: isNav ? "scene" : "info",
-        text: h.title,
+        type: "info",
+        cssClass: cssClass,
+        text: (isPhoto ? '📷 ' : isNav ? '🔗 ' : 'ℹ️ ') + h.title,
         clickHandlerFunc: function() {
           if (isNav && h.target_scene_uuid) {
             var target = scenesData.find(function(s) { return s.uuid === h.target_scene_uuid; });
@@ -1698,13 +1817,28 @@
         hotSpots: hotspotsConfig
       });
 
+      // Detección Inteligente de Clic vs Arrastre (Permite girar la cámara libremente)
+      var mdX = 0, mdY = 0, mdTime = 0;
       panoViewer.on('mousedown', function(event) {
+        mdX = event.clientX;
+        mdY = event.clientY;
+        mdTime = Date.now();
+      });
+
+      panoViewer.on('mouseup', function(event) {
         if (isAddHotspotMode) {
-          var coords = panoViewer.mouseEventToCoords(event);
-          var pitch = coords[0];
-          var yaw = coords[1];
-          openHotspotModal(pitch, yaw);
-          toggleAddHotspotMode(false);
+          var dist = Math.hypot(event.clientX - mdX, event.clientY - mdY);
+          var duration = Date.now() - mdTime;
+          // Si el mouse se desplazó menos de 7px y duró menos de 500ms, es un CLIC intencional, no un paneo/giro
+          if (dist < 7 && duration < 500) {
+            var coords = panoViewer.mouseEventToCoords(event);
+            if (coords && coords.length >= 2) {
+              var pitch = coords[0];
+              var yaw = coords[1];
+              openHotspotModal(pitch, yaw, 'photo_poi');
+              toggleAddHotspotMode(false);
+            }
+          }
         }
       });
 
@@ -1800,8 +1934,8 @@
 
   // Modal de Vista Previa de POI / Fotografía
   function openPoiPreviewModal(title, desc, imgUrl, audioUrl) {
-    document.getElementById('poi-preview-title').innerText = title || 'Punto de Interés';
-    document.getElementById('poi-preview-desc').innerText = desc || '';
+    document.getElementById('poi-preview-title').innerText = title || 'Fotografía / Punto de Interés';
+    document.getElementById('poi-preview-desc').innerText = desc || 'Sin descripción disponible.';
     
     var imgEl = document.getElementById('poi-preview-img');
     if (imgUrl) {
@@ -1824,26 +1958,120 @@
     document.getElementById('poi-preview-modal').style.display = 'flex';
   }
 
-  function fetchStudioJson() {
+  // Sincronización Global Reactiva (Elimina la necesidad de presionar F5)
+  window.syncStudioState = function(options) {
+    options = options || {};
+    var statusEl = document.getElementById('studio-global-status');
+    if (statusEl) {
+      statusEl.innerHTML = '<span class="status-dot" style="width:8px;height:8px;border-radius:50%;background:#f2994a;display:inline-block;"></span> Sincronizando...';
+      statusEl.style.color = '#e67e22';
+    }
+
     fetch('/api/v1/routes/' + routeUuid + '/studio-data/')
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        scenesData = data.scenes;
-        if (data.route.geojson_track) {
+        scenesData = data.scenes || [];
+        poisData = data.points_of_interest || [];
+        if (data.route && data.route.geojson_track) {
           geojsonTrack = data.route.geojson_track;
           drawGpxTrack(geojsonTrack);
         }
-        renderSceneMarkers();
 
+        // 1. Actualizar contador en sidebar
         var countBadge = document.getElementById('scenes-count-badge');
         if (countBadge) countBadge.innerText = scenesData.length;
 
-        if (scenesData.length > 0 && !activeSceneUuid) {
+        // 2. Si se eliminó una escena, limpiar referencia si era la activa
+        if (options.deletedUuid && activeSceneUuid === options.deletedUuid) {
+          if (scenesData.length > 0) {
+            selectScene(scenesData[0].uuid, scenesData[0].sequence);
+            htmx.ajax('GET', '/admin/tourism/route/' + routePk + '/studio/scene-inspector/' + scenesData[0].uuid + '/', {
+              target: '#scene-inspector-panel',
+              swap: 'innerHTML'
+            });
+          } else {
+            activeSceneUuid = null;
+            loadPlaceholderPanorama();
+            var inspector = document.getElementById('scene-inspector-panel');
+            if (inspector) inspector.innerHTML = '<div style="padding: 30px 20px; text-align: center; color: var(--google-text-secondary); font-size: 13px;">No hay hitos en esta ruta.</div>';
+          }
+        }
+
+        // 3. Re-renderizar marcadores del mapa Leaflet
+        renderSceneMarkers();
+        renderPoisOnMap();
+
+        // 4. Refrescar escena activa en Pannellum si corresponde
+        if (activeSceneUuid) {
+          var currentScene = scenesData.find(function(s) { return s.uuid === activeSceneUuid; });
+          if (currentScene) {
+            var badge = document.getElementById('active-scene-badge');
+            if (badge) badge.innerText = currentScene.sequence + '. ' + currentScene.title;
+
+            var card = document.getElementById('scene-card-' + activeSceneUuid);
+            if (card) {
+              var titleEl = card.querySelector('.scene-title');
+              if (titleEl) titleEl.innerText = currentScene.sequence + '. ' + currentScene.title;
+              var metaEl = card.querySelector('.scene-meta');
+              if (metaEl) {
+                var altText = currentScene.altitude_masl ? (currentScene.altitude_masl + ' m s.n.m.') : 'Sin altitud';
+                var countHotspots = (currentScene.hotspots || []).length;
+                metaEl.innerText = altText + ' • ' + countHotspots + ' Hotspots';
+              }
+              if (currentScene.panorama_image_url) {
+                var thumb = card.querySelector('.scene-thumb');
+                if (thumb) thumb.src = currentScene.panorama_image_url;
+              }
+            }
+
+            if (options.refreshHotspots || options.updatedSceneUuid) {
+              var curYaw = panoViewer ? panoViewer.getYaw() : currentScene.initial_yaw;
+              var curPitch = panoViewer ? panoViewer.getPitch() : currentScene.initial_pitch;
+              loadPanorama(currentScene, curYaw, curPitch);
+            }
+          }
+        } else if (scenesData.length > 0) {
           selectScene(scenesData[0].uuid, scenesData[0].sequence);
         }
+
+        // 5. Estado guardado
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="status-dot" style="width:8px;height:8px;border-radius:50%;background:#1e8e3e;display:inline-block;"></span> Guardado sincronizado';
+          statusEl.style.color = '#1e8e3e';
+        }
+
+        if (options.showToastMsg) {
+          showToast(options.showToastMsg);
+        }
       })
-      .catch(function() {});
-  }
+      .catch(function(err) {
+        console.warn('Error al sincronizar estudio:', err);
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="status-dot" style="width:8px;height:8px;border-radius:50%;background:#d93025;display:inline-block;"></span> Error de sincronización';
+          statusEl.style.color = '#d93025';
+        }
+      });
+  };
+
+  // Guardar y sincronizar todo explícitamente
+  window.handleGlobalSaveAndSync = function() {
+    var inspectorForm = document.getElementById('scene-inspector-form');
+    if (inspectorForm) {
+      htmx.trigger(inspectorForm, 'submit');
+    }
+    window.syncStudioState({ showToastMsg: '✔ Recorrido 360° guardado y sincronizado al 100%' });
+  };
+
+  // Añadir Fotografía / Hotspot exactamente en el centro de la vista actual de la cámara 360
+  window.addHotspotAtCenterView = function(preselectedType) {
+    if (!panoViewer || !activeSceneUuid) {
+      showToast('⚠️ Selecciona o abre primero un hito 360°');
+      return;
+    }
+    var yaw = panoViewer.getYaw();
+    var pitch = panoViewer.getPitch();
+    openHotspotModal(pitch, yaw, preselectedType || 'photo_poi');
+  };
 
   // 4. Simulador de Recorrido Virtual Street View
   window.startVirtualTourSimulator = function() {
@@ -1935,10 +2163,31 @@
 
   window.openGpxModal = function() { document.getElementById('gpx-modal').style.display = 'flex'; };
 
-  window.openHotspotModal = function(pitch, yaw) {
-    document.getElementById('hotspot-source-uuid').value = activeSceneUuid;
-    document.getElementById('hotspot-pitch').value = pitch.toFixed(2);
-    document.getElementById('hotspot-yaw').value = yaw.toFixed(2);
+  window.openHotspotModal = function(pitch, yaw, preselectedType) {
+    var sourceEl = document.getElementById('hotspot-source-uuid');
+    if (sourceEl) sourceEl.value = activeSceneUuid;
+
+    var pitchEl = document.getElementById('hotspot-pitch');
+    if (pitchEl) pitchEl.value = (typeof pitch === 'number') ? pitch.toFixed(2) : (pitch || '0.00');
+
+    var yawEl = document.getElementById('hotspot-yaw');
+    if (yawEl) yawEl.value = (typeof yaw === 'number') ? yaw.toFixed(2) : (yaw || '0.00');
+
+    var pVal = parseFloat(pitchEl ? pitchEl.value : 0);
+    var yVal = parseFloat(yawEl ? yawEl.value : 0);
+    var coordsPreview = document.getElementById('hotspot-coords-preview');
+    if (coordsPreview) {
+      coordsPreview.innerText = 'Yaw: ' + yVal.toFixed(1) + '° | Pitch: ' + pVal.toFixed(1) + '°';
+    }
+
+    var typeSelect = document.getElementById('hotspot-type-select');
+    if (typeSelect && preselectedType) {
+      typeSelect.value = preselectedType;
+      handleHotspotTypeChange(preselectedType);
+    } else if (typeSelect) {
+      handleHotspotTypeChange(typeSelect.value);
+    }
+
     document.getElementById('hotspot-modal').style.display = 'flex';
   };
 
@@ -1953,14 +2202,24 @@
   window.toggleAddHotspotMode = function(force) {
     isAddHotspotMode = force !== undefined ? force : !isAddHotspotMode;
     var btn = document.getElementById('add-hotspot-mode-btn');
-    if (btn) {
-      if (isAddHotspotMode) {
+    var banner = document.getElementById('placement-hud-banner');
+    var viewerEl = document.getElementById('panorama-viewer');
+
+    if (isAddHotspotMode) {
+      if (btn) {
         btn.style.background = '#d93025';
-        btn.innerText = '🎯 Clic en el 360 para fijar';
-      } else {
-        btn.style.background = 'var(--google-blue)';
-        btn.innerText = '🎯 Añadir Hotspot / POI';
+        btn.innerText = '🎯 Cancelar';
       }
+      if (banner) banner.style.display = 'flex';
+      if (viewerEl) viewerEl.style.cursor = 'crosshair';
+      showToast('🎯 Modo Colocación Activo: Gira la foto y haz un clic en el punto exacto');
+    } else {
+      if (btn) {
+        btn.style.background = 'var(--google-blue)';
+        btn.innerText = '🎯 Clic en Punto 360';
+      }
+      if (banner) banner.style.display = 'none';
+      if (viewerEl) viewerEl.style.cursor = 'default';
     }
   };
 

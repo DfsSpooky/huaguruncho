@@ -93,6 +93,8 @@ ASGI_APPLICATION = 'config.asgi.application'
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
+LOGIN_REDIRECT_URL = '/admin/'
+LOGOUT_REDIRECT_URL = '/admin/login/'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

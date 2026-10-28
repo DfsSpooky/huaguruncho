@@ -165,6 +165,7 @@ class RouteAdmin(admin.ModelAdmin):
         scene = get_object_or_404(TourScene, uuid=scene_uuid, route=route)
 
         if request.method == 'POST':
+            title = request.POST.get('title')
             lat = request.POST.get('latitude')
             lng = request.POST.get('longitude')
             alt = request.POST.get('altitude_masl')
@@ -173,14 +174,43 @@ class RouteAdmin(admin.ModelAdmin):
             init_pitch = request.POST.get('initial_pitch')
             desc = request.POST.get('description', '')
 
+            if title and title.strip():
+                scene.title = title.strip()
+            
+            # Normalizar separadores decimales (soporte para comas de localización española)
+            if lat:
+                lat = str(lat).replace(',', '.').strip()
+            if lng:
+                lng = str(lng).replace(',', '.').strip()
+            if alt:
+                alt = str(alt).replace(',', '.').strip()
+            if head:
+                head = str(head).replace(',', '.').strip()
+            if init_yaw:
+                init_yaw = str(init_yaw).replace(',', '.').strip()
+            if init_pitch:
+                init_pitch = str(init_pitch).replace(',', '.').strip()
+
             scene.latitude = lat if lat else None
             scene.longitude = lng if lng else None
-            scene.altitude_masl = int(alt) if alt else None
-            scene.heading = float(head) if head else 0.0
-            if init_yaw is not None and init_yaw != '':
-                scene.initial_yaw = float(init_yaw)
-            if init_pitch is not None and init_pitch != '':
-                scene.initial_pitch = float(init_pitch)
+            try:
+                scene.altitude_masl = int(float(alt)) if alt and str(alt).strip() != '' else None
+            except (ValueError, TypeError):
+                scene.altitude_masl = None
+            try:
+                scene.heading = float(head) if head and str(head).strip() != '' else 0.0
+            except (ValueError, TypeError):
+                scene.heading = 0.0
+            if init_yaw is not None and str(init_yaw).strip() != '':
+                try:
+                    scene.initial_yaw = float(init_yaw)
+                except (ValueError, TypeError):
+                    pass
+            if init_pitch is not None and str(init_pitch).strip() != '':
+                try:
+                    scene.initial_pitch = float(init_pitch)
+                except (ValueError, TypeError):
+                    pass
             scene.description = desc
             pano_file = request.FILES.get('panorama_image')
             if pano_file:
@@ -197,6 +227,11 @@ class RouteAdmin(admin.ModelAdmin):
         route = get_object_or_404(Route, pk=object_id)
         scene = get_object_or_404(TourScene, uuid=scene_uuid, route=route)
         scene.delete()
+        # Re-indexar secuencias ordenadas de los hitos restantes
+        for idx, s in enumerate(route.scenes.all().order_by('sequence', 'created_at'), start=1):
+            if s.sequence != idx:
+                s.sequence = idx
+                s.save(update_fields=['sequence'])
         return HttpResponse("", status=200)
 
     def delete_hotspot_view(self, request, object_id, hotspot_id):
@@ -377,13 +412,20 @@ class RouteAdmin(admin.ModelAdmin):
         desc = request.POST.get('description', '')
         pano_file = request.FILES.get('panorama_image')
 
+        alt_val = None
+        if alt and str(alt).strip():
+            try:
+                alt_val = int(float(alt))
+            except (ValueError, TypeError):
+                alt_val = None
+
         TourScene.objects.create(
             route=route,
             title=title,
             sequence=sequence,
             latitude=lat,
             longitude=lng,
-            altitude_masl=int(alt) if alt else None,
+            altitude_masl=alt_val,
             description=desc,
             panorama_image=pano_file if pano_file else 'panoramas/default_sample.jpg'
         )
