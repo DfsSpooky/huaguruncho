@@ -568,7 +568,85 @@
     color: var(--google-text);
     box-shadow: var(--google-shadow-sm);
   }
-  
+
+  /* Banner Flotante de Modo Colocación (Google Material 3 Pill - Simétrico y sin solaparse) */
+  .placement-hud-pill {
+    position: absolute;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(25, 28, 31, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 30px;
+    padding: 6px 16px;
+    font-size: 12.5px;
+    color: #ffffff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    display: none;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+    animation: hudSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes hudSlideDown {
+    from { opacity: 0; transform: translate(-50%, -8px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+
+  .placement-hud-pill .hud-radar-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.4);
+    display: inline-block;
+    animation: radarPulse 1.6s infinite ease-in-out;
+  }
+
+  @keyframes radarPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.35); opacity: 0.65; }
+  }
+
+  .placement-hud-pill .hud-text {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #f1f3f4;
+    letter-spacing: 0.15px;
+  }
+
+  .placement-hud-pill .hud-text b {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .placement-hud-pill .hud-cancel-pill {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  }
+
+  .placement-hud-pill .hud-cancel-pill:hover {
+    background: #d93025;
+    border-color: #d93025;
+    color: #ffffff;
+    transform: scale(1.03);
+  }
+
   .pano-bottom-tools {
     position: absolute;
     bottom: 14px;
@@ -806,50 +884,141 @@
 
   /* Hotspots personalizadas de alta definición en Pannellum */
   .pnlm-custom-hotspot {
-    width: 36px !important;
-    height: 36px !important;
+    width: 40px !important;
+    height: 40px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.45) !important;
-    font-size: 17px !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5) !important;
     user-select: none !important;
+    transition: box-shadow 0.2s ease, filter 0.2s ease !important;
+    position: absolute !important;
   }
+
+  /* REGLA DE ORO: NUNCA aplicar transform, margin o cambio de tamaño a .pnlm-custom-hotspot:hover 
+     porque Pannellum proyecta coordenadas usando transform: translate3d(...) en cada frame.
+     Modificar el transform aquí produce colisión de puntero y temblores continuos. */
   .pnlm-custom-hotspot:hover {
-    transform: scale(1.22) !important;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+    filter: brightness(1.15) !important;
+    box-shadow: 0 0 0 3.5px rgba(255,255,255,0.92), 0 8px 24px rgba(0,0,0,0.6) !important;
+    z-index: 9999 !important;
   }
+
+  /* Icono interno centrado en el disco */
+  .pnlm-custom-hotspot .hs-inner-icon {
+    font-size: 18px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: none !important;
+    color: #FFFFFF !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .pnlm-custom-hotspot:hover .hs-inner-icon {
+    transform: scale(1.18) !important;
+  }
+
+  /* Paletas visuales por tipo de hotspot */
+  .pnlm-hotspot-nav {
+    background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%) !important;
+    border: 2.5px solid #FFFFFF !important;
+  }
+
   .pnlm-hotspot-photo {
     background: linear-gradient(135deg, #A43716 0%, #D85A30 100%) !important;
     border: 2.5px solid #FFFFFF !important;
   }
-  .pnlm-hotspot-nav {
-    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%) !important;
-    border: 2.5px solid #FFFFFF !important;
-  }
+
   .pnlm-hotspot-info {
     background: linear-gradient(135deg, #1e8e3e 0%, #34a853 100%) !important;
     border: 2.5px solid #FFFFFF !important;
   }
+
   .pnlm-hotspot-warning {
     background: linear-gradient(135deg, #ea8600 0%, #f9ab00 100%) !important;
     border: 2.5px solid #FFFFFF !important;
   }
+
   .pnlm-hotspot-audio {
     background: linear-gradient(135deg, #9334e6 0%, #a142f4 100%) !important;
     border: 2.5px solid #FFFFFF !important;
   }
-  .pnlm-tooltip span {
-    font-family: 'Google Sans', Roboto, sans-serif !important;
+
+  /* Tooltip Flotante de Alta Fidelidad (Google Glassmorphism) */
+  .pnlm-custom-hotspot .hs-card-tooltip {
+    position: absolute !important;
+    bottom: calc(100% + 10px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(4px) !important;
+    background: rgba(25, 28, 31, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 9px !important;
+    padding: 7px 14px !important;
+    min-width: 140px !important;
+    max-width: 250px !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important; /* CRÍTICO: Evita capturar el cursor y previene parpadeos */
+    transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.18s !important;
+    text-align: center !important;
+    white-space: normal !important;
+    z-index: 10000 !important;
+  }
+
+  /* Flecha indicadora hacia el disco */
+  .pnlm-custom-hotspot .hs-card-tooltip::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    border-width: 5px 5px 0 5px !important;
+    border-style: solid !important;
+    border-color: rgba(25, 28, 31, 0.95) transparent transparent transparent !important;
+  }
+
+  .pnlm-custom-hotspot:hover .hs-card-tooltip {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateX(-50%) translateY(0) !important;
+  }
+
+  .hs-card-category {
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.6px !important;
+    font-weight: 700 !important;
+    color: #8ab4f8 !important; /* Soft blue */
+    margin-bottom: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+  }
+
+  .hs-card-category.cat-photo {
+    color: #ffab91 !important; /* Soft terracotta */
+  }
+
+  .hs-card-title {
     font-size: 12px !important;
     font-weight: 600 !important;
-    padding: 6px 12px !important;
-    border-radius: 8px !important;
-    background: rgba(25, 28, 31, 0.92) !important;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
+    color: #FFFFFF !important;
+    line-height: 1.3 !important;
+  }
+
+  .hs-card-hint {
+    font-size: 10.5px !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+    margin-top: 3px !important;
   }
 </style>
 {% endblock %}
@@ -994,11 +1163,13 @@
             1. Plaza Mayor de Huachón (Punto de Partida)
           </div>
 
-          <!-- Banner Flotante de Modo Colocación -->
-          <div id="placement-hud-banner" style="display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(25, 28, 31, 0.94); color: #ffffff; padding: 7px 16px; border-radius: 24px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.45); align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2);">
-            <span>🎯 <b>Modo Colocación Activo:</b> Gira la foto y haz un clic en el punto exacto</span>
-            <button type="button" class="btn-google" style="padding: 3px 10px; font-size: 11px; background: var(--google-blue); color: white; border: none; font-weight: 600;" onclick="addHotspotAtCenterView('photo_poi')">📍 Fijar en Centro</button>
-            <button type="button" class="btn-google" style="padding: 3px 8px; font-size: 11px; background: rgba(255,255,255,0.2); color: white; border: none;" onclick="toggleAddHotspotMode(false)">✕ Cancelar</button>
+          <!-- Banner Flotante de Modo Colocación (Elegante, simétrico y sin solaparse con el título) -->
+          <div id="placement-hud-banner" class="placement-hud-pill">
+            <span class="hud-radar-dot"></span>
+            <span class="hud-text"><b>Modo Colocación Activo:</b> Haz clic en el 360° para fijar la foto</span>
+            <button type="button" class="hud-cancel-pill" onclick="toggleAddHotspotMode(false)" title="Cancelar colocación">
+              ✕ Cancelar
+            </button>
           </div>
 
           <div class="pano-bottom-tools">
@@ -1754,6 +1925,40 @@
     }
   }
 
+  function renderCustomHotspotDom(hotSpotDiv, args) {
+    // 1. Limpiar cualquier nodo previo
+    hotSpotDiv.innerHTML = '';
+
+    // 2. Icono central nítido
+    var iconSpan = document.createElement('span');
+    iconSpan.className = 'hs-inner-icon';
+    iconSpan.innerHTML = args.icon;
+    hotSpotDiv.appendChild(iconSpan);
+
+    // 3. Tarjeta Tooltip informativa al pasar el cursor (con flecha y estilo Glassmorphic)
+    var card = document.createElement('div');
+    card.className = 'hs-card-tooltip';
+
+    var cat = document.createElement('div');
+    cat.className = 'hs-card-category' + (args.isPhoto ? ' cat-photo' : '');
+    cat.innerText = args.category;
+    card.appendChild(cat);
+
+    var title = document.createElement('div');
+    title.className = 'hs-card-title';
+    title.innerText = args.title;
+    card.appendChild(title);
+
+    if (args.hint) {
+      var hint = document.createElement('div');
+      hint.className = 'hs-card-hint';
+      hint.innerText = args.hint;
+      card.appendChild(hint);
+    }
+
+    hotSpotDiv.appendChild(card);
+  }
+
   function loadPanorama(scene, targetYaw, targetPitch) {
     if (typeof pannellum === 'undefined') {
       setTimeout(function() { loadPanorama(scene, targetYaw, targetPitch); }, 150);
@@ -1777,12 +1982,23 @@
       else if (h.type === 'warning') cssClass += ' pnlm-hotspot-warning';
       else cssClass += ' pnlm-hotspot-info';
 
+      var iconChar = isNav ? '➔' : (isPhoto ? '📷' : (h.type === 'audio_guide' ? '🎧' : (h.type === 'warning' ? '⚠️' : 'ℹ️')));
+      var categoryName = isNav ? '🔗 Conexión 360°' : (isPhoto ? '📷 Fotografía / POI' : (h.type === 'audio_guide' ? '🎧 Audioguía' : (h.type === 'warning' ? '⚠️ Advertencia' : 'ℹ️ Información')));
+      var hintText = isNav ? 'Clic para trasladarse al siguiente hito' : 'Clic para ver fotografía';
+
       return {
         pitch: h.pitch,
         yaw: h.yaw,
-        type: "info",
         cssClass: cssClass,
-        text: (isPhoto ? '📷 ' : isNav ? '🔗 ' : 'ℹ️ ') + h.title,
+        createTooltipFunc: renderCustomHotspotDom,
+        createTooltipArgs: {
+          icon: iconChar,
+          category: categoryName,
+          title: h.title,
+          hint: hintText,
+          isNav: isNav,
+          isPhoto: isPhoto
+        },
         clickHandlerFunc: function() {
           if (isNav && h.target_scene_uuid) {
             var target = scenesData.find(function(s) { return s.uuid === h.target_scene_uuid; });
@@ -1792,6 +2008,7 @@
                 target: '#scene-inspector-panel',
                 swap: 'innerHTML'
               });
+              showToast('🚀 Trasladando a: ' + target.title);
             }
           } else {
             openPoiPreviewModal(h.title, h.content, h.media_image_url, h.audio_url);
