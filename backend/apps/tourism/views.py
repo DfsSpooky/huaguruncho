@@ -336,11 +336,24 @@ class MountainWeatherStationViewSet(viewsets.ReadOnlyModelViewSet):
 
         return super().list(request, *args, **kwargs)
 
-    @action(detail=False, methods=['get', 'post'], url_path='refresh')
+    @action(
+        detail=False,
+        methods=['get', 'post'],
+        url_path='refresh',
+        permission_classes=[permissions.AllowAny],
+    )
     def refresh(self, request):
-        """Forzar actualización en tiempo real desde la API meteorológica"""
+        """
+        Actualiza estaciones meteorológicas; solo permite omitir caché (force_refresh=True)
+        a personal municipal o administradores para evitar abuso (DoS) contra la API externa.
+        """
         from .services.weather_service import sync_weather_stations
-        sync_result = sync_weather_stations(force_refresh=True)
+        is_privileged = bool(
+            request.user
+            and request.user.is_authenticated
+            and (request.user.is_staff or getattr(request.user, 'role', '') in ('admin', 'municipalidad'))
+        )
+        sync_result = sync_weather_stations(force_refresh=is_privileged)
         stations = self.get_queryset()
         serializer = self.get_serializer(stations, many=True)
         return Response({

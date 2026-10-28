@@ -36,6 +36,11 @@ class EnvironmentalReportViewSet(viewsets.ModelViewSet):
     search_fields = ['description', 'admin_notes']
     ordering_fields = ['captured_at', 'created_at']
 
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsMunicipalidadOrAdmin()]
+        return [permissions.IsAuthenticatedOrReadOnly()]
+
     def get_serializer_class(self):
         if self.action in ['create']:
             return EnvironmentalReportCreateSerializer
@@ -94,8 +99,16 @@ class SyncBatchView(APIView):
         for item in reports_data:
             local_uuid = item.get('local_uuid')
             try:
-                report = EnvironmentalReport.objects.filter(local_uuid=local_uuid).first()
+                report = EnvironmentalReport.objects.filter(
+                    local_uuid=local_uuid,
+                    user=request.user,
+                ).first()
                 if not report:
+                    # Evitar colisión si otro usuario ya registró ese local_uuid
+                    if EnvironmentalReport.objects.filter(local_uuid=local_uuid).exists():
+                        import uuid as uuid_lib
+                        local_uuid = f"{local_uuid}-{str(uuid_lib.uuid4())[:8]}"
+
                     route_uuid = item.get('route_uuid')
                     route = None
                     if route_uuid:
@@ -174,9 +187,23 @@ class ReportEvidenceCreateView(APIView):
         if 'image' not in request.FILES:
             return Response({'image': 'Archivo de imagen requerido.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        uploaded_image = request.FILES['image']
+        allowed_extensions = ('.jpg', '.jpeg', '.png', '.webp', '.heic')
+        file_name_lower = (uploaded_image.name or '').lower()
+        if not file_name_lower.endswith(allowed_extensions):
+            return Response(
+                {'image': 'Formato de archivo no permitido. Use JPG, PNG, WEBP o HEIC.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if uploaded_image.size > 15 * 1024 * 1024:
+            return Response(
+                {'image': 'La imagen excede el tamaño máximo permitido de 15 MB.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         evidence = ReportEvidence.objects.create(
             report=report,
-            image=request.FILES['image']
+            image=uploaded_image
         )
         serializer = ReportEvidenceSerializer(evidence, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)

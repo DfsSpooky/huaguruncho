@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../constants/api_endpoints.dart';
 import '../storage/secure_storage_service.dart';
 import 'auth_interceptor.dart';
@@ -24,15 +25,18 @@ class DioClient {
       AuthInterceptor(storage: storageService, dio: dio),
     );
 
-    dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestHeader: false,
-        requestBody: true,
-        responseHeader: false,
-        responseBody: true,
-        error: true,
-      ),
-    );
+    // Solo registrar trazas HTTP en modo debug y sin volcar cuerpos sensibles (contraseñas/tokens JWT)
+    if (kDebugMode) {
+      dio.interceptors.add(
+        LogInterceptor(
+          request: true,
+          requestHeader: false,
+          requestBody: false,
+          responseHeader: false,
+          responseBody: false,
+          error: true,
+        ),
+      );
+    }
   }
 }

@@ -63,8 +63,8 @@ class HealthCheckView(APIView):
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1;")
                 cursor.fetchone()
-        except Exception as e:
-            db_status = f"unhealthy: {str(e)}"
+        except Exception:
+            db_status = "unhealthy"
             return Response(
                 {
                     "status": "unhealthy",

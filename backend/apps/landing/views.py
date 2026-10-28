@@ -152,7 +152,10 @@ class HTMXSafetyAdvisorView(View):
             target_altitude = 4250
 
         experience = request.POST.get('experience', 'intermedio')
-        acclimatization_days = int(request.POST.get('acclimatization_days', 1))
+        try:
+            acclimatization_days = max(0, min(30, int(request.POST.get('acclimatization_days', 1))))
+        except (ValueError, TypeError):
+            acclimatization_days = 1
 
         # Cálculos biométricos y de altitud
         # A nivel del mar: 100% O2 efectivo. A 5,000m: ~53% presión de O2.

@@ -38,7 +38,7 @@ class LandingPageTests(TestCase):
         response = self.client.get(reverse('landing:index'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "HUAGURUNCHO")
-        self.assertContains(response, "Sendero Laguna Huascacocha")
+        self.assertContains(response, "Huaguruncho 360")
 
     def test_htmx_route_filter_endpoint(self):
         """Verifica el filtrado HTMX de rutas por dificultad."""

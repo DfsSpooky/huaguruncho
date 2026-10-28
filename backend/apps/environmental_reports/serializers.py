@@ -81,11 +81,15 @@ class EnvironmentalReportCreateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user if self.context['request'].user.is_authenticated else None
         validated_data['user'] = user
 
-        # Idempotencia: Si ya existe local_uuid, retornarlo en lugar de crear duplicado
+        # Idempotencia segura por propietario: Si ya existe local_uuid del mismo usuario, retornarlo
         local_uuid = validated_data.get('local_uuid')
-        existing = EnvironmentalReport.objects.filter(local_uuid=local_uuid).first()
-        if existing:
-            return existing
+        if local_uuid and user:
+            existing = EnvironmentalReport.objects.filter(local_uuid=local_uuid, user=user).first()
+            if existing:
+                return existing
+            if EnvironmentalReport.objects.filter(local_uuid=local_uuid).exists():
+                import uuid as uuid_lib
+                validated_data['local_uuid'] = f"{local_uuid}-{str(uuid_lib.uuid4())[:8]}"
 
         return super().create(validated_data)
 
