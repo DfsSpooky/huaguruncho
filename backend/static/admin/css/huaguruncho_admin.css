@@ -667,9 +667,16 @@ html[data-theme="dark"] .change-form fieldset h2 {
    -------------------------------------------------------------------------- */
 body.in-tour-studio #nav-sidebar,
 body.in-tour-studio #toggle-nav-sidebar,
-body.in-tour-studio .breadcrumbs,
-body.in-tour-studio #content-start {
+body.in-tour-studio .breadcrumbs {
   display: none !important;
+}
+
+body.in-tour-studio #content-start {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100vw !important;
+  width: 100vw !important;
 }
 
 body.in-tour-studio #content {
