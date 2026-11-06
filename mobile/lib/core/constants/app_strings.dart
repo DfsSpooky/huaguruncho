@@ -1,7 +1,7 @@
 class AppStrings {
   AppStrings._();
 
-  static const String appName = 'HUAGURUNCHO 360';
+  static const String appName = 'HUAGURUNCHO 360°';
   static const String appSubtitle = 'Explora, cuida y recorre el Nevado Huaguruncho';
   static const String locationTitle = 'Huachón, Pasco, Perú';
 

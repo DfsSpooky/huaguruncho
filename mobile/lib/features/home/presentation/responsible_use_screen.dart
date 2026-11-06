@@ -43,7 +43,7 @@ class ResponsibleUseScreen extends StatelessWidget {
             _buildTermItem(
               title: '1. Carácter Informativo y No Reemplazo de Guías',
               description:
-                  'HUAGURUNCHO 360 es una aplicación de orientación y concientización ambiental. No sustituye la contratación de un Guía Oficial de Turismo ni protocolos de alta montaña autorizados por la Municipalidad de Huachón o SERNANP.',
+                  'HUAGURUNCHO 360° es una aplicación de orientación y concientización ambiental. No sustituye la contratación de un Guía Oficial de Turismo ni protocolos de alta montaña autorizados por la Municipalidad de Huachón o SERNANP.',
             ),
             _buildTermItem(
               title: '2. Condiciones Climáticas Extremas',

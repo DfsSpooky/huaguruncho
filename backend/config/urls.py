@@ -41,6 +41,6 @@ if getattr(settings, 'SERVE_MEDIA_FILES', False) or settings.DEBUG:
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-admin.site.site_header = "HUAGURUNCHO 360 - Panel Administrativo"
-admin.site.site_title = "HUAGURUNCHO 360 Admin"
+admin.site.site_header = "HUAGURUNCHO 360° - Panel Administrativo"
+admin.site.site_title = "HUAGURUNCHO 360° Admin"
 admin.site.index_title = "Gestión de Turismo Sostenible y Reportes Ambientales"

@@ -39,7 +39,7 @@ class LandingPageView(TemplateView):
             if 'application/json' in accept and 'text/html' not in accept:
                 from django.http import JsonResponse
                 return JsonResponse({
-                    'service': 'HUAGURUNCHO 360 - API Gateway',
+                    'service': 'HUAGURUNCHO 360° - API Gateway',
                     'version': '1.0.0',
                     'status': 'operational',
                     'portal': 'https://huaguruncho.aquienpasco.com'
@@ -319,7 +319,7 @@ class SitemapXmlView(View):
             '    <image:image>\n'
             '      <image:loc>https://huaguruncho.aquienpasco.com/static/images/huaguruncho_hero.jpg</image:loc>\n'
             '      <image:title>Nevado Huaguruncho (5,742 m) - Cordillera de Pasco</image:title>\n'
-            '      <image:caption>La aplicación móvil oficial para explorar el Nevado Huaguruncho con cartografía sin conexión a internet y tours 360</image:caption>\n'
+            '      <image:caption>La aplicación móvil oficial para explorar el Nevado Huaguruncho con cartografía sin conexión a internet y tours 360°</image:caption>\n'
             '    </image:image>\n'
             '  </url>\n'
             '</urlset>'

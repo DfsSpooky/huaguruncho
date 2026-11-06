@@ -1,4 +1,4 @@
-# HUAGURUNCHO 360
+# HUAGURUNCHO 360°
 > **“Explora, cuida y recorre el Nevado Huaguruncho”**  
 > *Plataforma móvil y backend para turismo sostenible y gestión ambiental participativa en Huachón, Pasco, Perú.*
 
@@ -8,7 +8,7 @@
 
 ## 🏔️ 1. Descripción del Proyecto
 
-**HUAGURUNCHO 360** es una solución digital completa orientada al turismo de alta montaña responsable en la cordillera del Nevado Huaguruncho (5,742 m s.n.m.). La plataforma permite:
+**HUAGURUNCHO 360°** es una solución digital completa orientada al turismo de alta montaña responsable en la cordillera del Nevado Huaguruncho (5,742 m s.n.m.). La plataforma permite:
 
 1. **Puesto de Control Guardabosques ("Huella Cero")**: Módulo exclusivo y 100% offline para el registro de ascensos de visitantes y control jurado de retorno de residuos sólidos (botellas, latas, empaques, gas, baterías).
 2. **Explorar Rutas y Senderos**: Consulta de distancias, dificultades, tiempos estimados y recomendaciones de seguridad.

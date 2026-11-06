@@ -160,7 +160,7 @@ class _EmergencySosScreenState extends ConsumerState<EmergencySosScreen> {
       '• *Longitud:* $lngStr\n'
       '• *Margen de Error:* $accStr\n'
       '• *Mapa Satelital:* $mapUrl\n\n'
-      'Mensaje generado desde HUAGURUNCHO 360',
+      'Mensaje generado desde HUAGURUNCHO 360°',
     );
 
     final cleanPhone = targetPhone.replaceAll(RegExp(r'[\s\+\-]'), '');

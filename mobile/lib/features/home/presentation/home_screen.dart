@@ -441,7 +441,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'HUAGURUNCHO 360',
+                  'HUAGURUNCHO 360°',
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 14.5,

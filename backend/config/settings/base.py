@@ -176,8 +176,8 @@ SIMPLE_JWT = {
 
 # OpenAPI / Swagger Documentation
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'HUAGURUNCHO 360 API',
-    'DESCRIPTION': 'API REST para turismo sostenible, tour virtual 360 y eco-reportes ambientales en el Nevado Huaguruncho (Huachón, Pasco, Perú).',
+    'TITLE': 'HUAGURUNCHO 360° API',
+    'DESCRIPTION': 'API REST para turismo sostenible, tour virtual 360° y eco-reportes ambientales en el Nevado Huaguruncho (Huachón, Pasco, Perú).',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SCHEMA_PATH_PREFIX': '/api/v1',

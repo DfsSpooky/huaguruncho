@@ -1,3 +1,3 @@
 """
-App Landing Page HUAGURUNCHO 360
+App Landing Page HUAGURUNCHO 360°
 """

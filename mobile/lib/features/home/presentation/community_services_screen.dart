@@ -36,9 +36,8 @@ class _CommunityServicesScreenState
 
   Future<void> _launchWhatsApp(String phone, String name) async {
     final cleanPhone = phone.replaceAll(RegExp(r'[\s\+\-]'), '');
-    final uri = Uri.parse(
-      'https://wa.me/$cleanPhone?text=Hola%20$name,%20vi%20su%20servicio%20en%20la%20App%20Huaguruncho%20360.',
-    );
+    final msg = Uri.encodeComponent('Hola $name, vi su servicio en la App Huaguruncho 360°.');
+    final uri = Uri.parse('https://wa.me/$cleanPhone?text=$msg');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

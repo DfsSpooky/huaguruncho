@@ -36,7 +36,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             Text(
-              'PERFIL OFICIAL · HUAGURUNCHO 360',
+              'PERFIL OFICIAL · HUAGURUNCHO 360°',
               style: TextStyle(
                 color: AppColors.graniteMuted,
                 fontSize: 9,
